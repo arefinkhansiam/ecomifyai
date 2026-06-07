@@ -14,13 +14,243 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ar_products: {
+        Row: {
+          ar_viewer_url: string | null
+          created_at: string | null
+          dominant_color: string | null
+          embed_count: number
+          error_message: string | null
+          file_size_bytes: number | null
+          glb_url: string | null
+          id: string
+          image_height: number | null
+          image_width: number | null
+          is_public: boolean | null
+          original_image_url: string | null
+          processed_image_url: string | null
+          processing_progress: number | null
+          processing_step: string | null
+          product_name: string
+          qr_code_url: string | null
+          status: string
+          updated_at: string | null
+          usdz_url: string | null
+          user_id: string
+          views_count: number
+        }
+        Insert: {
+          ar_viewer_url?: string | null
+          created_at?: string | null
+          dominant_color?: string | null
+          embed_count?: number
+          error_message?: string | null
+          file_size_bytes?: number | null
+          glb_url?: string | null
+          id?: string
+          image_height?: number | null
+          image_width?: number | null
+          is_public?: boolean | null
+          original_image_url?: string | null
+          processed_image_url?: string | null
+          processing_progress?: number | null
+          processing_step?: string | null
+          product_name: string
+          qr_code_url?: string | null
+          status?: string
+          updated_at?: string | null
+          usdz_url?: string | null
+          user_id: string
+          views_count?: number
+        }
+        Update: {
+          ar_viewer_url?: string | null
+          created_at?: string | null
+          dominant_color?: string | null
+          embed_count?: number
+          error_message?: string | null
+          file_size_bytes?: number | null
+          glb_url?: string | null
+          id?: string
+          image_height?: number | null
+          image_width?: number | null
+          is_public?: boolean | null
+          original_image_url?: string | null
+          processed_image_url?: string | null
+          processing_progress?: number | null
+          processing_step?: string | null
+          product_name?: string
+          qr_code_url?: string | null
+          status?: string
+          updated_at?: string | null
+          usdz_url?: string | null
+          user_id?: string
+          views_count?: number
+        }
+        Relationships: []
+      }
+      ar_views: {
+        Row: {
+          ar_capability: string | null
+          browser: string | null
+          country_code: string | null
+          device_type: string | null
+          id: string
+          product_id: string
+          viewed_at: string | null
+          viewer_ip_hash: string | null
+        }
+        Insert: {
+          ar_capability?: string | null
+          browser?: string | null
+          country_code?: string | null
+          device_type?: string | null
+          id?: string
+          product_id: string
+          viewed_at?: string | null
+          viewer_ip_hash?: string | null
+        }
+        Update: {
+          ar_capability?: string | null
+          browser?: string | null
+          country_code?: string | null
+          device_type?: string | null
+          id?: string
+          product_id?: string
+          viewed_at?: string | null
+          viewer_ip_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ar_views_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "ar_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_history: {
+        Row: {
+          amount_usd: number
+          billing_period_end: string | null
+          billing_period_start: string | null
+          created_at: string | null
+          currency: string | null
+          id: string
+          invoice_url: string | null
+          plan: string
+          status: string
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_usd: number
+          billing_period_end?: string | null
+          billing_period_start?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          invoice_url?: string | null
+          plan: string
+          status: string
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_usd?: number
+          billing_period_end?: string | null
+          billing_period_start?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          invoice_url?: string | null
+          plan?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_plans: {
+        Row: {
+          ar_product_limit: number
+          billing_end_date: string | null
+          billing_start_date: string | null
+          billing_status: string | null
+          created_at: string | null
+          id: string
+          plan: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ar_product_limit?: number
+          billing_end_date?: string | null
+          billing_start_date?: string | null
+          billing_status?: string | null
+          created_at?: string | null
+          id?: string
+          plan?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ar_product_limit?: number
+          billing_end_date?: string | null
+          billing_start_date?: string | null
+          billing_status?: string | null
+          created_at?: string | null
+          id?: string
+          plan?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_dashboard_stats: { Args: { uid: string }; Returns: Json }
+      increment_ar_views: {
+        Args: { p_capability: string; p_device: string; p_product_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
