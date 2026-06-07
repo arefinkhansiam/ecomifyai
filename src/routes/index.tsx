@@ -24,11 +24,9 @@ function Landing() {
     <MarketingShell>
       {/* HERO */}
       <section className="relative min-h-[calc(100vh-72px)] flex items-center overflow-hidden">
-        <div className="absolute inset-0 gradient-radial pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(180deg, #02060c 0%, #0a1929 18%, #0f3050 38%, #15649e 58%, #38bdf8 75%, #e0f2fe 92%, #f6fafe 100%)' }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 900px 600px at 50% 0%, rgba(56,189,248,0.22), transparent 70%)' }} />
         <div className="mx-auto max-w-5xl px-6 py-20 text-center relative">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <span className="pill"><Sparkles size={14} /> AI-Powered AR for E-Commerce</span>
-          </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
@@ -38,7 +36,7 @@ function Landing() {
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.45 }}
-            className="mt-6 max-w-2xl mx-auto text-[18px]"
+            className="mt-6 max-w-2xl mx-auto text-[18px] text-white/80"
           >
             Easibie transforms any product photo into a stunning AR experience in seconds. No 3D modeling. No developer needed. Just upload, generate, and sell more.
           </motion.p>
@@ -51,7 +49,7 @@ function Landing() {
           </motion.div>
           <div className="mt-10 flex items-center justify-center gap-4">
             <div className="flex -space-x-2">
-              {["#7C3AED","#06B6D4","#10B981","#F59E0B","#EF4444"].map((c, i) => (
+              {["#0284C7","#06B6D4","#10B981","#F59E0B","#EF4444"].map((c, i) => (
                 <div key={i} className="w-9 h-9 rounded-full border-2 border-[var(--bg)]" style={{ background: c }} />
               ))}
             </div>
@@ -60,7 +58,7 @@ function Landing() {
           </div>
           {/* Hero mockup */}
           <div className="mt-16 flex justify-center">
-            <div className="float w-[260px] h-[520px] rounded-[44px] bg-card p-3 relative" style={{ boxShadow: "0 40px 120px rgba(124,58,237,0.25)" }}>
+            <div className="float w-[260px] h-[520px] rounded-[44px] bg-card p-3 relative" style={{ boxShadow: "0 40px 120px rgba(2,132,199,0.35)" }}>
               <div className="w-full h-full rounded-[34px] bg-bg overflow-hidden relative grid place-items-center">
                 <div className="absolute top-4 left-4 right-4 flex justify-between text-xs text-muted">
                   <span>9:41</span><span>•••</span>
@@ -71,7 +69,7 @@ function Landing() {
                 <div className="absolute bottom-6 left-4 right-4">
                   <div className="bg-card rounded-xl p-3">
                     <div className="text-xs text-muted">AR Preview</div>
-                    <div className="text-sm font-semibold text-white">Modern Lounge Chair</div>
+                    <div className="text-sm font-semibold text-ink">Modern Lounge Chair</div>
                   </div>
                 </div>
               </div>
@@ -154,7 +152,7 @@ function Landing() {
       </section>
 
       {/* SOCIAL PROOF */}
-      <section className="py-20" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.08), rgba(6,182,212,0.05))" }}>
+      <section className="py-20" style={{ background: "linear-gradient(135deg, rgba(2,132,199,0.10), rgba(6,182,212,0.05))" }}>
         <div className="mx-auto max-w-6xl px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
           <StatCounter target={10247} suffix="+" label="Stores Using Easibie" />
           <StatCounter target={2400000} suffix="+" label="AR Experiences Delivered" />
@@ -166,7 +164,7 @@ function Landing() {
       </section>
 
       {/* CTA */}
-      <section className="py-24 relative" style={{ background: "radial-gradient(ellipse 1000px 400px at center, rgba(124,58,237,0.2), transparent)" }}>
+      <section className="py-24 relative" style={{ background: "radial-gradient(ellipse 1000px 400px at center, rgba(2,132,199,0.22), transparent)" }}>
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h2 className="text-white">Start Selling in AR Today</h2>
           <p className="mt-4">Join 10,000+ stores already using Easibie. Your first AR product is free forever.</p>
