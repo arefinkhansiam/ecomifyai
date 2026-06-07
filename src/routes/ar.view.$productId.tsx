@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import "@/types/model-viewer";
+
 import { Box, Smartphone, ExternalLink, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { detectARCapability, detectDeviceType } from "@/lib/ar-detect";
