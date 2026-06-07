@@ -33,26 +33,34 @@ export function Navbar() {
 
   return (
     <>
-      <header
-        className="fixed top-0 left-0 right-0 z-50 transition-all"
-        style={{
-          background: scrolled ? "rgba(10,10,15,0.92)" : "rgba(10,10,15,0.6)",
-          backdropFilter: "blur(20px)",
-          boxShadow: "0 1px 0 rgba(124,58,237,0.2)",
-        }}
-      >
-        <div className="mx-auto max-w-7xl flex items-center justify-between px-6 h-16 md:h-[72px]">
-          <Link to="/" className="font-display text-[22px] font-extrabold tracking-tight">
+      <header className="fixed top-3 md:top-5 left-0 right-0 z-50 px-3 md:px-6 pointer-events-none">
+        <div
+          className="pointer-events-auto mx-auto max-w-6xl flex items-center justify-between px-4 md:px-6 h-14 md:h-16 rounded-full transition-all"
+          style={{
+            background: scrolled ? "rgba(255,255,255,0.65)" : "rgba(255,255,255,0.28)",
+            backdropFilter: "blur(22px) saturate(160%)",
+            WebkitBackdropFilter: "blur(22px) saturate(160%)",
+            border: "1px solid rgba(255,255,255,0.5)",
+            boxShadow: scrolled
+              ? "0 20px 50px -20px rgba(2,132,199,0.35), inset 0 1px 0 rgba(255,255,255,0.6)"
+              : "0 12px 40px -18px rgba(2,132,199,0.25), inset 0 1px 0 rgba(255,255,255,0.55)",
+          }}
+        >
+          <Link to="/" className="font-display text-[20px] font-extrabold tracking-tight">
             <span className="text-cyan">E</span>
-            <span className="text-white">ASIBIE</span>
+            <span className={scrolled ? "text-ink" : "text-white drop-shadow"}>ASIBIE</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-7">
             {links.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
-                className="text-sm font-medium transition-colors"
-                style={{ color: pathname === l.to ? "#fff" : "var(--muted)" }}
+                className="text-sm font-medium transition-colors hover:text-primary"
+                style={{
+                  color: pathname === l.to
+                    ? "var(--primary)"
+                    : scrolled ? "var(--ink-soft)" : "rgba(255,255,255,0.92)",
+                }}
               >
                 {l.label}
               </Link>
@@ -70,14 +78,14 @@ export function Navbar() {
                   </div>
                 </button>
                 {open && (
-                  <div className="absolute right-0 top-12 w-48 rounded-xl bg-card p-2 shadow-2xl">
-                    <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-white text-sm">
+                  <div className="absolute right-0 top-12 w-48 rounded-xl bg-card p-2 shadow-2xl border border-[var(--border)]">
+                    <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-ink text-sm">
                       <LayoutDashboard size={16} /> Dashboard
                     </Link>
-                    <Link to="/dashboard/settings" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-white text-sm">
+                    <Link to="/dashboard/settings" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-ink text-sm">
                       <Settings size={16} /> Settings
                     </Link>
-                    <button onClick={signOut} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-white text-sm">
+                    <button onClick={signOut} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-ink text-sm">
                       <LogOut size={16} /> Sign Out
                     </button>
                   </div>
@@ -85,17 +93,26 @@ export function Navbar() {
               </div>
             ) : (
               <>
-                <Link to="/auth" search={{ mode: "signin" }} className="px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-medium hover:border-[var(--primary)] transition-colors">
+                <Link
+                  to="/auth"
+                  search={{ mode: "signin" }}
+                  className="text-sm font-medium hover:text-primary transition-colors"
+                  style={{ color: scrolled ? "var(--ink-soft)" : "rgba(255,255,255,0.92)" }}
+                >
                   Sign In
                 </Link>
-                <Link to="/auth" search={{ mode: "signup" }} className="px-5 py-2.5 rounded-lg bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[var(--primary-light)] transition-colors">
+                <Link to="/auth" search={{ mode: "signup" }} className="px-5 py-2 rounded-full bg-[var(--primary)] text-white text-sm font-semibold hover:brightness-110 transition shadow-lg shadow-sky-500/30">
                   Get Started
                 </Link>
               </>
             )}
           </div>
-          <button className="md:hidden text-white" onClick={() => setMenuOpen(true)}>
-            <Menu size={26} />
+          <button
+            className="md:hidden"
+            onClick={() => setMenuOpen(true)}
+            style={{ color: scrolled ? "var(--ink)" : "#ffffff" }}
+          >
+            <Menu size={24} />
           </button>
         </div>
       </header>
