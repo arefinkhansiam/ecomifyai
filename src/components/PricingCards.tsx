@@ -36,25 +36,25 @@ export function PricingCards() {
       {PLANS.map((p) => (
         <div
           key={p.id}
-          className="bg-card rounded-2xl p-8 flex flex-col"
+          className="bg-card rounded-2xl p-8 flex flex-col relative glow-card"
           style={p.highlight ? {
-            background: "linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.1))",
-            border: "1px solid rgba(124,58,237,0.4)",
-            boxShadow: "0 40px 100px rgba(124,58,237,0.3)",
+            background: "linear-gradient(135deg, rgba(2,132,199,0.08), rgba(6,182,212,0.04))",
+            border: "1px solid rgba(2,132,199,0.35)",
+            boxShadow: "0 40px 100px -30px rgba(2,132,199,0.45)",
             transform: "scale(1.03)",
           } : undefined}
         >
           {p.highlight && (
-            <div className="absolute -mt-12 self-center bg-[var(--primary)] text-white text-xs uppercase tracking-wide px-4 py-1 rounded-full font-semibold">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--primary)] text-white text-xs uppercase tracking-wide px-4 py-1 rounded-full font-semibold">
               Most Popular
             </div>
           )}
           <div className="text-sm text-muted mb-2">{p.name}</div>
-          <div className="font-display text-5xl font-extrabold text-white">{p.price}<span className="text-base text-muted font-normal"> / month</span></div>
+          <div className="font-display text-5xl font-extrabold text-ink">{p.price}<span className="text-base text-muted font-normal"> / month</span></div>
           <p className="text-sm mt-2">{p.subtitle}</p>
           <ul className="mt-6 space-y-3 flex-1">
             {p.features.map((f) => (
-              <li key={f} className="flex items-start gap-2 text-white text-sm">
+              <li key={f} className="flex items-start gap-2 text-ink text-sm">
                 <CheckCircle2 size={18} className="text-[var(--success)] shrink-0 mt-0.5" /> {f}
               </li>
             ))}

@@ -79,7 +79,7 @@ function Landing() {
       </section>
 
       {/* STATS */}
-      <section className="bg-surface py-16">
+      <section className="bg-surface/60 backdrop-blur-sm py-16">
         <div className="mx-auto max-w-6xl px-6 grid grid-cols-2 md:grid-cols-4 gap-10">
           <StatCounter target={10000} suffix="+" label="Active Stores" />
           <StatCounter target={2400000} suffix="+" label="AR Views Generated" />
@@ -92,7 +92,7 @@ function Landing() {
       <section className="py-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-white">Everything You Need to Sell in AR</h2>
+            <h2 className="text-gradient-ocean">Everything You Need to Sell in AR</h2>
             <p className="mt-4">No technical skills required. Easibie handles everything from photo to AR in seconds.</p>
           </div>
           <div className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -107,10 +107,10 @@ function Landing() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how" className="bg-surface py-24">
+      <section id="how" className="py-24" style={{ background: "linear-gradient(180deg, transparent, rgba(2,132,199,0.06), transparent)" }}>
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-white">How Easibie Works</h2>
+            <h2 className="text-gradient-ocean">How Easibie Works</h2>
             <p className="mt-4">From photo to AR in 3 simple steps.</p>
           </div>
           <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -119,10 +119,10 @@ function Landing() {
               { n: "02", color: "var(--primary)", icon: Sparkles, title: "AI Generates Your AR", desc: "Our system processes the image and creates your AR experience automatically." },
               { n: "03", color: "var(--cyan)", icon: Share2, title: "Share and Sell More", desc: "Copy your AR link or embed code. Customers view it in their space before buying." },
             ].map((s, i) => (
-              <motion.div key={s.n} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }} className="bg-card rounded-2xl p-8 relative">
+              <motion.div key={s.n} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }} className="bg-card rounded-2xl p-8 relative glow-card">
                 <div className="inline-block px-3 py-1 rounded-full text-xs font-bold" style={{ background: `${s.color}20`, color: s.color }}>{s.n}</div>
-                <s.icon size={28} className="mt-4 text-white" />
-                <h3 className="mt-4 text-white">{s.title}</h3>
+                <s.icon size={28} className="mt-4 text-primary" />
+                <h3 className="mt-4 text-ink">{s.title}</h3>
                 <p className="mt-2 text-sm">{s.desc}</p>
               </motion.div>
             ))}
@@ -134,7 +134,7 @@ function Landing() {
       <section id="pricing" className="py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-white">Simple, Transparent Pricing</h2>
+            <h2 className="text-gradient-ocean">Simple, Transparent Pricing</h2>
             <p className="mt-4">Start free. Upgrade when you are ready to scale.</p>
           </div>
           <PricingCards />
@@ -145,7 +145,7 @@ function Landing() {
       {/* REVIEWS */}
       <section className="py-24">
         <div className="mx-auto max-w-7xl px-6 mb-12 text-center">
-          <h2 className="text-white">Loved by Store Owners Worldwide</h2>
+          <h2 className="text-gradient-ocean">Loved by Store Owners Worldwide</h2>
           <p className="mt-4">Real results from real Easibie users.</p>
         </div>
         <ReviewCarousel />
@@ -157,17 +157,18 @@ function Landing() {
           <StatCounter target={10247} suffix="+" label="Stores Using Easibie" />
           <StatCounter target={2400000} suffix="+" label="AR Experiences Delivered" />
           <div className="text-center">
-            <div className="font-display font-extrabold text-white text-4xl md:text-5xl">4.9 / 5</div>
+            <div className="font-display font-extrabold text-gradient-ocean text-4xl md:text-5xl">4.9 / 5</div>
             <div className="mt-2 text-sm text-muted">Average Customer Rating</div>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-24 relative" style={{ background: "radial-gradient(ellipse 1000px 400px at center, rgba(2,132,199,0.22), transparent)" }}>
-        <div className="mx-auto max-w-3xl px-6 text-center">
+      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #02060c 0%, #0a1929 30%, #0369A1 70%, #38BDF8 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 1000px 400px at center, rgba(255,255,255,0.10), transparent)" }} />
+        <div className="mx-auto max-w-3xl px-6 text-center relative">
           <h2 className="text-white">Start Selling in AR Today</h2>
-          <p className="mt-4">Join 10,000+ stores already using Easibie. Your first AR product is free forever.</p>
+          <p className="mt-4 text-white/80">Join 10,000+ stores already using Easibie. Your first AR product is free forever.</p>
           <div className="mt-8 flex justify-center gap-4 flex-wrap">
             <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Create Free Account</Link>
             <Link to="/pricing" className="btn-ghost">See Pricing</Link>
