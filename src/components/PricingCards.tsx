@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { CheckCircle2 } from "lucide-react";
 
 export type Plan = {
