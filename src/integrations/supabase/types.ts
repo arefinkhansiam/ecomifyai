@@ -17,6 +17,11 @@ export type Database = {
       ar_products: {
         Row: {
           ar_viewer_url: string | null
+          button_bg_color: string
+          button_border_radius: number
+          button_label: string
+          button_size: string
+          button_text_color: string
           created_at: string | null
           dominant_color: string | null
           embed_count: number
@@ -32,6 +37,7 @@ export type Database = {
           processing_progress: number | null
           processing_step: string | null
           product_name: string
+          product_price: number | null
           qr_code_url: string | null
           status: string
           updated_at: string | null
@@ -41,6 +47,11 @@ export type Database = {
         }
         Insert: {
           ar_viewer_url?: string | null
+          button_bg_color?: string
+          button_border_radius?: number
+          button_label?: string
+          button_size?: string
+          button_text_color?: string
           created_at?: string | null
           dominant_color?: string | null
           embed_count?: number
@@ -56,6 +67,7 @@ export type Database = {
           processing_progress?: number | null
           processing_step?: string | null
           product_name: string
+          product_price?: number | null
           qr_code_url?: string | null
           status?: string
           updated_at?: string | null
@@ -65,6 +77,11 @@ export type Database = {
         }
         Update: {
           ar_viewer_url?: string | null
+          button_bg_color?: string
+          button_border_radius?: number
+          button_label?: string
+          button_size?: string
+          button_text_color?: string
           created_at?: string | null
           dominant_color?: string | null
           embed_count?: number
@@ -80,6 +97,7 @@ export type Database = {
           processing_progress?: number | null
           processing_step?: string | null
           product_name?: string
+          product_price?: number | null
           qr_code_url?: string | null
           status?: string
           updated_at?: string | null
