@@ -60,13 +60,12 @@ export function PricingCards() {
               </li>
             ))}
           </ul>
-          <Link
-            to={p.href.split("?")[0] as any}
-            search={p.href.includes("?") ? Object.fromEntries(new URLSearchParams(p.href.split("?")[1])) : undefined}
+          <a
+            href={p.href}
             className={`mt-8 w-full ${p.variant === "primary" ? "btn-primary" : p.variant === "cyan" ? "btn-cyan" : "btn-ghost"}`}
           >
             {p.cta}
-          </Link>
+          </a>
         </div>
       ))}
     </div>
