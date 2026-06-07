@@ -24,11 +24,9 @@ function Landing() {
     <MarketingShell>
       {/* HERO */}
       <section className="relative min-h-[calc(100vh-72px)] flex items-center overflow-hidden">
-        <div className="absolute inset-0 gradient-radial pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(180deg, #02060c 0%, #0a1929 18%, #0f3050 38%, #15649e 58%, #38bdf8 75%, #e0f2fe 92%, #f6fafe 100%)' }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 900px 600px at 50% 0%, rgba(56,189,248,0.22), transparent 70%)' }} />
         <div className="mx-auto max-w-5xl px-6 py-20 text-center relative">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <span className="pill"><Sparkles size={14} /> AI-Powered AR for E-Commerce</span>
-          </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
@@ -38,7 +36,7 @@ function Landing() {
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.45 }}
-            className="mt-6 max-w-2xl mx-auto text-[18px]"
+            className="mt-6 max-w-2xl mx-auto text-[18px] text-white/80"
           >
             Easibie transforms any product photo into a stunning AR experience in seconds. No 3D modeling. No developer needed. Just upload, generate, and sell more.
           </motion.p>
