@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TryArRouteImport } from './routes/try-ar'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -25,6 +26,11 @@ import { Route as AuthenticatedDashboardEmbedRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 
+const TryArRoute = TryArRouteImport.update({
+  id: '/try-ar',
+  path: '/try-ar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
+  '/try-ar': typeof TryArRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
+  '/try-ar': typeof TryArRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
+  '/try-ar': typeof TryArRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/how-it-works'
     | '/pricing'
+    | '/try-ar'
     | '/dashboard/analytics'
     | '/dashboard/billing'
     | '/dashboard/embed'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/how-it-works'
     | '/pricing'
+    | '/try-ar'
     | '/dashboard/analytics'
     | '/dashboard/billing'
     | '/dashboard/embed'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/how-it-works'
     | '/pricing'
+    | '/try-ar'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/embed'
@@ -217,11 +229,19 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   HowItWorksRoute: typeof HowItWorksRoute
   PricingRoute: typeof PricingRoute
+  TryArRoute: typeof TryArRoute
   ArViewProductIdRoute: typeof ArViewProductIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/try-ar': {
+      id: '/try-ar'
+      path: '/try-ar'
+      fullPath: '/try-ar'
+      preLoaderRoute: typeof TryArRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing': {
       id: '/pricing'
       path: '/pricing'
@@ -361,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   HowItWorksRoute: HowItWorksRoute,
   PricingRoute: PricingRoute,
+  TryArRoute: TryArRoute,
   ArViewProductIdRoute: ArViewProductIdRoute,
 }
 export const routeTree = rootRouteImport
