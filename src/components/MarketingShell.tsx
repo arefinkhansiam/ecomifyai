@@ -4,9 +4,9 @@ import { Footer } from "./Footer";
 
 export function MarketingShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-bg text-white">
+    <div className="min-h-screen text-ink">
       <Navbar />
-      <main className="pt-16 md:pt-[72px]">{children}</main>
+      <main>{children}</main>
       <Footer />
     </div>
   );
