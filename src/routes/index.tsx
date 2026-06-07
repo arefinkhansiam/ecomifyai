@@ -49,7 +49,7 @@ function Landing() {
           </motion.div>
           <div className="mt-10 flex items-center justify-center gap-4">
             <div className="flex -space-x-2">
-              {["#7C3AED","#06B6D4","#10B981","#F59E0B","#EF4444"].map((c, i) => (
+              {["#0284C7","#06B6D4","#10B981","#F59E0B","#EF4444"].map((c, i) => (
                 <div key={i} className="w-9 h-9 rounded-full border-2 border-[var(--bg)]" style={{ background: c }} />
               ))}
             </div>
@@ -58,7 +58,7 @@ function Landing() {
           </div>
           {/* Hero mockup */}
           <div className="mt-16 flex justify-center">
-            <div className="float w-[260px] h-[520px] rounded-[44px] bg-card p-3 relative" style={{ boxShadow: "0 40px 120px rgba(124,58,237,0.25)" }}>
+            <div className="float w-[260px] h-[520px] rounded-[44px] bg-card p-3 relative" style={{ boxShadow: "0 40px 120px rgba(2,132,199,0.35)" }}>
               <div className="w-full h-full rounded-[34px] bg-bg overflow-hidden relative grid place-items-center">
                 <div className="absolute top-4 left-4 right-4 flex justify-between text-xs text-muted">
                   <span>9:41</span><span>•••</span>
@@ -69,7 +69,7 @@ function Landing() {
                 <div className="absolute bottom-6 left-4 right-4">
                   <div className="bg-card rounded-xl p-3">
                     <div className="text-xs text-muted">AR Preview</div>
-                    <div className="text-sm font-semibold text-white">Modern Lounge Chair</div>
+                    <div className="text-sm font-semibold text-ink">Modern Lounge Chair</div>
                   </div>
                 </div>
               </div>
@@ -152,7 +152,7 @@ function Landing() {
       </section>
 
       {/* SOCIAL PROOF */}
-      <section className="py-20" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.08), rgba(6,182,212,0.05))" }}>
+      <section className="py-20" style={{ background: "linear-gradient(135deg, rgba(2,132,199,0.10), rgba(6,182,212,0.05))" }}>
         <div className="mx-auto max-w-6xl px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
           <StatCounter target={10247} suffix="+" label="Stores Using Easibie" />
           <StatCounter target={2400000} suffix="+" label="AR Experiences Delivered" />
@@ -164,7 +164,7 @@ function Landing() {
       </section>
 
       {/* CTA */}
-      <section className="py-24 relative" style={{ background: "radial-gradient(ellipse 1000px 400px at center, rgba(124,58,237,0.2), transparent)" }}>
+      <section className="py-24 relative" style={{ background: "radial-gradient(ellipse 1000px 400px at center, rgba(2,132,199,0.22), transparent)" }}>
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h2 className="text-white">Start Selling in AR Today</h2>
           <p className="mt-4">Join 10,000+ stores already using Easibie. Your first AR product is free forever.</p>
