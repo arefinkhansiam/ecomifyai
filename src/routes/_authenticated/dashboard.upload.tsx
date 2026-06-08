@@ -98,10 +98,10 @@ function UploadPage() {
         button_size: size,
         is_public: true,
         product_colors: colors,
-        use_gradient: useGradient,
+        use_gradient: isPaid ? useGradient : false,
         gradient_from: bg,
         gradient_to: bg2,
-        show_branding: showBranding,
+        show_branding: isPaid ? showBranding : true,
       } as any).select().single();
       if (insErr) throw insErr;
 
