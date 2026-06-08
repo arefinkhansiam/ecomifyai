@@ -4,12 +4,13 @@ import { toast } from "sonner";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { Box, ExternalLink, Trash2, QrCode, Upload } from "lucide-react";
+import { Box, ExternalLink, Trash2, QrCode, Upload, Copy, Check } from "lucide-react";
 
 type Product = {
   id: string; product_name: string; status: string; dominant_color: string;
   views_count: number; processing_progress: number; processed_image_url: string | null;
   original_image_url: string | null; created_at: string;
+  embed_token: string | null; view_count?: number;
 };
 
 export const Route = createFileRoute("/_authenticated/dashboard/products")({
@@ -75,13 +76,26 @@ function ProductsPage() {
 
 function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
   const [thumb, setThumb] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   useEffect(() => {
-    if (!p.original_image_url) return;
-    supabase.storage.from("product-images").createSignedUrl(p.original_image_url, 3600).then(({ data }) => {
+    const path = p.processed_image_url ?? p.original_image_url;
+    if (!path) return;
+    supabase.storage.from("product-images").createSignedUrl(path, 3600).then(({ data }) => {
       if (data?.signedUrl) setThumb(data.signedUrl);
     });
-  }, [p.original_image_url]);
-  const viewerUrl = typeof window !== "undefined" ? `${window.location.origin}/ar/view/${p.id}` : "";
+  }, [p.processed_image_url, p.original_image_url]);
+
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const viewerUrl = p.embed_token ? `${origin}/ar/${p.embed_token}` : `${origin}/ar/view/${p.id}`;
+  const embedCode = `<iframe src="${viewerUrl}" width="100%" height="550" frameborder="0" allow="xr-spatial-tracking; camera" allowfullscreen></iframe>`;
+
+  const copyEmbed = async () => {
+    await navigator.clipboard.writeText(embedCode);
+    setCopied(true);
+    toast.success("Embed code copied");
+    setTimeout(() => setCopied(false), 1500);
+  };
+
   return (
     <div className="bg-card rounded-2xl overflow-hidden">
       <div className="aspect-square relative grid place-items-center" style={{ background: `radial-gradient(ellipse at center, ${p.dominant_color}33, transparent 70%)` }}>
@@ -90,17 +104,22 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
           style={{
             background: p.status === "ready" ? "rgba(16,185,129,0.15)" : p.status === "failed" ? "rgba(239,68,68,0.15)" : "rgba(245,158,11,0.15)",
             color: p.status === "ready" ? "var(--success)" : p.status === "failed" ? "var(--error)" : "var(--warning)",
-          }}>{p.status}</span>
+          }}>{p.status === "ready" ? "AR Ready" : p.status}</span>
       </div>
       {p.status === "processing" && (
         <div className="h-1 bg-[var(--surface)]"><div className="h-full bg-[var(--primary)]" style={{ width: `${p.processing_progress}%` }} /></div>
       )}
       <div className="p-4">
         <h4 className="text-white truncate">{p.product_name}</h4>
-        <div className="text-xs text-muted mt-1">{p.views_count.toLocaleString()} views</div>
-        <div className="flex gap-2 mt-4">
+        <div className="text-xs text-muted mt-1">{(p.view_count ?? p.views_count ?? 0).toLocaleString()} views</div>
+        <div className="flex gap-2 mt-4 flex-wrap">
           {p.status === "ready" && (
-            <a href={viewerUrl} target="_blank" rel="noreferrer" className="flex-1 btn-ghost text-[10px]"><ExternalLink size={12} /> View</a>
+            <a href={viewerUrl} target="_blank" rel="noreferrer" className="flex-1 btn-ghost text-[10px]"><ExternalLink size={12} /> Preview AR</a>
+          )}
+          {p.status === "ready" && p.embed_token && (
+            <button onClick={copyEmbed} className="btn-ghost text-[10px]">
+              {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? "Copied" : "Embed"}
+            </button>
           )}
           <Link to="/dashboard/embed" className="btn-ghost text-[10px]"><QrCode size={12} /></Link>
           <button onClick={onDelete} className="btn-ghost text-[10px]" style={{ borderColor: "var(--error)", color: "var(--error)" }}><Trash2 size={12} /></button>
