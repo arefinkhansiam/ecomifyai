@@ -165,27 +165,48 @@ function ARCameraView() {
 
       {/* Floating product card */}
       {phase === "placed" && (
-        <div className="absolute left-3 right-3 z-30" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
-          <div className="glass-dark rounded-3xl p-4 flex items-center gap-3 pop-in">
-            {imageUrl && <img src={imageUrl} alt="" className="w-14 h-14 rounded-xl object-cover bg-white/10" />}
+        <div className="absolute left-3 right-3 z-30" style={{ bottom: "calc(env(safe-area-inset-bottom) + 14px)" }}>
+          {/* Color picker */}
+          {productColors.length > 0 && (
+            <div className="glass-dark rounded-full px-3 py-2 inline-flex items-center gap-2 mb-2 pop-in">
+              <span className="text-[10px] uppercase tracking-wider text-white/70">Color</span>
+              {productColors.map((c) => (
+                <button key={c} onClick={() => setSelectedColor(c)}
+                  className="w-6 h-6 rounded-full border-2 transition-transform"
+                  style={{ background: c, borderColor: selectedColor === c ? "#fff" : "rgba(255,255,255,0.3)", transform: selectedColor === c ? "scale(1.1)" : "scale(1)" }} />
+              ))}
+            </div>
+          )}
+
+          <div className="glass-dark rounded-2xl p-3 flex items-center gap-3 pop-in">
+            {imageUrl && <img src={imageUrl} alt="" className="w-12 h-12 rounded-xl object-cover bg-white/10 shrink-0" />}
             <div className="flex-1 min-w-0">
-              <div className="text-[11px] uppercase tracking-wider text-white/60">Now placed</div>
-              <div className="text-white font-semibold truncate" style={{ fontFamily: "var(--font-display)" }}>{product.product_name}</div>
-              {product.product_price != null && (
-                <div className="text-sky-300 text-sm font-medium mt-0.5">${Number(product.product_price).toFixed(2)}</div>
-              )}
+              <div className="text-[10px] uppercase tracking-wider text-white/60">Now placed</div>
+              <div className="text-white font-semibold truncate text-sm" style={{ fontFamily: "var(--font-display)" }}>{product.product_name}</div>
             </div>
             <button
-              className="rounded-full px-4 py-2.5 text-sm font-semibold inline-flex items-center gap-2"
-              style={{ background: product.button_bg_color, color: product.button_text_color }}
+              className="rounded-full px-3 py-2 text-xs font-semibold inline-flex items-center gap-1.5 shrink-0"
+              style={{
+                background: product.use_gradient && product.gradient_from && product.gradient_to
+                  ? `linear-gradient(135deg, ${product.gradient_from} 0%, ${product.gradient_to} 100%)`
+                  : product.button_bg_color,
+                color: product.button_text_color,
+              }}
             >
-              <ShoppingCart size={15} /> Add
+              <ShoppingCart size={13} /> Add
             </button>
           </div>
-          <div className="flex items-center justify-center gap-3 mt-3">
-            <button onClick={() => setScale((s) => Math.max(0.4, s - 0.1))} className="glass-dark w-9 h-9 rounded-full grid place-items-center text-base">−</button>
-            <span className="text-[11px] text-white/70 glass-dark px-3 py-1 rounded-full">{Math.round(scale * 100)}%</span>
-            <button onClick={() => setScale((s) => Math.min(2.2, s + 0.1))} className="glass-dark w-9 h-9 rounded-full grid place-items-center text-base">+</button>
+
+          <div className="flex items-center justify-center gap-2 mt-2">
+            <button onClick={() => setScale((s) => Math.max(0.4, s - 0.1))} className="glass-dark w-8 h-8 rounded-full grid place-items-center text-sm">−</button>
+            <span className="text-[10px] text-white/80 glass-dark px-2.5 py-1 rounded-full font-mono">{Math.round(scale * 100)}%</span>
+            <button onClick={() => setScale((s) => Math.min(2.2, s + 0.1))} className="glass-dark w-8 h-8 rounded-full grid place-items-center text-sm">+</button>
+            {product.show_branding !== false && (
+              <a href="https://easibie.com" target="_blank" rel="noreferrer"
+                className="ml-2 glass-dark px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider text-white/70 hover:text-white">
+                Powered by <span className="font-bold text-sky-300">Easibie</span>
+              </a>
+            )}
           </div>
         </div>
       )}
