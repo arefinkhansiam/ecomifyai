@@ -371,7 +371,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" }) {
    Full 3D: model-viewer with WebXR / Quick Look / Scene Viewer
    ============================================================ */
 function Full3DView() {
-  const { product, glbUrl } = Route.useLoaderData();
+  const { product, glbUrl, usdzUrl } = Route.useLoaderData();
   const cust = useCustomization(product);
   const tracker = useSessionTracker(product, "back", "model-viewer");
   const [loaded, setLoaded] = useState(false);
