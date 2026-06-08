@@ -25,6 +25,7 @@ import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardProductsRouteImport } from './routes/_authenticated/dashboard.products'
 import { Route as AuthenticatedDashboardEmbedRouteImport } from './routes/_authenticated/dashboard.embed'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
+import { Route as AuthenticatedDashboardBehaviourRouteImport } from './routes/_authenticated/dashboard.behaviour'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 
 const TryArRoute = TryArRouteImport.update({
@@ -112,6 +113,12 @@ const AuthenticatedDashboardBillingRoute =
     path: '/dashboard/billing',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardBehaviourRoute =
+  AuthenticatedDashboardBehaviourRouteImport.update({
+    id: '/dashboard/behaviour',
+    path: '/dashboard/behaviour',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardAnalyticsRoute =
   AuthenticatedDashboardAnalyticsRouteImport.update({
     id: '/dashboard/analytics',
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/try-ar': typeof TryArRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
+  '/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
@@ -146,6 +154,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/try-ar': typeof TryArRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
+  '/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
@@ -166,6 +175,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/try-ar': typeof TryArRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
+  '/_authenticated/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/_authenticated/dashboard/products': typeof AuthenticatedDashboardProductsRoute
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/try-ar'
     | '/dashboard/analytics'
+    | '/dashboard/behaviour'
     | '/dashboard/billing'
     | '/dashboard/embed'
     | '/dashboard/products'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/try-ar'
     | '/dashboard/analytics'
+    | '/dashboard/behaviour'
     | '/dashboard/billing'
     | '/dashboard/embed'
     | '/dashboard/products'
@@ -223,6 +235,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/try-ar'
     | '/_authenticated/dashboard/analytics'
+    | '/_authenticated/dashboard/behaviour'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/embed'
     | '/_authenticated/dashboard/products'
@@ -360,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardBillingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/behaviour': {
+      id: '/_authenticated/dashboard/behaviour'
+      path: '/dashboard/behaviour'
+      fullPath: '/dashboard/behaviour'
+      preLoaderRoute: typeof AuthenticatedDashboardBehaviourRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/analytics': {
       id: '/_authenticated/dashboard/analytics'
       path: '/dashboard/analytics'
@@ -372,6 +392,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
+  AuthenticatedDashboardBehaviourRoute: typeof AuthenticatedDashboardBehaviourRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardEmbedRoute: typeof AuthenticatedDashboardEmbedRoute
   AuthenticatedDashboardProductsRoute: typeof AuthenticatedDashboardProductsRoute
@@ -382,6 +403,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
+  AuthenticatedDashboardBehaviourRoute: AuthenticatedDashboardBehaviourRoute,
   AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
   AuthenticatedDashboardEmbedRoute: AuthenticatedDashboardEmbedRoute,
   AuthenticatedDashboardProductsRoute: AuthenticatedDashboardProductsRoute,
