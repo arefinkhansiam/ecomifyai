@@ -52,6 +52,8 @@ function ARCameraView() {
   const streamRef = useRef<MediaStream | null>(null);
   const [phase, setPhase] = useState<"requesting" | "scanning" | "placed" | "denied" | "unsupported">("requesting");
   const [scale, setScale] = useState(1);
+  const productColors: string[] = Array.isArray(product.product_colors) ? product.product_colors : [];
+  const [selectedColor, setSelectedColor] = useState<string | null>(productColors[0] ?? null);
 
   const startCamera = async () => {
     setPhase("requesting");
