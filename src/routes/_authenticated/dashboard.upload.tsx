@@ -4,7 +4,14 @@ import { toast } from "sonner";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown } from "lucide-react";
+import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown, Shirt, Sofa, Box } from "lucide-react";
+
+type ArMode = "fashion" | "furniture" | "full_3d";
+const MODE_INFO: Record<ArMode, { label: string; desc: string; Icon: any; accept: string; hint: string }> = {
+  fashion:   { label: "Fashion try-on", desc: "Shirts, t-shirts, tops",          Icon: Shirt, accept: "image/jpeg,image/png,image/webp", hint: "Upload garment photo (JPG / PNG / WebP)" },
+  furniture: { label: "Furniture / Decor", desc: "Place in customer's room",     Icon: Sofa,  accept: "image/jpeg,image/png,image/webp", hint: "Upload product photo (JPG / PNG / WebP)" },
+  full_3d:   { label: "Full 3D AR",      desc: "Real-time 3D in their space",    Icon: Box,   accept: ".glb,.gltf,model/gltf-binary", hint: "Upload GLB or GLTF 3D model" },
+};
 
 export const Route = createFileRoute("/_authenticated/dashboard/upload")({
   component: UploadPage,
@@ -33,6 +40,7 @@ function UploadPage() {
   const [step, setStep] = useState("");
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [arMode, setArMode] = useState<ArMode>("furniture");
 
   const [colors, setColors] = useState<string[]>([]);
   const [newColor, setNewColor] = useState("#0EA5E9");
@@ -70,10 +78,15 @@ function UploadPage() {
 
   const onFile = (f: File | null) => {
     if (!f) return;
-    if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) { toast.error("Use JPG, PNG or WebP"); return; }
-    if (f.size > 10 * 1024 * 1024) { toast.error("Max 10MB"); return; }
+    const isModel = arMode === "full_3d";
+    const okType = isModel
+      ? /\.(glb|gltf)$/i.test(f.name) || f.type === "model/gltf-binary" || f.type === "model/gltf+json"
+      : ["image/jpeg", "image/png", "image/webp"].includes(f.type);
+    if (!okType) { toast.error(isModel ? "Upload a .glb or .gltf file" : "Use JPG, PNG or WebP"); return; }
+    const maxMb = isModel ? 50 : 10;
+    if (f.size > maxMb * 1024 * 1024) { toast.error(`Max ${maxMb}MB`); return; }
     setFile(f);
-    setPreview(URL.createObjectURL(f));
+    setPreview(isModel ? null : URL.createObjectURL(f));
     if (!name) setName(f.name.replace(/\.[^.]+$/, ""));
   };
 
@@ -86,17 +99,22 @@ function UploadPage() {
     if (!file || !user) return;
     setBusy(true);
     try {
-      setStep("Uploading image...");
+      const isModel = arMode === "full_3d";
+      setStep(isModel ? "Uploading 3D model..." : "Uploading image...");
       const ext = file.name.split(".").pop();
       const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("product-images").upload(path, file);
+      const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, {
+        contentType: file.type || (isModel ? "model/gltf-binary" : undefined),
+      });
       if (upErr) throw upErr;
 
       setStep("Saving product...");
       const { data: created, error: insErr } = await supabase.from("ar_products").insert({
         user_id: user.id,
         product_name: name || "Untitled Product",
-        original_image_url: path,
+        original_image_url: isModel ? null : path,
+        glb_url: isModel ? path : null,
+        ar_mode: arMode,
         status: "ready",
         processing_step: "complete",
         processing_progress: 100,
@@ -121,7 +139,7 @@ function UploadPage() {
           button_radius: arButtonRadius,
           button_shadow: arButtonShadow,
           custom_button_text: customButtonText,
-          default_camera: defaultCamera,
+          default_camera: arMode === "fashion" ? "front" : defaultCamera,
           show_product_name: showProductName,
         } : {},
       } as any).select().single();
@@ -154,8 +172,34 @@ function UploadPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: image upload + colors */}
         <div className="bg-card rounded-2xl p-6 glow-card">
-          <h4 className="text-ink">1. Product image</h4>
-          <label className="block mt-4">
+          <h4 className="text-ink">1. Choose AR mode</h4>
+          <p className="text-sm mt-1" style={{ color: "var(--ink-soft)" }}>How will customers experience this product?</p>
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {(Object.keys(MODE_INFO) as ArMode[]).map((m) => {
+              const info = MODE_INFO[m];
+              const active = arMode === m;
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => { setArMode(m); setFile(null); setPreview(null); }}
+                  className="text-left p-3 rounded-xl border transition-all"
+                  style={{
+                    borderColor: active ? "var(--primary)" : "var(--border)",
+                    background: active ? "linear-gradient(135deg, rgba(2,132,199,0.10), rgba(56,189,248,0.06))" : "#fff",
+                    boxShadow: active ? "0 8px 24px -12px rgba(2,132,199,0.45)" : "none",
+                  }}
+                >
+                  <info.Icon size={20} style={{ color: active ? "var(--primary)" : "var(--ink-soft)" }} />
+                  <div className="mt-2 text-sm font-semibold text-ink">{info.label}</div>
+                  <div className="text-[11px] mt-0.5" style={{ color: "var(--ink-soft)" }}>{info.desc}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          <h4 className="text-ink mt-6">2. {arMode === "full_3d" ? "3D model file" : "Product image"}</h4>
+          <label className="block mt-3">
             <div
               className="border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-colors hover:border-primary bg-soft"
               onDragOver={(e) => e.preventDefault()}
@@ -163,14 +207,20 @@ function UploadPage() {
             >
               {preview ? (
                 <img src={preview} alt="preview" className="max-h-60 mx-auto object-contain" />
+              ) : file && arMode === "full_3d" ? (
+                <div className="flex flex-col items-center gap-2">
+                  <Box size={48} className="text-primary" />
+                  <div className="font-display text-lg text-ink">{file.name}</div>
+                  <p className="text-xs">{(file.size / 1024 / 1024).toFixed(1)} MB · ready to upload</p>
+                </div>
               ) : (
                 <>
                   <UploadCloud size={48} className="mx-auto text-primary" />
-                  <div className="mt-4 font-display text-lg text-ink">Drop a photo here</div>
-                  <p className="text-sm mt-1">JPG, PNG or WebP. Max 10MB.</p>
+                  <div className="mt-4 font-display text-lg text-ink">Drop a {arMode === "full_3d" ? "GLB/GLTF file" : "photo"} here</div>
+                  <p className="text-sm mt-1">{MODE_INFO[arMode].hint}. Max {arMode === "full_3d" ? "50MB" : "10MB"}.</p>
                 </>
               )}
-              <input type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
+              <input type="file" accept={MODE_INFO[arMode].accept} hidden onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
             </div>
           </label>
 

@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, X, RefreshCw, Sparkles, SwitchCamera } from "lucide-react";
+import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/ar/view/$productId")({
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/ar/view/$productId")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("ar_products")
-      .select("id, product_name, original_image_url, processed_image_url, button_label, button_bg_color, button_text_color, status, is_public, dominant_color, product_colors, show_branding, ar_customization")
+      .select("id, product_name, original_image_url, processed_image_url, glb_url, usdz_url, button_label, button_bg_color, button_text_color, status, is_public, dominant_color, product_colors, show_branding, ar_customization, ar_mode")
       .eq("id", params.productId)
       .maybeSingle();
     if (error || !data || data.status !== "ready" || !data.is_public) throw notFound();
@@ -24,11 +24,21 @@ export const Route = createFileRoute("/ar/view/$productId")({
       const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(data.original_image_url, 3600);
       imageUrl = signed?.signedUrl ?? null;
     }
-    return { product: data as any, imageUrl };
+    let glbUrl: string | null = null;
+    if (data.glb_url) {
+      const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(data.glb_url, 3600);
+      glbUrl = signed?.signedUrl ?? null;
+    }
+    let usdzUrl: string | null = null;
+    if (data.usdz_url) {
+      const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(data.usdz_url, 3600);
+      usdzUrl = signed?.signedUrl ?? null;
+    }
+    return { product: data as any, imageUrl, glbUrl, usdzUrl };
   },
   notFoundComponent: () => <NotReady />,
   errorComponent: () => <NotReady />,
-  component: ARCameraView,
+  component: ARRouter,
 });
 
 function NotReady() {
@@ -56,66 +66,36 @@ type Customization = {
   show_product_name?: boolean;
 };
 
-function ARCameraView() {
-  const { product, imageUrl } = Route.useLoaderData();
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+function useCustomization(product: any) {
+  const c: Customization = (product.ar_customization || {}) as Customization;
+  return {
+    pageBg: c.page_bg || "#000000",
+    fontColor: c.font_color || "#FFFFFF",
+    overlay: c.overlay_color || "rgba(255,255,255,0.14)",
+    accent: c.accent_color || product.dominant_color || "#38BDF8",
+    btnRadius: (c.button_radius ?? product.button_border_radius ?? 12) + "px",
+    showName: c.show_product_name !== false,
+    defaultCam: (c.default_camera || "back") as "front" | "back",
+  };
+}
+
+function useSessionTracker(product: any, camera: "front" | "back", arMode: string) {
   const startedAt = useRef<number>(Date.now());
   const sessionId = useRef<string>(typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
   const didInteract = useRef(false);
+  const sent = useRef(false);
 
-  const c: Customization = (product.ar_customization || {}) as Customization;
-  const pageBg = c.page_bg || "#000000";
-  const fontColor = c.font_color || "#FFFFFF";
-  const overlay = c.overlay_color || "rgba(255,255,255,0.14)";
-  const accent = c.accent_color || product.dominant_color || "#38BDF8";
-  const btnRadius = (c.button_radius ?? product.button_border_radius ?? 12) + "px";
-  const btnText = c.custom_button_text || product.button_label || "View in AR";
-  const showName = c.show_product_name !== false;
-  const defaultCam = c.default_camera || "back";
-
-  const [facing, setFacing] = useState<"user" | "environment">(defaultCam === "front" ? "user" : "environment");
-  const [phase, setPhase] = useState<"requesting" | "scanning" | "placed" | "denied" | "unsupported">("requesting");
-  const [scale, setScale] = useState(1);
-  const productColors: string[] = Array.isArray(product.product_colors) ? product.product_colors : [];
-  const [selectedColor, setSelectedColor] = useState<string | null>(productColors[0] ?? null);
-
-  const startCamera = async (mode: "user" | "environment" = facing) => {
-    setPhase("requesting");
-    try {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      if (!navigator.mediaDevices?.getUserMedia) { setPhase("unsupported"); return; }
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: mode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play().catch(() => {});
-      }
-      setPhase("scanning");
-      setTimeout(() => setPhase("placed"), 2000);
-    } catch {
-      setPhase("denied");
-    }
-  };
-
-  const flipCamera = () => {
-    const next = facing === "user" ? "environment" : "user";
-    setFacing(next);
-    startCamera(next);
-  };
-
-  const sendSession = (closedManually: boolean) => {
+  const send = (closedManually: boolean) => {
+    if (sent.current) return;
+    sent.current = true;
     const payload = {
       product_id: product.id,
       session_id: sessionId.current,
       user_agent: navigator.userAgent,
       referrer: document.referrer || null,
       time_spent_seconds: Math.max(0, Math.round((Date.now() - startedAt.current) / 1000)),
-      camera_used: facing === "user" ? "front" : "back",
-      ar_mode: "model-viewer",
+      camera_used: camera,
+      ar_mode: arMode,
       did_interact: didInteract.current,
       did_close_manually: closedManually,
     };
@@ -127,91 +107,249 @@ function ARCameraView() {
   };
 
   useEffect(() => {
-    startCamera(defaultCam === "front" ? "user" : "environment");
-    const onUnload = () => sendSession(false);
+    const onUnload = () => send(false);
     window.addEventListener("pagehide", onUnload);
-    return () => {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      window.removeEventListener("pagehide", onUnload);
-    };
+    return () => window.removeEventListener("pagehide", onUnload);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const stopAndExit = () => {
-    sendSession(true);
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    if (window.history.length > 1) window.history.back();
-    else window.location.href = "/";
+  return { markInteract: () => { didInteract.current = true; }, sendSession: send };
+}
+
+function exitView() {
+  if (window.history.length > 1) window.history.back();
+  else window.location.href = "/";
+}
+
+function TopBar({ name, showName, overlay, fontColor, accent, onClose, badge }: any) {
+  return (
+    <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-30" style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}>
+      <div className="px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}>
+        <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: accent }} /> {badge}
+      </div>
+      {showName && (
+        <div className="px-3 py-1.5 rounded-full text-xs font-semibold max-w-[55%] truncate" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}>
+          {name}
+        </div>
+      )}
+      <button onClick={onClose} className="w-10 h-10 rounded-full grid place-items-center" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}><X size={18} /></button>
+    </div>
+  );
+}
+
+function ARRouter() {
+  const { product } = Route.useLoaderData();
+  const mode = (product.ar_mode || "furniture") as "fashion" | "furniture" | "full_3d";
+  if (mode === "full_3d") return <Full3DView />;
+  return <CameraComposeView mode={mode} />;
+}
+
+/* ============================================================
+   Fashion + Furniture: camera → capture → AI compose
+   ============================================================ */
+function CameraComposeView({ mode }: { mode: "fashion" | "furniture" }) {
+  const { product, imageUrl } = Route.useLoaderData();
+  const cust = useCustomization(product);
+  const initialFacing: "user" | "environment" = mode === "fashion" ? "user" : (cust.defaultCam === "front" ? "user" : "environment");
+  const [facing, setFacing] = useState<"user" | "environment">(initialFacing);
+  const camLabel: "front" | "back" = facing === "user" ? "front" : "back";
+  const tracker = useSessionTracker(product, camLabel, mode);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const [phase, setPhase] = useState<"requesting" | "ready" | "capturing" | "processing" | "result" | "denied" | "unsupported">("requesting");
+  const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const startCamera = async (mode: "user" | "environment" = facing) => {
+    setPhase("requesting");
+    setErrorMsg(null);
+    try {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      if (!navigator.mediaDevices?.getUserMedia) { setPhase("unsupported"); return; }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: mode }, width: { ideal: 1280 }, height: { ideal: 1280 } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play().catch(() => {});
+      }
+      setPhase("ready");
+    } catch { setPhase("denied"); }
   };
 
-  const onInteract = () => { didInteract.current = true; };
+  useEffect(() => {
+    startCamera(initialFacing);
+    return () => streamRef.current?.getTracks().forEach((t) => t.stop());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const shadow = c.button_shadow === false ? "none" : `0 12px 28px -8px ${accent}88`;
+  const flipCamera = () => {
+    const next = facing === "user" ? "environment" : "user";
+    setFacing(next);
+    startCamera(next);
+  };
+
+  const capture = async () => {
+    if (!videoRef.current) return;
+    tracker.markInteract();
+    setPhase("capturing");
+    const v = videoRef.current;
+    const w = v.videoWidth || 720;
+    const h = v.videoHeight || 1280;
+    const canvas = canvasRef.current ?? document.createElement("canvas");
+    canvasRef.current = canvas;
+    // Cap to keep payload under ~3MB
+    const maxDim = 1024;
+    const scale = Math.min(1, maxDim / Math.max(w, h));
+    canvas.width = Math.round(w * scale);
+    canvas.height = Math.round(h * scale);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) { setPhase("ready"); return; }
+    if (facing === "user") { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
+    ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    setPhase("processing");
+
+    try {
+      const r = await fetch("/api/public/ar-compose", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id, captureBase64: dataUrl, mode }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j?.error || `AI error (${r.status})`);
+      setResultUrl(j.imageUrl);
+      setPhase("result");
+    } catch (e: any) {
+      setErrorMsg(e?.message || "Something went wrong");
+      setPhase("ready");
+      startCamera(facing);
+    }
+  };
+
+  const retake = () => {
+    setResultUrl(null);
+    setErrorMsg(null);
+    startCamera(facing);
+  };
+
+  const share = async () => {
+    if (!resultUrl) return;
+    try {
+      const blob = await (await fetch(resultUrl)).blob();
+      const file = new File([blob], `${product.product_name || "easibie-ar"}.png`, { type: blob.type });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: product.product_name });
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = resultUrl;
+      a.download = file.name;
+      a.click();
+    } catch {}
+  };
+
+  const close = () => { tracker.sendSession(true); streamRef.current?.getTracks().forEach((t) => t.stop()); exitView(); };
+
+  const badge = mode === "fashion" ? "TRY-ON" : "PLACE IT";
+  const captureHint = mode === "fashion" ? "Stand in frame, then capture" : "Aim at the spot, then capture";
 
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ background: pageBg, color: fontColor, fontFamily: "var(--font-body)" }}>
-      <video ref={videoRef} playsInline muted className="absolute inset-0 w-full h-full object-cover" style={{ transform: facing === "user" ? "scaleX(-1)" : undefined }} />
+    <div className="fixed inset-0 overflow-hidden" style={{ background: cust.pageBg, color: cust.fontColor, fontFamily: "var(--font-body)" }}>
+      {/* Camera feed or result */}
+      {phase === "result" && resultUrl ? (
+        <img src={resultUrl} alt="AR result" className="absolute inset-0 w-full h-full object-contain bg-black" />
+      ) : (
+        <video ref={videoRef} playsInline muted className="absolute inset-0 w-full h-full object-cover" style={{ transform: facing === "user" ? "scaleX(-1)" : undefined }} />
+      )}
       <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.35), transparent 30%, transparent 60%, rgba(0,0,0,0.55))" }} />
 
-      {/* Top bar */}
-      <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-30" style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}>
-        <div className="px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}>
-          <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: accent }} /> AR LIVE
-        </div>
-        {showName && (
-          <div className="px-3 py-1.5 rounded-full text-xs font-semibold max-w-[55%] truncate" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}>
-            {product.product_name}
-          </div>
-        )}
-        <button onClick={stopAndExit} className="w-10 h-10 rounded-full grid place-items-center" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}><X size={18} /></button>
-      </div>
+      <TopBar name={product.product_name} showName={cust.showName} overlay={cust.overlay} fontColor={cust.fontColor} accent={cust.accent} onClose={close} badge={phase === "result" ? "RESULT" : badge} />
 
-      {/* Scanning frame */}
-      {phase !== "denied" && phase !== "unsupported" && (
-        <div className="absolute inset-0 grid place-items-center pointer-events-none z-10">
-          <div className="relative" style={{ width: "min(72vw, 320px)", aspectRatio: "1/1" }}>
-            <Corner pos="tl" color={fontColor} /><Corner pos="tr" color={fontColor} /><Corner pos="bl" color={fontColor} /><Corner pos="br" color={fontColor} />
-            {phase === "scanning" && (
-              <div className="absolute left-0 right-0 ar-scan-line">
-                <div className="h-[2px] mx-3 rounded-full" style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)`, boxShadow: `0 0 18px ${accent}` }} />
-              </div>
-            )}
+      {/* Garment preview thumbnail (fashion only, while in ready) */}
+      {phase === "ready" && mode === "fashion" && imageUrl && (
+        <div className="absolute z-30 left-4 top-20 w-16 h-20 rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: cust.fontColor }}>
+          <img src={imageUrl} alt="" className="w-full h-full object-cover bg-white/10" />
+        </div>
+      )}
+      {phase === "ready" && mode === "furniture" && imageUrl && (
+        <div className="absolute z-30 left-4 top-20 w-20 h-20 rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: cust.fontColor }}>
+          <img src={imageUrl} alt="" className="w-full h-full object-contain bg-white/10" />
+        </div>
+      )}
+
+      {/* Hint */}
+      {phase === "ready" && (
+        <div className="absolute left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full text-xs font-medium" style={{ top: "calc(env(safe-area-inset-top) + 70px)", background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+          {captureHint}
+        </div>
+      )}
+
+      {/* Processing overlay */}
+      {(phase === "capturing" || phase === "processing") && (
+        <div className="absolute inset-0 z-40 grid place-items-center text-center px-6" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}>
+          <div>
+            <div className="w-16 h-16 mx-auto rounded-full grid place-items-center" style={{ background: cust.accent + "33", border: `2px solid ${cust.accent}` }}>
+              <Loader2 className="animate-spin" size={28} style={{ color: cust.accent }} />
+            </div>
+            <h3 className="mt-5" style={{ color: cust.fontColor, fontFamily: "var(--font-display)" }}>
+              {mode === "fashion" ? "Trying it on…" : "Placing it in your space…"}
+            </h3>
+            <p className="mt-2 text-sm opacity-70">This usually takes 10–20 seconds.</p>
           </div>
         </div>
       )}
 
-      {/* Product */}
-      {phase === "placed" && imageUrl && (
-        <div className="absolute inset-0 grid place-items-center z-20" onPointerDown={onInteract} onWheel={onInteract}>
-          <img
-            src={imageUrl}
-            alt={product.product_name}
-            className="float pop-in select-none"
-            draggable={false}
-            style={{
-              maxWidth: "70vw",
-              maxHeight: "55vh",
-              transform: `scale(${scale})`,
-              filter: `drop-shadow(0 28px 40px ${accent}66) drop-shadow(0 0 30px ${accent}44)`,
-              touchAction: "none",
-            }}
-          />
+      {/* Error toast */}
+      {errorMsg && phase === "ready" && (
+        <div className="absolute left-4 right-4 z-40 mt-2 p-3 rounded-xl text-sm" style={{ background: "rgba(220,38,38,0.95)", color: "#fff", top: "calc(env(safe-area-inset-top) + 110px)" }}>
+          {errorMsg}
         </div>
       )}
 
-      {phase === "scanning" && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[140px] z-30 px-4 py-2 rounded-full text-xs font-medium" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}>
-          Scanning surface…
+      {/* Bottom controls */}
+      {phase === "ready" && (
+        <div className="absolute left-0 right-0 z-30 flex items-center justify-center gap-4" style={{ bottom: "calc(env(safe-area-inset-bottom) + 24px)" }}>
+          <div className="w-12" />
+          <button onClick={capture} aria-label="Capture"
+            className="w-20 h-20 rounded-full grid place-items-center transition-transform active:scale-95"
+            style={{ background: "#fff", boxShadow: `0 0 0 4px ${cust.accent}, 0 18px 40px -10px rgba(0,0,0,0.5)` }}>
+            <div className="w-16 h-16 rounded-full grid place-items-center" style={{ background: cust.accent }}>
+              <Aperture size={28} color="#fff" />
+            </div>
+          </button>
+          <button onClick={flipCamera} aria-label="Flip camera"
+            className="w-12 h-12 rounded-full grid place-items-center" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+            <SwitchCamera size={18} />
+          </button>
+        </div>
+      )}
+
+      {phase === "result" && (
+        <div className="absolute left-3 right-3 z-30 flex items-center justify-center gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
+          <button onClick={retake} className="px-5 py-3 rounded-full font-semibold text-sm" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+            <RefreshCw size={14} className="inline mr-1.5" /> Retake
+          </button>
+          <button onClick={share} className="px-6 py-3 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius, boxShadow: `0 12px 28px -8px ${cust.accent}88` }}>
+            <Share2 size={15} /> Share
+          </button>
         </div>
       )}
 
       {(phase === "denied" || phase === "unsupported") && (
         <div className="absolute inset-0 z-40 grid place-items-center p-6 text-center" style={{ background: "rgba(11,18,32,0.95)" }}>
           <div className="max-w-sm">
-            <Camera size={44} className="mx-auto" style={{ color: accent }} />
+            <Camera size={44} className="mx-auto" style={{ color: cust.accent }} />
             <h3 className="mt-4 text-white">{phase === "denied" ? "Camera access needed" : "Camera not supported"}</h3>
             <p className="mt-2 text-white/70 text-sm">
-              {phase === "denied" ? "Allow camera permission to place this product in your real environment." : "Open this page on a mobile browser to use AR."}
+              {phase === "denied" ? "Allow camera permission to continue." : "Open on a mobile browser to use AR."}
             </p>
             {phase === "denied" && (
               <button onClick={() => startCamera()} className="btn-primary mt-6 inline-flex"><RefreshCw size={16} /> Retry</button>
@@ -220,59 +358,90 @@ function ARCameraView() {
         </div>
       )}
 
-      {/* Bottom controls */}
-      {phase === "placed" && (
-        <div className="absolute left-3 right-3 z-30" style={{ bottom: "calc(env(safe-area-inset-bottom) + 14px)" }}>
-          {productColors.length > 0 && (
-            <div className="rounded-full px-3 py-2 inline-flex items-center gap-2 mb-2 pop-in" style={{ background: overlay, backdropFilter: "blur(10px)" }}>
-              <span className="text-[10px] uppercase tracking-wider opacity-70">Color</span>
-              {productColors.map((col) => (
-                <button key={col} onClick={() => { setSelectedColor(col); onInteract(); }}
-                  className="w-6 h-6 rounded-full border-2 transition-transform"
-                  style={{ background: col, borderColor: selectedColor === col ? fontColor : "rgba(255,255,255,0.3)", transform: selectedColor === col ? "scale(1.1)" : "scale(1)" }} />
-              ))}
-            </div>
-          )}
-
-          <div className="rounded-2xl p-3 flex items-center gap-3 pop-in" style={{ background: overlay, backdropFilter: "blur(14px)" }}>
-            {imageUrl && <img src={imageUrl} alt="" className="w-12 h-12 rounded-xl object-cover bg-white/10 shrink-0" />}
-            <div className="flex-1 min-w-0">
-              <div className="text-[10px] uppercase tracking-wider opacity-60">Now placed</div>
-              {showName && <div className="font-semibold truncate text-sm" style={{ fontFamily: "var(--font-display)" }}>{product.product_name}</div>}
-            </div>
-            <button onClick={onInteract}
-              className="px-3 py-2 text-xs font-semibold inline-flex items-center gap-1.5 shrink-0"
-              style={{ background: accent, color: product.button_text_color || "#fff", borderRadius: btnRadius, boxShadow: shadow, border: "none" }}>
-              <Sparkles size={13} /> {btnText}
-            </button>
-          </div>
-
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <button onClick={() => { onInteract(); setScale((s) => Math.max(0.4, s - 0.1)); }} className="w-8 h-8 rounded-full grid place-items-center text-sm" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}>−</button>
-            <span className="text-[10px] px-2.5 py-1 rounded-full font-mono" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}>{Math.round(scale * 100)}%</span>
-            <button onClick={() => { onInteract(); setScale((s) => Math.min(2.2, s + 0.1)); }} className="w-8 h-8 rounded-full grid place-items-center text-sm" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}>+</button>
-            <button onClick={flipCamera} title="Switch camera" className="ml-1 w-8 h-8 rounded-full grid place-items-center" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}><SwitchCamera size={14} /></button>
-            {product.show_branding !== false && (
-              <a href="https://easibie.com" target="_blank" rel="noreferrer"
-                className="ml-2 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70 hover:opacity-100"
-                style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}>
-                Powered by <span className="font-bold" style={{ color: accent }}>Easibie</span>
-              </a>
-            )}
-          </div>
+      {product.show_branding !== false && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70" style={{ background: cust.overlay, color: cust.fontColor }}>
+          Powered by <span className="font-bold" style={{ color: cust.accent }}>Easibie</span>
         </div>
       )}
     </div>
   );
 }
 
-function Corner({ pos, color }: { pos: "tl" | "tr" | "bl" | "br"; color: string }) {
-  const base = { position: "absolute" as const, width: 28, height: 28 };
-  const sides: Record<string, React.CSSProperties> = {
-    tl: { top: 0, left: 0, borderTop: `2px solid ${color}`, borderLeft: `2px solid ${color}`, borderTopLeftRadius: 12 },
-    tr: { top: 0, right: 0, borderTop: `2px solid ${color}`, borderRight: `2px solid ${color}`, borderTopRightRadius: 12 },
-    bl: { bottom: 0, left: 0, borderBottom: `2px solid ${color}`, borderLeft: `2px solid ${color}`, borderBottomLeftRadius: 12 },
-    br: { bottom: 0, right: 0, borderBottom: `2px solid ${color}`, borderRight: `2px solid ${color}`, borderBottomRightRadius: 12 },
-  };
-  return <div style={{ ...base, ...sides[pos], opacity: 0.9 }} />;
+/* ============================================================
+   Full 3D: model-viewer with WebXR / Quick Look / Scene Viewer
+   ============================================================ */
+function Full3DView() {
+  const { product, glbUrl, usdzUrl } = Route.useLoaderData();
+  const cust = useCustomization(product);
+  const tracker = useSessionTracker(product, "back", "model-viewer");
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (document.querySelector('script[data-model-viewer]')) { setLoaded(true); return; }
+    const s = document.createElement("script");
+    s.type = "module";
+    s.src = "https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js";
+    s.setAttribute("data-model-viewer", "true");
+    s.onload = () => setLoaded(true);
+    document.head.appendChild(s);
+  }, []);
+
+  const close = () => { tracker.sendSession(true); exitView(); };
+
+  if (!glbUrl) {
+    return (
+      <div className="fixed inset-0 grid place-items-center bg-black text-white text-center p-6">
+        <div>
+          <Sparkles size={44} className="mx-auto text-sky-400" />
+          <h3 className="mt-4">No 3D model uploaded</h3>
+          <p className="mt-2 text-white/70 text-sm">Ask the seller to upload a GLB file for full 3D AR.</p>
+          <button onClick={close} className="mt-6 px-5 py-2 rounded-full bg-white/15">Close</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 overflow-hidden" style={{ background: cust.pageBg, color: cust.fontColor, fontFamily: "var(--font-body)" }}>
+      <TopBar name={product.product_name} showName={cust.showName} overlay={cust.overlay} fontColor={cust.fontColor} accent={cust.accent} onClose={close} badge="3D AR" />
+      {loaded ? (
+        // @ts-ignore — web component
+        <model-viewer
+          src={glbUrl}
+          ios-src={usdzUrl || undefined}
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          camera-controls
+          touch-action="pan-y"
+          shadow-intensity="1"
+          exposure="1"
+          auto-rotate
+          interaction-prompt="auto"
+          style={{ width: "100%", height: "100%", background: cust.pageBg }}
+          onLoad={() => tracker.markInteract()}
+        >
+          <button
+            slot="ar-button"
+            style={{
+              position: "absolute", bottom: "calc(env(safe-area-inset-bottom) + 28px)", left: "50%", transform: "translateX(-50%)",
+              background: cust.accent, color: "#fff", border: "none", padding: "14px 28px",
+              borderRadius: cust.btnRadius, fontWeight: 700, boxShadow: `0 18px 40px -10px ${cust.accent}cc`,
+              fontFamily: "var(--font-display)", letterSpacing: ".3px",
+            }}
+          >
+            View in your space
+          </button>
+        </model-viewer>
+      ) : (
+        <div className="absolute inset-0 grid place-items-center">
+          <Loader2 className="animate-spin" size={32} style={{ color: cust.accent }} />
+        </div>
+      )}
+      {product.show_branding !== false && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70" style={{ background: cust.overlay, color: cust.fontColor }}>
+          Powered by <span className="font-bold" style={{ color: cust.accent }}>Easibie</span>
+        </div>
+      )}
+    </div>
+  );
 }
