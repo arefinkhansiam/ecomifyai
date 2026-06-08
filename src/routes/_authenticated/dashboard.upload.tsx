@@ -40,6 +40,7 @@ function UploadPage() {
   const [step, setStep] = useState("");
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [arMode, setArMode] = useState<ArMode>("furniture");
 
   const [colors, setColors] = useState<string[]>([]);
   const [newColor, setNewColor] = useState("#0EA5E9");
