@@ -227,6 +227,44 @@ function TryARPage() {
             )}
           </div>
 
+          {/* Demo 3D models — instant AR */}
+          <div className="mt-10">
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <h3 className="text-white">Try a demo in AR</h3>
+                <p className="text-sm">Tap any model, then hit the AR icon to place it in your room.</p>
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {[
+                { name: "Sheen Chair", src: "https://modelviewer.dev/shared-assets/models/glTF-Sample-Models/2.0/SheenChair/glTF-Binary/SheenChair.glb" },
+                { name: "Astronaut", src: "https://modelviewer.dev/shared-assets/models/Astronaut.glb", ios: "https://modelviewer.dev/shared-assets/models/Astronaut.usdz" },
+                { name: "Damaged Helmet", src: "https://modelviewer.dev/shared-assets/models/glTF-Sample-Models/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb" },
+              ].map((m) => (
+                <div key={m.name} className="rounded-2xl overflow-hidden border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                  <div className="h-64 bg-gradient-to-br from-sky-50 to-cyan-100">
+                    <model-viewer
+                      src={m.src}
+                      ios-src={m.ios}
+                      alt={m.name}
+                      ar
+                      ar-modes="webxr scene-viewer quick-look"
+                      camera-controls
+                      auto-rotate
+                      shadow-intensity="1"
+                      touch-action="pan-y"
+                      style={{ width: "100%", height: "100%", background: "transparent" } as any}
+                    />
+                  </div>
+                  <div className="p-3 flex items-center justify-between">
+                    <div className="font-semibold text-white text-sm">{m.name}</div>
+                    <span className="text-[10px] uppercase tracking-wider text-[var(--cyan)]">AR Ready</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="grid sm:grid-cols-3 gap-4 mt-8">
             {[
               { icon: Camera, t: "Live Camera AR", d: "Uses your device camera with one tap. Works in modern mobile and desktop browsers." },

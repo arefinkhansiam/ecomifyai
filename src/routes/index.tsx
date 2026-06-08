@@ -69,19 +69,29 @@ function Landing() {
             <div className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.92)" }}>Join 10,000+ store owners</div>
             <div className="flex gap-1">{[0,1,2,3,4].map(i => <Star key={i} size={14} className="text-cyan" fill="currentColor" />)}</div>
           </div>
-          {/* Hero mockup */}
+          {/* Hero mockup with live 3D / AR demo */}
           <div className="mt-16 flex justify-center">
-            <div className="float w-[260px] h-[520px] rounded-[44px] bg-card p-3 relative" style={{ boxShadow: "0 40px 120px rgba(2,132,199,0.35)" }}>
-              <div className="w-full h-full rounded-[34px] bg-bg overflow-hidden relative grid place-items-center">
-                <div className="absolute top-4 left-4 right-4 flex justify-between text-xs text-muted">
+            <div className="float w-[280px] h-[560px] rounded-[44px] bg-card p-3 relative" style={{ boxShadow: "0 40px 120px rgba(2,132,199,0.4)" }}>
+              <div className="w-full h-full rounded-[34px] bg-bg overflow-hidden relative">
+                <div className="absolute top-4 left-4 right-4 flex justify-between text-xs text-muted z-10">
                   <span>9:41</span><span>•••</span>
                 </div>
-                <div className="w-44 h-44 rounded-2xl gradient-radial grid place-items-center">
-                  <Box size={64} className="text-[var(--lavender)]" />
-                </div>
-                <div className="absolute bottom-6 left-4 right-4">
-                  <div className="bg-card rounded-xl p-3">
-                    <div className="text-xs text-muted">AR Preview</div>
+                <model-viewer
+                  src="https://modelviewer.dev/shared-assets/models/glTF-Sample-Models/2.0/SheenChair/glTF-Binary/SheenChair.glb"
+                  ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
+                  alt="Modern Lounge Chair AR demo"
+                  ar
+                  ar-modes="webxr scene-viewer quick-look"
+                  camera-controls
+                  auto-rotate
+                  shadow-intensity="1"
+                  exposure="0.9"
+                  touch-action="pan-y"
+                  style={{ width: "100%", height: "100%", background: "linear-gradient(180deg, #f6fafe 0%, #e0f2fe 100%)", "--poster-color": "transparent" } as any}
+                />
+                <div className="absolute bottom-6 left-4 right-4 z-10">
+                  <div className="bg-card/95 backdrop-blur-md rounded-xl p-3 shadow-lg">
+                    <div className="text-[10px] uppercase tracking-wider text-muted">Live AR Demo · Tap & drag</div>
                     <div className="text-sm font-semibold text-ink">Modern Lounge Chair</div>
                   </div>
                 </div>
