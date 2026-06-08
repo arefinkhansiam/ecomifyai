@@ -78,10 +78,15 @@ function UploadPage() {
 
   const onFile = (f: File | null) => {
     if (!f) return;
-    if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) { toast.error("Use JPG, PNG or WebP"); return; }
-    if (f.size > 10 * 1024 * 1024) { toast.error("Max 10MB"); return; }
+    const isModel = arMode === "full_3d";
+    const okType = isModel
+      ? /\.(glb|gltf)$/i.test(f.name) || f.type === "model/gltf-binary" || f.type === "model/gltf+json"
+      : ["image/jpeg", "image/png", "image/webp"].includes(f.type);
+    if (!okType) { toast.error(isModel ? "Upload a .glb or .gltf file" : "Use JPG, PNG or WebP"); return; }
+    const maxMb = isModel ? 50 : 10;
+    if (f.size > maxMb * 1024 * 1024) { toast.error(`Max ${maxMb}MB`); return; }
     setFile(f);
-    setPreview(URL.createObjectURL(f));
+    setPreview(isModel ? null : URL.createObjectURL(f));
     if (!name) setName(f.name.replace(/\.[^.]+$/, ""));
   };
 
