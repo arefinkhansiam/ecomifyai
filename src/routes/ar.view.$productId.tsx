@@ -29,7 +29,12 @@ export const Route = createFileRoute("/ar/view/$productId")({
       const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(data.glb_url, 3600);
       glbUrl = signed?.signedUrl ?? null;
     }
-    return { product: data as any, imageUrl, glbUrl };
+    let usdzUrl: string | null = null;
+    if (data.usdz_url) {
+      const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(data.usdz_url, 3600);
+      usdzUrl = signed?.signedUrl ?? null;
+    }
+    return { product: data as any, imageUrl, glbUrl, usdzUrl };
   },
   notFoundComponent: () => <NotReady />,
   errorComponent: () => <NotReady />,
