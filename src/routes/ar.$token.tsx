@@ -140,3 +140,19 @@ function ArByToken() {
     </div>
   );
 }
+
+function ModelViewer({ src, iosSrc, pageBg }: { src: string; iosSrc?: string; pageBg: string }) {
+  const Tag = "model-viewer" as any;
+  return (
+    <Tag
+      src={src}
+      ios-src={iosSrc}
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      camera-controls
+      auto-rotate
+      shadow-intensity="1"
+      style={{ width: "100%", height: "min(70vh, 560px)", background: pageBg, display: "block" }}
+    />
+  );
+}
