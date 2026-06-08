@@ -38,13 +38,13 @@ export function Navbar() {
         <div
           className="pointer-events-auto mx-auto max-w-6xl grid grid-cols-3 md:flex items-center md:justify-between px-4 md:px-6 h-14 md:h-16 rounded-full transition-all"
           style={{
-            background: scrolled ? "rgba(255,255,255,0.78)" : "rgba(255,255,255,0.45)",
-            backdropFilter: "blur(22px) saturate(160%)",
-            WebkitBackdropFilter: "blur(22px) saturate(160%)",
-            border: "1px solid rgba(255,255,255,0.6)",
+            background: scrolled ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.92)",
+            backdropFilter: "blur(22px) saturate(180%)",
+            WebkitBackdropFilter: "blur(22px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.85)",
             boxShadow: scrolled
-              ? "0 20px 50px -20px rgba(2,132,199,0.35), inset 0 1px 0 rgba(255,255,255,0.6)"
-              : "0 12px 40px -18px rgba(2,132,199,0.25), inset 0 1px 0 rgba(255,255,255,0.55)",
+              ? "0 20px 50px -20px rgba(2,132,199,0.35), inset 0 1px 0 rgba(255,255,255,0.9)"
+              : "0 14px 40px -18px rgba(2,132,199,0.3), inset 0 1px 0 rgba(255,255,255,0.85)",
           }}
         >
           {/* Mobile: left spacer for centering */}
