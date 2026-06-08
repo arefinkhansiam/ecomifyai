@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Box, Upload, BarChart2, Link as LinkIcon, CreditCard, Settings, LogOut, Bell, HelpCircle, Sparkles, Crown } from "lucide-react";
+import { LayoutDashboard, Box, Upload, BarChart2, Link as LinkIcon, CreditCard, Settings, LogOut, Bell, HelpCircle, Sparkles, Crown, Activity } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
