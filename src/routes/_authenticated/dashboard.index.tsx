@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Box, Eye, Code, Upload, ArrowUpRight } from "lucide-react";
+import { Box, Eye, Code, Upload, ArrowUpRight, Sparkles, TrendingUp, Crown } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: Dashboard,
 });
+
+const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
 
 function Dashboard() {
   const { user } = useAuth();
@@ -21,66 +23,78 @@ function Dashboard() {
   }, [user]);
 
   const cards = [
-    { label: "Total Products", value: stats?.total_products ?? 0, icon: Box, color: "var(--primary)" },
-    { label: "Ready for AR", value: stats?.ready_products ?? 0, icon: Box, color: "var(--cyan)" },
-    { label: "Total AR Views", value: stats?.total_views ?? 0, icon: Eye, color: "var(--success)" },
-    { label: "Embed Count", value: stats?.total_embeds ?? 0, icon: Code, color: "var(--warning)" },
+    { label: "Total Products", value: stats?.total_products ?? 0, icon: Box, accent: "#0369A1" },
+    { label: "Ready for AR", value: stats?.ready_products ?? 0, icon: Sparkles, accent: "#0EA5E9" },
+    { label: "Total AR Views", value: stats?.total_views ?? 0, icon: Eye, accent: "#10B981" },
+    { label: "Embed Count", value: stats?.total_embeds ?? 0, icon: Code, accent: "#F59E0B" },
   ];
+
+  const plan = stats?.plan ?? "free";
+  const isPaid = plan !== "free";
 
   return (
     <DashboardShell title="Dashboard">
-      <div>
-        <h1 className="text-3xl font-display font-bold">Welcome back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name.split(" ")[0]}` : ""}.</h1>
-        <p className="mt-2">Your AR command center. Upload a product, share the link, watch the views roll in.</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <span className="pill"><Sparkles size={12} /> Command center</span>
+          <h1 className="mt-3 text-3xl md:text-4xl font-display font-extrabold leading-tight" style={{ background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+            Welcome back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name.split(" ")[0]}` : ""}.
+          </h1>
+          <p className="mt-2 text-base" style={{ color: "var(--ink-soft)" }}>Upload a product, share the link, watch the views roll in.</p>
+        </div>
+        <Link to="/dashboard/upload" className="btn-primary"><Upload size={16} /> New AR Product</Link>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
         {cards.map((c) => (
-          <div key={c.label} className="bg-card rounded-2xl p-6">
-            <div className="flex items-start justify-between">
-              <div className="w-10 h-10 rounded-xl grid place-items-center" style={{ background: `${c.color}22` }}>
-                <c.icon size={18} style={{ color: c.color }} />
-              </div>
+          <div key={c.label} className="rounded-2xl p-5 relative overflow-hidden"
+            style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(14px)", border: "1px solid rgba(2,132,199,0.15)", boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)" }}>
+            <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20" style={{ background: `radial-gradient(circle, ${c.accent}, transparent 70%)` }} />
+            <div className="w-11 h-11 rounded-xl grid place-items-center text-white" style={{ background: `linear-gradient(135deg, ${c.accent}, #38BDF8)`, boxShadow: `0 10px 24px -10px ${c.accent}aa` }}>
+              <c.icon size={18} />
             </div>
-            <div className="font-display font-extrabold text-3xl text-white mt-4">{c.value.toLocaleString()}</div>
-            <div className="text-xs text-muted mt-1">{c.label}</div>
+            <div className="font-display font-extrabold text-3xl mt-4" style={{ background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>{c.value.toLocaleString()}</div>
+            <div className="text-xs mt-1 font-medium" style={{ color: "var(--muted)" }}>{c.label}</div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
-        <Link to="/dashboard/upload" className="bg-card rounded-2xl p-6 hover:glow-card transition-shadow group">
-          <Upload size={24} className="text-cyan" />
-          <h3 className="text-white mt-4">Upload a product</h3>
-          <p className="text-sm mt-2">Drag in a photo, get a live AR link in seconds.</p>
-          <div className="mt-4 text-cyan text-sm inline-flex items-center gap-1">Get started <ArrowUpRight size={14} /></div>
-        </Link>
-        <Link to="/dashboard/products" className="bg-card rounded-2xl p-6 hover:glow-card transition-shadow">
-          <Box size={24} className="text-[var(--primary)]" />
-          <h3 className="text-white mt-4">Manage products</h3>
-          <p className="text-sm mt-2">View, edit and share your AR products.</p>
-          <div className="mt-4 text-cyan text-sm inline-flex items-center gap-1">Open <ArrowUpRight size={14} /></div>
-        </Link>
-        <Link to="/dashboard/analytics" className="bg-card rounded-2xl p-6 hover:glow-card transition-shadow">
-          <Eye size={24} className="text-[var(--success)]" />
-          <h3 className="text-white mt-4">See analytics</h3>
-          <p className="text-sm mt-2">Track AR views, devices and trends.</p>
-          <div className="mt-4 text-cyan text-sm inline-flex items-center gap-1">View <ArrowUpRight size={14} /></div>
-        </Link>
+        {[
+          { to: "/dashboard/upload", icon: Upload, title: "Upload a product", body: "Drag in a photo, get a live AR link in seconds." },
+          { to: "/dashboard/products", icon: Box, title: "Manage products", body: "View, edit and share your AR products." },
+          { to: "/dashboard/analytics", icon: TrendingUp, title: "See analytics", body: "Track AR views, devices and trends." },
+        ].map((q) => (
+          <Link key={q.to} to={q.to} className="rounded-2xl p-6 transition-transform hover:-translate-y-1 group"
+            style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(14px)", border: "1px solid rgba(2,132,199,0.15)", boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)" }}>
+            <div className="w-12 h-12 rounded-2xl grid place-items-center text-white" style={{ background: GRAD }}>
+              <q.icon size={20} />
+            </div>
+            <h3 className="text-ink mt-4">{q.title}</h3>
+            <p className="text-sm mt-2">{q.body}</p>
+            <div className="mt-4 text-sm font-semibold inline-flex items-center gap-1" style={{ background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+              Open <ArrowUpRight size={14} className="text-primary" />
+            </div>
+          </Link>
+        ))}
       </div>
 
-      <div className="mt-8 bg-card rounded-2xl p-6">
-        <div className="flex justify-between items-center">
+      <div className="mt-8 rounded-2xl p-6 relative overflow-hidden" style={{ background: GRAD, color: "#fff", boxShadow: "0 25px 60px -25px rgba(2,132,199,0.6)" }}>
+        <div className="flex justify-between items-center flex-wrap gap-4">
           <div>
-            <div className="text-sm text-muted">Plan usage</div>
-            <div className="font-display text-2xl font-bold mt-1">
+            <div className="text-xs uppercase tracking-wider opacity-80 flex items-center gap-2">
+              {isPaid && <Crown size={12} />} Plan usage · {plan}
+            </div>
+            <div className="font-display text-2xl md:text-3xl font-extrabold mt-1">
               {stats?.total_products ?? 0} / {stats?.plan_limit ?? 1} AR products
             </div>
           </div>
-          <Link to="/dashboard/billing" className="btn-ghost text-xs">Upgrade</Link>
+          <Link to="/dashboard/billing" className="rounded-full px-5 py-2.5 text-sm font-semibold text-ink" style={{ background: "#fff" }}>
+            {isPaid ? "Manage" : "Upgrade"} →
+          </Link>
         </div>
-        <div className="mt-4 h-2 rounded-full bg-[var(--surface)] overflow-hidden">
-          <div className="h-full bg-[var(--primary)]" style={{ width: `${Math.min(100, ((stats?.total_products ?? 0) / Math.max(1, stats?.plan_limit ?? 1)) * 100)}%` }} />
+        <div className="mt-4 h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.2)" }}>
+          <div className="h-full" style={{ width: `${Math.min(100, ((stats?.total_products ?? 0) / Math.max(1, stats?.plan_limit ?? 1)) * 100)}%`, background: "linear-gradient(90deg,#38BDF8,#fff)" }} />
         </div>
       </div>
     </DashboardShell>
