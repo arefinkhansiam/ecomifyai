@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { UploadCloud, Loader2, Sparkles, Copy, Check } from "lucide-react";
+import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/upload")({
   component: UploadPage,
@@ -12,23 +12,30 @@ export const Route = createFileRoute("/_authenticated/dashboard/upload")({
 
 type Size = "small" | "medium" | "large";
 
+const PRESET_COLORS = ["#0B1220", "#0EA5E9", "#38BDF8", "#7C3AED", "#10B981", "#F59E0B", "#EF4444", "#FFFFFF"];
+
 function UploadPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState("");
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
+  const [colors, setColors] = useState<string[]>([]);
+  const [newColor, setNewColor] = useState("#0EA5E9");
+
   const [label, setLabel] = useState("View in AR");
-  const [bg, setBg] = useState("#0284C7");
+  const [useGradient, setUseGradient] = useState(true);
+  const [bg, setBg] = useState("#0369A1");
+  const [bg2, setBg2] = useState("#38BDF8");
   const [fg, setFg] = useState("#FFFFFF");
-  const [radius, setRadius] = useState(12);
+  const [radius, setRadius] = useState(14);
   const [size, setSize] = useState<Size>("medium");
+  const [showBranding, setShowBranding] = useState(true);
 
   const onFile = (f: File | null) => {
     if (!f) return;
@@ -37,6 +44,11 @@ function UploadPage() {
     setFile(f);
     setPreview(URL.createObjectURL(f));
     if (!name) setName(f.name.replace(/\.[^.]+$/, ""));
+  };
+
+  const addColor = () => {
+    if (colors.includes(newColor)) return;
+    setColors([...colors, newColor]);
   };
 
   const upload = async () => {
@@ -53,7 +65,6 @@ function UploadPage() {
       const { data: created, error: insErr } = await supabase.from("ar_products").insert({
         user_id: user.id,
         product_name: name || "Untitled Product",
-        product_price: price ? Number(price) : null,
         original_image_url: path,
         status: "ready",
         processing_step: "complete",
@@ -66,7 +77,12 @@ function UploadPage() {
         button_border_radius: radius,
         button_size: size,
         is_public: true,
-      }).select().single();
+        product_colors: colors,
+        use_gradient: useGradient,
+        gradient_from: bg,
+        gradient_to: bg2,
+        show_branding: showBranding,
+      } as any).select().single();
       if (insErr) throw insErr;
 
       toast.success("AR product created!");
@@ -79,10 +95,11 @@ function UploadPage() {
   const origin = typeof window !== "undefined" ? window.location.origin : "https://your-domain.com";
   const productId = createdId ?? "PRODUCT_ID";
   const htmlSnippet = `<script src="${origin}/widget.js" data-product-id="${productId}"></script>`;
-  const liquidSnippet = `{% comment %} Easibie AR — paste in product template {% endcomment %}\n<script\n  src="${origin}/widget.js"\n  data-product-id="${productId}"\n  data-label="${label}"\n  data-color="${bg}"\n  data-text-color="${fg}"\n></script>`;
+  const liquidSnippet = `{% comment %} Easibie AR — paste in product template {% endcomment %}\n<script\n  src="${origin}/widget.js"\n  data-product-id="${productId}"\n  data-label="${label}"\n></script>`;
 
   const sizePad = useMemo(() => size === "small" ? "10px 18px" : size === "large" ? "18px 36px" : "14px 28px", [size]);
   const sizeFs = useMemo(() => size === "small" ? "13px" : size === "large" ? "17px" : "15px", [size]);
+  const btnBg = useGradient ? `linear-gradient(135deg, ${bg} 0%, ${bg2} 100%)` : bg;
 
   const copy = async (text: string, key: string) => {
     await navigator.clipboard.writeText(text);
@@ -93,7 +110,7 @@ function UploadPage() {
   return (
     <DashboardShell title="Upload New AR Product">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: image upload */}
+        {/* Left: image upload + colors */}
         <div className="bg-card rounded-2xl p-6 glow-card">
           <h4 className="text-ink">1. Product image</h4>
           <label className="block mt-4">
@@ -115,14 +132,35 @@ function UploadPage() {
             </div>
           </label>
 
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-muted uppercase tracking-wide">Product name</label>
-              <input className="input-base mt-1" value={name} onChange={(e) => setName(e.target.value)} placeholder="Modern Lounge Chair" />
+          <div className="mt-6">
+            <label className="text-xs text-muted uppercase tracking-wide">Product name</label>
+            <input className="input-base mt-1" value={name} onChange={(e) => setName(e.target.value)} placeholder="Modern Lounge Chair" />
+          </div>
+
+          {/* Color variants */}
+          <div className="mt-5">
+            <label className="text-xs text-muted uppercase tracking-wide">Available colors (optional)</label>
+            <p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>Customers can pick from these when viewing in AR.</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {colors.map((c) => (
+                <div key={c} className="relative group">
+                  <div className="w-9 h-9 rounded-full border-2 border-white shadow" style={{ background: c }} />
+                  <button onClick={() => setColors(colors.filter((x) => x !== c))}
+                    className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-black text-white grid place-items-center opacity-0 group-hover:opacity-100">
+                    <X size={10} />
+                  </button>
+                </div>
+              ))}
+              <div className="flex items-center gap-2 border rounded-full px-2 py-1" style={{ borderColor: "var(--border)" }}>
+                <input type="color" value={newColor} onChange={(e) => setNewColor(e.target.value)} className="w-7 h-7 rounded-full cursor-pointer bg-transparent border-0" />
+                <button onClick={addColor} className="text-xs font-semibold text-primary inline-flex items-center gap-1"><Plus size={12} /> Add</button>
+              </div>
             </div>
-            <div>
-              <label className="text-xs text-muted uppercase tracking-wide">Price (optional)</label>
-              <input className="input-base mt-1" value={price} onChange={(e) => setPrice(e.target.value.replace(/[^\d.]/g, ""))} placeholder="299.00" inputMode="decimal" />
+            <div className="mt-3 flex flex-wrap gap-2">
+              {PRESET_COLORS.map((c) => (
+                <button key={c} onClick={() => !colors.includes(c) && setColors([...colors, c])}
+                  className="w-6 h-6 rounded-full border" style={{ background: c, borderColor: "var(--border)" }} title={c} />
+              ))}
             </div>
           </div>
         </div>
@@ -135,10 +173,27 @@ function UploadPage() {
               <label className="text-xs text-muted uppercase tracking-wide">Button label</label>
               <input className="input-base mt-1" value={label} onChange={(e) => setLabel(e.target.value)} maxLength={40} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <ColorField label="Background" value={bg} onChange={setBg} />
-              <ColorField label="Text color" value={fg} onChange={setFg} />
+
+            <div className="flex items-center justify-between p-3 rounded-xl bg-soft">
+              <div>
+                <div className="text-sm font-semibold text-ink">Use gradient</div>
+                <div className="text-xs" style={{ color: "var(--ink-soft)" }}>Blend two colors smoothly</div>
+              </div>
+              <button onClick={() => setUseGradient(!useGradient)} className="relative w-11 h-6 rounded-full transition-colors"
+                style={{ background: useGradient ? "var(--primary)" : "#cbd5e1" }}>
+                <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ transform: useGradient ? "translateX(22px)" : "translateX(2px)" }} />
+              </button>
             </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <ColorField label={useGradient ? "Gradient start" : "Background"} value={bg} onChange={setBg} />
+              {useGradient
+                ? <ColorField label="Gradient end" value={bg2} onChange={setBg2} />
+                : <ColorField label="Text color" value={fg} onChange={setFg} />
+              }
+            </div>
+            {useGradient && <ColorField label="Text color" value={fg} onChange={setFg} />}
+
             <div>
               <label className="text-xs text-muted uppercase tracking-wide flex justify-between">
                 <span>Border radius</span><span>{radius}px</span>
@@ -156,6 +211,17 @@ function UploadPage() {
                 ))}
               </div>
             </div>
+
+            <div className="flex items-center justify-between p-3 rounded-xl bg-soft">
+              <div>
+                <div className="text-sm font-semibold text-ink">Show "Powered by Easibie"</div>
+                <div className="text-xs" style={{ color: "var(--ink-soft)" }}>Free plan keeps branding. Paid plans can hide it.</div>
+              </div>
+              <button onClick={() => setShowBranding(!showBranding)} className="relative w-11 h-6 rounded-full transition-colors"
+                style={{ background: showBranding ? "var(--primary)" : "#cbd5e1" }}>
+                <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ transform: showBranding ? "translateX(22px)" : "translateX(2px)" }} />
+              </button>
+            </div>
           </div>
 
           <div className="mt-6 rounded-2xl p-8 bg-soft grid place-items-center">
@@ -163,14 +229,15 @@ function UploadPage() {
             <button
               type="button"
               style={{
-                background: bg, color: fg, padding: sizePad, fontSize: sizeFs,
+                background: btnBg, color: fg, padding: sizePad, fontSize: sizeFs,
                 borderRadius: radius, fontWeight: 600, border: "none",
-                boxShadow: "0 6px 20px -6px rgba(2,132,199,0.55)",
+                boxShadow: "0 10px 28px -8px rgba(2,132,199,0.5)",
                 display: "inline-flex", alignItems: "center", gap: 8,
               }}
             >
               <Sparkles size={16} /> {label || "View in AR"}
             </button>
+            {showBranding && <div className="mt-3 text-[10px] uppercase tracking-wider text-muted">Powered by Easibie</div>}
           </div>
 
           <button onClick={upload} disabled={!file || busy || !!createdId} className="btn-primary w-full mt-6">
@@ -180,7 +247,6 @@ function UploadPage() {
         </div>
       </div>
 
-      {/* Step 3 — embed code (shown after creation) */}
       {createdId && (
         <div className="mt-6 bg-card rounded-2xl p-6 glow-card">
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -195,16 +261,6 @@ function UploadPage() {
             <CodeBlock title="Any website / WooCommerce / Wix" code={htmlSnippet} onCopy={() => copy(htmlSnippet, "html")} copied={copied === "html"} />
             <CodeBlock title="Shopify (product.liquid)" code={liquidSnippet} onCopy={() => copy(liquidSnippet, "liquid")} copied={copied === "liquid"} />
           </div>
-
-          <details className="mt-5 text-sm text-muted">
-            <summary className="cursor-pointer text-ink font-semibold">Where to paste it →</summary>
-            <ul className="mt-3 space-y-2 list-disc list-inside">
-              <li><b>Shopify:</b> Online Store → Themes → Edit code → Sections/product.liquid. Paste anywhere inside the product info block.</li>
-              <li><b>WooCommerce:</b> Edit product → Product short description (Text tab) → Paste the script tag.</li>
-              <li><b>Wix:</b> Add an HTML Embed widget on your product page and paste the script.</li>
-              <li><b>Plain HTML:</b> Paste the script tag inside the product details section.</li>
-            </ul>
-          </details>
 
           <button onClick={() => navigate({ to: "/dashboard/upload", reloadDocument: true })} className="btn-ghost mt-5">+ Create another product</button>
         </div>

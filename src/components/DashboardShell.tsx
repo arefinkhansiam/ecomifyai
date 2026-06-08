@@ -88,9 +88,10 @@ export function DashboardShell({ title, children }: { title: string; children: R
             </div>
           </div>
         </header>
-        <main className="flex-1 p-6 md:p-8">{children}</main>
+        <main className="flex-1 p-4 sm:p-6 md:p-8 pb-24 md:pb-8">{children}</main>
         {/* mobile bottom tab bar */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-[var(--border)] flex justify-around py-2 z-20">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-[var(--border)] flex justify-around py-2 z-20"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)" }}>
           {NAV.slice(0, 5).map((n) => {
             const active = isActive(n.to, "exact" in n ? (n as any).exact : false);
             return (

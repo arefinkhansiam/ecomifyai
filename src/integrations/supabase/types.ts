@@ -28,6 +28,8 @@ export type Database = {
           error_message: string | null
           file_size_bytes: number | null
           glb_url: string | null
+          gradient_from: string | null
+          gradient_to: string | null
           id: string
           image_height: number | null
           image_width: number | null
@@ -36,12 +38,15 @@ export type Database = {
           processed_image_url: string | null
           processing_progress: number | null
           processing_step: string | null
+          product_colors: Json
           product_name: string
           product_price: number | null
           qr_code_url: string | null
+          show_branding: boolean
           status: string
           updated_at: string | null
           usdz_url: string | null
+          use_gradient: boolean
           user_id: string
           views_count: number
         }
@@ -58,6 +63,8 @@ export type Database = {
           error_message?: string | null
           file_size_bytes?: number | null
           glb_url?: string | null
+          gradient_from?: string | null
+          gradient_to?: string | null
           id?: string
           image_height?: number | null
           image_width?: number | null
@@ -66,12 +73,15 @@ export type Database = {
           processed_image_url?: string | null
           processing_progress?: number | null
           processing_step?: string | null
+          product_colors?: Json
           product_name: string
           product_price?: number | null
           qr_code_url?: string | null
+          show_branding?: boolean
           status?: string
           updated_at?: string | null
           usdz_url?: string | null
+          use_gradient?: boolean
           user_id: string
           views_count?: number
         }
@@ -88,6 +98,8 @@ export type Database = {
           error_message?: string | null
           file_size_bytes?: number | null
           glb_url?: string | null
+          gradient_from?: string | null
+          gradient_to?: string | null
           id?: string
           image_height?: number | null
           image_width?: number | null
@@ -96,12 +108,15 @@ export type Database = {
           processed_image_url?: string | null
           processing_progress?: number | null
           processing_step?: string | null
+          product_colors?: Json
           product_name?: string
           product_price?: number | null
           qr_code_url?: string | null
+          show_branding?: boolean
           status?: string
           updated_at?: string | null
           usdz_url?: string | null
+          use_gradient?: boolean
           user_id?: string
           views_count?: number
         }
@@ -197,6 +212,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          store_name: string | null
           updated_at: string | null
         }
         Insert: {
@@ -205,6 +221,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          store_name?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -213,6 +230,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          store_name?: string | null
           updated_at?: string | null
         }
         Relationships: []
