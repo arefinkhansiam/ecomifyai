@@ -19,6 +19,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as ArViewProductIdRouteImport } from './routes/ar.view.$productId'
+import { Route as ApiPublicTrackArSessionRouteImport } from './routes/api/public/track-ar-session'
 import { Route as AuthenticatedDashboardUploadRouteImport } from './routes/_authenticated/dashboard.upload'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardProductsRouteImport } from './routes/_authenticated/dashboard.products'
@@ -76,6 +77,11 @@ const ArViewProductIdRoute = ArViewProductIdRouteImport.update({
   path: '/ar/view/$productId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTrackArSessionRoute = ApiPublicTrackArSessionRouteImport.update({
+  id: '/api/public/track-ar-session',
+  path: '/api/public/track-ar-session',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardUploadRoute =
   AuthenticatedDashboardUploadRouteImport.update({
     id: '/dashboard/upload',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
+  '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
+  '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/products': typeof AuthenticatedDashboardProductsRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
+  '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/dashboard/products'
     | '/dashboard/settings'
     | '/dashboard/upload'
+    | '/api/public/track-ar-session'
     | '/ar/view/$productId'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/dashboard/products'
     | '/dashboard/settings'
     | '/dashboard/upload'
+    | '/api/public/track-ar-session'
     | '/ar/view/$productId'
     | '/dashboard'
   id:
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/products'
     | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/upload'
+    | '/api/public/track-ar-session'
     | '/ar/view/$productId'
     | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
@@ -230,6 +242,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   PricingRoute: typeof PricingRoute
   TryArRoute: typeof TryArRoute
+  ApiPublicTrackArSessionRoute: typeof ApiPublicTrackArSessionRoute
   ArViewProductIdRoute: typeof ArViewProductIdRoute
 }
 
@@ -303,6 +316,13 @@ declare module '@tanstack/react-router' {
       path: '/ar/view/$productId'
       fullPath: '/ar/view/$productId'
       preLoaderRoute: typeof ArViewProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/track-ar-session': {
+      id: '/api/public/track-ar-session'
+      path: '/api/public/track-ar-session'
+      fullPath: '/api/public/track-ar-session'
+      preLoaderRoute: typeof ApiPublicTrackArSessionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/upload': {
@@ -382,8 +402,19 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   PricingRoute: PricingRoute,
   TryArRoute: TryArRoute,
+  ApiPublicTrackArSessionRoute: ApiPublicTrackArSessionRoute,
   ArViewProductIdRoute: ArViewProductIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
