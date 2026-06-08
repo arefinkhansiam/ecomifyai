@@ -10,9 +10,10 @@ const NAV = [
   { to: "/dashboard/products", label: "My AR Products", icon: Box },
   { to: "/dashboard/upload", label: "Upload New", icon: Upload },
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
+  { to: "/dashboard/behaviour", label: "Customer Behaviour", icon: Activity },
   { to: "/dashboard/embed", label: "Embed and Share", icon: LinkIcon },
   { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings },
+  { to: "/dashboard/settings", label: "Profile", icon: Settings },
 ] as const;
 
 const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
