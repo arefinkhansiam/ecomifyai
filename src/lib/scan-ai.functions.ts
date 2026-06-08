@@ -152,9 +152,13 @@ export const generateAiHeroFromImage = createServerFn({ method: "POST" })
         .upload(path, bytes, { contentType: mime, upsert: true });
       if (upErr) throw upErr;
 
-      await supabase.from("models_3d").upsert({
-        product_id: productId, preview_url: path, processing_status: "done",
-      } as any, { onConflict: "product_id" } as any);
+      const { data: existing } = await supabase
+        .from("models_3d").select("id").eq("product_id", productId).maybeSingle();
+      if (existing?.id) {
+        await supabase.from("models_3d").update({ preview_url: path, processing_status: "done" }).eq("id", existing.id);
+      } else {
+        await supabase.from("models_3d").insert({ product_id: productId, preview_url: path, processing_status: "done" });
+      }
 
       await supabase.from("ar_products").update({ processed_image_url: path }).eq("id", productId);
       return { ok: true as const, previewPath: path };
