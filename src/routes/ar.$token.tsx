@@ -46,13 +46,16 @@ const loadProductByToken = createServerFn({ method: "POST" })
 
 export const Route = createFileRoute("/ar/$token")({
   ssr: false,
-  head: ({ loaderData }) => ({
-    meta: [
-      { title: loaderData ? `${loaderData.name} — AR Viewer` : "AR Viewer" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" },
-      { name: "description", content: "View this product in your space with AR." },
-    ],
-  }),
+  head: ({ loaderData }) => {
+    const name = (loaderData as any)?.name as string | undefined;
+    return {
+      meta: [
+        { title: name ? `${name} — AR Viewer` : "AR Viewer" },
+        { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" },
+        { name: "description", content: "View this product in your space with AR." },
+      ],
+    };
+  },
   loader: async ({ params }) => {
     const product = await loadProductByToken({ data: { token: params.token } });
     if (!product) throw notFound();
@@ -105,17 +108,7 @@ function ArByToken() {
 
         <div className="mt-4 rounded-3xl overflow-hidden" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
           {has3d ? (
-            // @ts-expect-error model-viewer is a web component
-            <model-viewer
-              src={product.glbUrl}
-              ios-src={product.usdzUrl ?? undefined}
-              ar
-              ar-modes="webxr scene-viewer quick-look"
-              camera-controls
-              auto-rotate
-              shadow-intensity="1"
-              style={{ width: "100%", height: "min(70vh, 560px)", background: pageBg }}
-            />
+            <ModelViewer src={product.glbUrl!} iosSrc={product.usdzUrl ?? undefined} pageBg={pageBg} />
           ) : (
             <div className="aspect-square grid place-items-center" style={{ background: `radial-gradient(ellipse at center, ${accent}22, transparent 70%)` }}>
               {product.imageUrl ? (

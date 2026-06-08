@@ -92,7 +92,7 @@ function ScanPage() {
 
     // Load MediaPipe object detector from CDN
     try {
-      const vision: any = await import(/* @vite-ignore */ "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs");
+      const vision: any = await import(/* @vite-ignore */ ("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs" as string));
       const fileset = await vision.FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm",
       );
