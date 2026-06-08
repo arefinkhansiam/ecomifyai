@@ -408,7 +408,7 @@ function Full3DView() {
         // @ts-ignore — web component
         <model-viewer
           src={glbUrl}
-          ios-src={product.usdz_url || undefined}
+          ios-src={usdzUrl || undefined}
           ar
           ar-modes="webxr scene-viewer quick-look"
           camera-controls
