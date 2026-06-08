@@ -421,21 +421,27 @@ function UploadPage() {
             </div>
           </div>
 
-          <div className="mt-6 rounded-2xl p-8 bg-soft grid place-items-center">
-            <div className="text-[11px] uppercase tracking-wider text-muted mb-3">Live preview</div>
-            <button
-              type="button"
-              style={{
-                background: btnBg, color: fg, padding: sizePad, fontSize: sizeFs,
-                borderRadius: radius, fontWeight: 600, border: "none",
-                boxShadow: "0 10px 28px -8px rgba(2,132,199,0.5)",
-                display: "inline-flex", alignItems: "center", gap: 8,
-              }}
-            >
-              <Sparkles size={16} /> {label || "View in AR"}
-            </button>
-            {showBranding && <div className="mt-3 text-[10px] uppercase tracking-wider text-muted">Powered by Easibie</div>}
+          <div className="mt-6">
+            <div className="text-[11px] uppercase tracking-wider text-muted mb-3 text-center">Live AR preview</div>
+            <ArLivePreview
+              productImage={preview}
+              productName={name || "Your product"}
+              buttonLabel={label || "View in AR"}
+              buttonBg={btnBg}
+              buttonFg={fg}
+              buttonRadius={radius}
+              pageBg={isPaid ? pageBg : "#000000"}
+              fontColor={isPaid ? fontColor : "#FFFFFF"}
+              accent={isPaid ? accentColor : bg}
+              overlay={isPaid ? overlayColor : "rgba(255,255,255,0.14)"}
+              arButtonRadius={isPaid ? arButtonRadius : radius}
+              arButtonText={isPaid ? customButtonText : "View in Your Space"}
+              showBranding={isPaid ? showBranding : true}
+              showProductName={isPaid ? showProductName : true}
+              mode={arMode}
+            />
           </div>
+
 
           <button onClick={upload} disabled={!file || busy || !!createdId} className="btn-primary w-full mt-6">
             {busy ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
