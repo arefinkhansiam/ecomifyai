@@ -99,17 +99,22 @@ function UploadPage() {
     if (!file || !user) return;
     setBusy(true);
     try {
-      setStep("Uploading image...");
+      const isModel = arMode === "full_3d";
+      setStep(isModel ? "Uploading 3D model..." : "Uploading image...");
       const ext = file.name.split(".").pop();
       const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("product-images").upload(path, file);
+      const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, {
+        contentType: file.type || (isModel ? "model/gltf-binary" : undefined),
+      });
       if (upErr) throw upErr;
 
       setStep("Saving product...");
       const { data: created, error: insErr } = await supabase.from("ar_products").insert({
         user_id: user.id,
         product_name: name || "Untitled Product",
-        original_image_url: path,
+        original_image_url: isModel ? null : path,
+        glb_url: isModel ? path : null,
+        ar_mode: arMode,
         status: "ready",
         processing_step: "complete",
         processing_progress: 100,
@@ -134,7 +139,7 @@ function UploadPage() {
           button_radius: arButtonRadius,
           button_shadow: arButtonShadow,
           custom_button_text: customButtonText,
-          default_camera: defaultCamera,
+          default_camera: arMode === "fashion" ? "front" : defaultCamera,
           show_product_name: showProductName,
         } : {},
       } as any).select().single();
