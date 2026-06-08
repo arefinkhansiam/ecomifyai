@@ -24,9 +24,9 @@ function Dashboard() {
 
   const cards = [
     { label: "Total Products", value: stats?.total_products ?? 0, icon: Box, accent: "#0369A1" },
-    { label: "Ready for AR", value: stats?.ready_products ?? 0, icon: Sparkles, accent: "#0EA5E9" },
-    { label: "Total AR Views", value: stats?.total_views ?? 0, icon: Eye, accent: "#10B981" },
-    { label: "Embed Count", value: stats?.total_embeds ?? 0, icon: Code, accent: "#F59E0B" },
+    { label: "Ready for AR", value: stats?.ready_products ?? 0, icon: Sparkles, accent: "#0369A1" },
+    { label: "Total AR Views", value: stats?.total_views ?? 0, icon: Eye, accent: "#0369A1" },
+    { label: "Embed Count", value: stats?.total_embeds ?? 0, icon: Code, accent: "#0369A1" },
   ];
 
   const plan = stats?.plan ?? "free";
