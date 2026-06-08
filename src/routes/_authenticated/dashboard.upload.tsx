@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus } from "lucide-react";
+import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/upload")({
   component: UploadPage,
@@ -13,10 +13,19 @@ export const Route = createFileRoute("/_authenticated/dashboard/upload")({
 type Size = "small" | "medium" | "large";
 
 const PRESET_COLORS = ["#0B1220", "#0EA5E9", "#38BDF8", "#7C3AED", "#10B981", "#F59E0B", "#EF4444", "#FFFFFF"];
+const GRADIENT_PRESETS = [
+  { name: "Ocean", from: "#0369A1", to: "#38BDF8" },
+  { name: "Sunset", from: "#F59E0B", to: "#EF4444" },
+  { name: "Violet", from: "#7C3AED", to: "#EC4899" },
+  { name: "Forest", from: "#065F46", to: "#10B981" },
+  { name: "Midnight", from: "#0B1220", to: "#4338CA" },
+  { name: "Candy", from: "#EC4899", to: "#38BDF8" },
+];
 
 function UploadPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [plan, setPlan] = useState<"free" | "starter" | "growth">("free");
   const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
@@ -29,13 +38,24 @@ function UploadPage() {
   const [newColor, setNewColor] = useState("#0EA5E9");
 
   const [label, setLabel] = useState("View in AR");
-  const [useGradient, setUseGradient] = useState(true);
+  const [useGradient, setUseGradient] = useState(false);
   const [bg, setBg] = useState("#0369A1");
   const [bg2, setBg2] = useState("#38BDF8");
   const [fg, setFg] = useState("#FFFFFF");
   const [radius, setRadius] = useState(14);
   const [size, setSize] = useState<Size>("medium");
   const [showBranding, setShowBranding] = useState(true);
+
+  const isPaid = plan !== "free";
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("user_plans").select("plan").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+      const p = (data?.plan as any) ?? "free";
+      setPlan(p);
+      if (p === "free") { setUseGradient(false); setShowBranding(true); }
+    });
+  }, [user]);
 
   const onFile = (f: File | null) => {
     if (!f) return;
@@ -78,10 +98,10 @@ function UploadPage() {
         button_size: size,
         is_public: true,
         product_colors: colors,
-        use_gradient: useGradient,
+        use_gradient: isPaid ? useGradient : false,
         gradient_from: bg,
         gradient_to: bg2,
-        show_branding: showBranding,
+        show_branding: isPaid ? showBranding : true,
       } as any).select().single();
       if (insErr) throw insErr;
 
@@ -174,15 +194,34 @@ function UploadPage() {
               <input className="input-base mt-1" value={label} onChange={(e) => setLabel(e.target.value)} maxLength={40} />
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-soft">
-              <div>
-                <div className="text-sm font-semibold text-ink">Use gradient</div>
-                <div className="text-xs" style={{ color: "var(--ink-soft)" }}>Blend two colors smoothly</div>
+            <div className="p-4 rounded-xl" style={{ background: "linear-gradient(135deg, rgba(2,132,199,0.06), rgba(56,189,248,0.06))", border: "1px solid rgba(2,132,199,0.15)" }}>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-semibold text-ink flex items-center gap-2">
+                    Use gradient
+                    {!isPaid && <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}><Crown size={9} /> Pro</span>}
+                  </div>
+                  <div className="text-xs" style={{ color: "var(--ink-soft)" }}>{isPaid ? "Blend two colors smoothly." : "Upgrade to unlock gradient buttons."}</div>
+                </div>
+                <button
+                  onClick={() => { if (!isPaid) { toast.info("Gradient buttons are a paid feature"); return; } setUseGradient(!useGradient); }}
+                  disabled={!isPaid}
+                  className="relative w-11 h-6 rounded-full transition-colors shrink-0"
+                  style={{ background: useGradient ? "var(--primary)" : "#cbd5e1", opacity: isPaid ? 1 : 0.5, cursor: isPaid ? "pointer" : "not-allowed" }}>
+                  <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ transform: useGradient ? "translateX(22px)" : "translateX(2px)" }} />
+                </button>
               </div>
-              <button onClick={() => setUseGradient(!useGradient)} className="relative w-11 h-6 rounded-full transition-colors"
-                style={{ background: useGradient ? "var(--primary)" : "#cbd5e1" }}>
-                <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ transform: useGradient ? "translateX(22px)" : "translateX(2px)" }} />
-              </button>
+
+              {useGradient && isPaid && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {GRADIENT_PRESETS.map((g) => (
+                    <button key={g.name} type="button" onClick={() => { setBg(g.from); setBg2(g.to); }}
+                      className="w-9 h-9 rounded-full border-2 transition-transform hover:scale-110"
+                      title={g.name}
+                      style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})`, borderColor: bg === g.from && bg2 === g.to ? "var(--primary)" : "rgba(255,255,255,0.7)" }} />
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -212,13 +251,19 @@ function UploadPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-soft">
+            <div className="flex items-center justify-between p-4 rounded-xl gap-3" style={{ background: "linear-gradient(135deg, rgba(2,132,199,0.06), rgba(56,189,248,0.06))", border: "1px solid rgba(2,132,199,0.15)" }}>
               <div>
-                <div className="text-sm font-semibold text-ink">Show "Powered by Easibie"</div>
-                <div className="text-xs" style={{ color: "var(--ink-soft)" }}>Free plan keeps branding. Paid plans can hide it.</div>
+                <div className="text-sm font-semibold text-ink flex items-center gap-2">
+                  Show "Powered by Easibie"
+                  {!isPaid && <Lock size={11} className="text-muted" />}
+                </div>
+                <div className="text-xs" style={{ color: "var(--ink-soft)" }}>{isPaid ? "Turn off to hide branding on your AR viewer." : "Free plan keeps branding. Upgrade to remove it."}</div>
               </div>
-              <button onClick={() => setShowBranding(!showBranding)} className="relative w-11 h-6 rounded-full transition-colors"
-                style={{ background: showBranding ? "var(--primary)" : "#cbd5e1" }}>
+              <button
+                onClick={() => { if (!isPaid) { toast.info("Removing branding is a paid feature"); return; } setShowBranding(!showBranding); }}
+                disabled={!isPaid}
+                className="relative w-11 h-6 rounded-full transition-colors shrink-0"
+                style={{ background: showBranding ? "var(--primary)" : "#cbd5e1", opacity: isPaid ? 1 : 0.6, cursor: isPaid ? "pointer" : "not-allowed" }}>
                 <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ transform: showBranding ? "translateX(22px)" : "translateX(2px)" }} />
               </button>
             </div>
