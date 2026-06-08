@@ -1,4 +1,5 @@
-import { CheckCircle2, Crown, Sparkles, Zap } from "lucide-react";
+import { Check } from "lucide-react";
+import { Crown, Sparkles, Zap } from "lucide-react";
 
 export type Plan = {
   id: "free" | "starter" | "growth";
