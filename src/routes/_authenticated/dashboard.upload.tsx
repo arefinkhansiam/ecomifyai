@@ -149,12 +149,25 @@ function UploadPage() {
       } as any).select().single();
       if (insErr) throw insErr;
 
+      // For image uploads, run the same AI hero pass so plain uploads become
+      // AR-ready (clean studio render) just like camera scans.
+      if (!isModel) {
+        setStep("AI is preparing your AR preview...");
+        try {
+          await generateHero({ data: { productId: created.id } });
+        } catch (e) {
+          console.warn("[upload] AI hero failed, keeping raw image", e);
+          toast.warning("AR preview kept the original image (AI cleanup unavailable).");
+        }
+      }
+
       toast.success("AR product created!");
       setCreatedId(created.id);
     } catch (e: any) {
       toast.error(e.message ?? "Upload failed");
     } finally { setBusy(false); setStep(""); }
   };
+
 
   const origin = typeof window !== "undefined" ? window.location.origin : "https://your-domain.com";
   const productId = createdId ?? "PRODUCT_ID";
