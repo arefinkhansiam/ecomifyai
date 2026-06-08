@@ -35,6 +35,7 @@ const GRADIENT_PRESETS = [
 function UploadPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const generateHero = useServerFn(generateAiHeroFromImage);
   const [plan, setPlan] = useState<"free" | "starter" | "growth">("free");
   const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState("");
