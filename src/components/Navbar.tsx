@@ -4,7 +4,7 @@ import { Menu, X, LogOut, LayoutDashboard, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import logoAsset from "@/assets/ecomify-logo.png.asset.json";
+
 
 const links = [
   { to: "/", label: "Home" },
@@ -50,13 +50,18 @@ export function Navbar() {
           {/* Mobile: left spacer for centering */}
           <div className="md:hidden justify-self-start" />
 
-          <Link to="/" className="flex items-center justify-self-center md:justify-self-auto">
-            <img
-              src={logoAsset.url}
-              alt="Ecomify"
-              className="h-7 md:h-8 w-auto object-contain"
-              style={{ filter: "drop-shadow(0 2px 8px rgba(2,132,199,0.25))" }}
-            />
+          <Link to="/" className="flex items-center justify-self-center md:justify-self-auto font-display font-extrabold tracking-tight text-[22px] md:text-[24px] leading-none">
+            <span
+              style={{
+                backgroundImage: "linear-gradient(135deg, #0B1220 0%, #0369A1 45%, #38BDF8 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              ECOMIFY
+            </span>
           </Link>
           <nav className="hidden md:flex items-center gap-7">
             {links.map((l) => (

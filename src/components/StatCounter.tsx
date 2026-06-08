@@ -33,17 +33,18 @@ export function StatCounter({ target, suffix = "", label }: { target: number; su
   return (
     <div ref={ref} className="text-center">
       <div
-        className="font-display font-extrabold text-4xl md:text-5xl"
+        className="font-display font-extrabold text-2xl sm:text-3xl md:text-5xl leading-tight"
         style={{
           backgroundImage: "linear-gradient(135deg, #0B1220 0%, #0369A1 45%, #38BDF8 100%)",
           WebkitBackgroundClip: "text",
           backgroundClip: "text",
           color: "transparent",
+          wordBreak: "break-word",
         }}
       >
         {value.toLocaleString()}{suffix}
       </div>
-      <div className="mt-2 text-sm font-medium" style={{ color: "var(--ink-soft)" }}>{label}</div>
+      <div className="mt-2 text-xs sm:text-sm font-medium" style={{ color: "var(--ink-soft)" }}>{label}</div>
     </div>
   );
 }
