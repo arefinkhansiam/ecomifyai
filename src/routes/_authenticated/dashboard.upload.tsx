@@ -113,6 +113,17 @@ function UploadPage() {
         gradient_from: bg,
         gradient_to: bg2,
         show_branding: isPaid ? showBranding : true,
+        ar_customization: isPaid ? {
+          page_bg: pageBg,
+          font_color: fontColor,
+          accent_color: accentColor,
+          overlay_color: overlayColor,
+          button_radius: arButtonRadius,
+          button_shadow: arButtonShadow,
+          custom_button_text: customButtonText,
+          default_camera: defaultCamera,
+          show_product_name: showProductName,
+        } : {},
       } as any).select().single();
       if (insErr) throw insErr;
 
