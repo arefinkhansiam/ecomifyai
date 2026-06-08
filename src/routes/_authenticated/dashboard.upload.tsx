@@ -169,6 +169,16 @@ function UploadPage() {
 
   return (
     <DashboardShell title="Upload New AR Product">
+      <Link to="/dashboard/scan" className="mb-6 block rounded-2xl p-4 text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", boxShadow: "0 18px 40px -18px rgba(2,132,199,0.55)" }}>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl grid place-items-center" style={{ background: "rgba(255,255,255,0.15)" }}>📷</div>
+          <div className="flex-1">
+            <div className="text-sm font-bold">Don't have a photo? Scan with your camera</div>
+            <div className="text-xs opacity-80">Capture the product from 40 angles → AI builds an AR-ready preview</div>
+          </div>
+          <span className="text-xs font-bold underline">Open scanner →</span>
+        </div>
+      </Link>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: image upload + colors */}
         <div className="bg-card rounded-2xl p-6 glow-card">

@@ -27,6 +27,7 @@ export type Database = {
           created_at: string | null
           dominant_color: string | null
           embed_count: number
+          embed_token: string | null
           error_message: string | null
           file_size_bytes: number | null
           glb_url: string | null
@@ -50,6 +51,7 @@ export type Database = {
           usdz_url: string | null
           use_gradient: boolean
           user_id: string
+          view_count: number
           views_count: number
         }
         Insert: {
@@ -64,6 +66,7 @@ export type Database = {
           created_at?: string | null
           dominant_color?: string | null
           embed_count?: number
+          embed_token?: string | null
           error_message?: string | null
           file_size_bytes?: number | null
           glb_url?: string | null
@@ -87,6 +90,7 @@ export type Database = {
           usdz_url?: string | null
           use_gradient?: boolean
           user_id: string
+          view_count?: number
           views_count?: number
         }
         Update: {
@@ -101,6 +105,7 @@ export type Database = {
           created_at?: string | null
           dominant_color?: string | null
           embed_count?: number
+          embed_token?: string | null
           error_message?: string | null
           file_size_bytes?: number | null
           glb_url?: string | null
@@ -124,6 +129,7 @@ export type Database = {
           usdz_url?: string | null
           use_gradient?: boolean
           user_id?: string
+          view_count?: number
           views_count?: number
         }
         Relationships: []
@@ -227,6 +233,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "ar_views_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "ar_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      models_3d: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          external_task_id: string | null
+          glb_url: string | null
+          id: string
+          preview_url: string | null
+          processing_status: string
+          product_id: string
+          updated_at: string
+          usdz_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          external_task_id?: string | null
+          glb_url?: string | null
+          id?: string
+          preview_url?: string | null
+          processing_status?: string
+          product_id: string
+          updated_at?: string
+          usdz_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          external_task_id?: string | null
+          glb_url?: string | null
+          id?: string
+          preview_url?: string | null
+          processing_status?: string
+          product_id?: string
+          updated_at?: string
+          usdz_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "models_3d_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "ar_products"
@@ -339,6 +392,38 @@ export type Database = {
         }
         Relationships: []
       }
+      scan_frames: {
+        Row: {
+          created_at: string
+          frame_number: number
+          frame_url: string
+          id: string
+          product_id: string
+        }
+        Insert: {
+          created_at?: string
+          frame_number: number
+          frame_url: string
+          id?: string
+          product_id: string
+        }
+        Update: {
+          created_at?: string
+          frame_number?: number
+          frame_url?: string
+          id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scan_frames_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "ar_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_plans: {
         Row: {
           ar_product_limit: number
@@ -391,6 +476,7 @@ export type Database = {
         Args: { p_capability: string; p_device: string; p_product_id: string }
         Returns: undefined
       }
+      increment_view_by_token: { Args: { p_token: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

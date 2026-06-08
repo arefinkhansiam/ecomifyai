@@ -1,95 +1,62 @@
-## Goal
 
-Add three explicit AR modes selectable by the vendor at upload time. Customer's AR viewer auto-loads the right mode and reports session data.
+# AR Scan-to-3D Module (integrated with existing AR system)
 
-```text
-Vendor upload → picks AR Mode → asset processed → embed code
-                       │
-                       ├── fashion  → photo (garment)
-                       ├── furniture→ photo (auto bg-remove)
-                       └── full_3d  → GLB / GLTF + optional USDZ
+I'll extend the current `ar_products` table and dashboard rather than create parallel tables, so vendors get one unified product list. A new "Scan with camera" mode joins the existing Furniture / Fashion / Full-3D modes.
 
-Customer click AR button
-        │
-        ├── fashion  → front cam → capture selfie → Replicate IDM-VTON → result
-        ├── furniture→ back cam  → capture frame  → composite product via canvas → result
-        └── full_3d  → model-viewer (WebXR / Quick Look / Scene Viewer)
-```
+## What gets built
 
-## External services required
+### 1. Vendor scan flow (`/dashboard/scan`)
+- Vendor enters product name → product row created with `status='scanning'`, `ar_mode='scan_ai'`.
+- Browser opens back camera (`getUserMedia { facingMode: "environment" }`).
+- MediaPipe Object Detector (CDN `@mediapipe/tasks-vision`) runs every 500 ms on the live feed; green bbox when an object is in frame, otherwise "Place product in front of camera".
+- Auto-capture one JPEG every 2 s while an object is detected, uploaded to `product-images` bucket at `scans/{productId}/frame_{n}.jpg`, URL recorded in `scan_frames`.
+- Circular progress ring 0→40 frames; rotation hint text changes every 10 frames ("rotate left", "tilt up", "show bottom", "show back").
+- After 40 frames camera stops, status flips to `processing`.
 
-| Service       | Why                                  | How                              |
-|---------------|--------------------------------------|----------------------------------|
-| Replicate     | IDM-VTON virtual try-on (Fashion)    | Standard connector (gateway)     |
-| Remove.bg     | Auto background removal (Furniture)  | Secret `REMOVEBG_API_KEY`        |
+### 2. AI 3D preview generation
+- A `createServerFn` picks frame #20 as the primary shot.
+- Calls Lovable AI Gateway (`google/gemini-2.5-flash-image`) to produce a clean studio "3D-style" hero render (turntable look on transparent background). Result PNG saved to `models_3d.preview_url`.
+- Also stores the cleaned hero image as the product's `model_url` fallback so the existing viewer keeps working.
+- `processing_status` flows: `pending → generating → done | failed`; product `status` → `ready` on success.
+- A clear banner in the viewer: "AI 3D preview — real GLB/USDZ coming when a 3D service is connected." Real TripoSR/Meshy integration is left as a single swap-in point in this function (one TODO, one place).
 
-I'll request both right after this plan is approved. Nothing else changes until they're linked.
+### 3. Embed token & widget
+- Add `embed_token` (unique, `crypto.randomUUID()`) and `view_count` to `ar_products` (no separate `ar_widgets` table — same purpose, less duplication).
+- Public viewer route: `/ar/$token`.
+  - Loads `<model-viewer>` from Google CDN.
+  - `src` = GLB if present, else the AI preview image rendered in a 360° spin frame; `ios-src` = USDZ when present.
+  - Attributes: `ar`, `ar-modes="webxr scene-viewer quick-look"`, `camera-controls`, `auto-rotate`, `shadow-intensity="1"`.
+  - Shows product name + description overlay, increments `view_count`.
+- Dashboard card gets two new buttons: **Preview AR** (opens `/ar/$token`) and **Copy embed code** (copies the `<iframe>` snippet with `allow="xr-spatial-tracking; camera"`).
 
-## Database (one migration)
+### 4. Dashboard polish
+- Status badges: Scanning / Processing / Ready / Failed.
+- Toast notification when status flips to Ready.
+- Loading skeletons, dark modern theme using existing tokens.
 
-Add to `ar_products`:
-- `ar_mode` text — `fashion` | `furniture` | `full_3d`
-- `model_usdz_url` text — optional iOS Quick Look file
-- `processed_asset_url` already exists; reuse for bg-removed image
+## Database changes (single migration)
 
-Add storage bucket `ar-models` (private, signed URLs) for `.glb` / `.usdz` uploads.
+- `ar_products`: add `embed_token text unique default`, `view_count int default 0`; extend `ar_mode` to include `'scan_ai'`.
+- New table `scan_frames` (`id`, `product_id` FK, `frame_url`, `frame_number`, `created_at`) with RLS scoped to product owner + GRANTs.
+- New table `models_3d` (`id`, `product_id` FK, `preview_url`, `glb_url`, `usdz_url`, `processing_status`, `external_task_id`, timestamps) with RLS + GRANTs.
+- Backfill `embed_token` for existing rows.
 
-Backfill existing rows: `ar_mode = 'full_3d'` when a `model_url` is present, else `'furniture'`.
+## Server functions / routes
 
-## Upload flow (`dashboard.upload.tsx`)
+- `src/lib/scan.functions.ts` — `createScanProduct`, `saveScanFrame`, `finalizeScan` (triggers AI step).
+- `src/lib/scan-ai.functions.ts` — `generate3dPreview` (Lovable AI image edit on frame #20).
+- `src/routes/ar.$token.tsx` — public viewer (server fn loads product + increments view count via `supabaseAdmin`, no auth required).
 
-Stepper:
-1. **Product Info** — name + category. Mode picker shown as 3 cards (Fashion / Furniture / Full 3D), preselected from category but always overridable.
-2. **Asset Upload** — input adapts to mode:
-   - fashion → single garment image (PNG/JPG)
-   - furniture → product image; after upload, server fn calls Remove.bg, stores result in `processed_asset_url`
-   - full_3d → GLB upload (required) + optional USDZ
-3. **Customization** — existing panel (free = button color only; growth = full).
-4. **Embed Code** — existing.
+## Technical notes
 
-## Server functions (new)
+- MediaPipe runs entirely client-side; no key needed.
+- Lovable AI Gateway is used for the "3D preview" image (no external HF/Replicate dependency).
+- USDZ conversion intentionally skipped; iPhone falls back to the 3D viewer until a real GLB pipeline is plugged in.
+- Public viewer uses a server fn that loads `supabaseAdmin` inside the handler to keep the import graph client-safe.
+- Embed `<iframe>` includes `allow="xr-spatial-tracking; camera"` — required for AR in iframes.
 
-- `src/lib/ar-fashion.functions.ts` → `runVirtualTryOn({ productId, personImageBase64 })`
-  Uploads selfie + garment to Replicate `/v1/files` via gateway, kicks off IDM-VTON prediction, polls, returns result URL. Stores nothing server-side (privacy).
-- `src/lib/ar-furniture.functions.ts` → `removeBackground({ productId })`
-  Pulls source image from storage, POSTs to Remove.bg, writes result back to `product-images/processed/`, updates `processed_asset_url`.
+## Out of scope this turn
 
-Both gated by `requireSupabaseAuth`.
-
-## Customer AR viewer (`ar.view.$productId.tsx`)
-
-Switch on `product.ar_mode`:
-
-- **fashion** — front camera + circular capture button. On capture: show loading state, call `runVirtualTryOn`, render result with Share / Retake / Close.
-- **furniture** — back camera + capture button. On capture: freeze frame, overlay `processed_asset_url` PNG, allow drag/pinch/rotate, Share / Retake / Close.
-- **full_3d** — existing `<model-viewer>` path, plus scale slider and a Share button that links to the AR page URL.
-
-Top bar (all modes): product name only, close button. All chrome styled from `ar_customization`. Session tracking continues to fire (`ar_mode`, `camera_used`, `did_interact`, `time_spent_seconds`).
-
-## Widget (`public/widget.js`)
-
-No mode-specific change — it still opens the viewer in a fullscreen iframe. Already passes session/customization data. Verify it picks up the new `ar_mode` from the product payload it fetches.
-
-## Out of scope (call out so it's not assumed)
-
-- Real WebXR plane detection / hit-testing for Furniture (would need AR-Quick-Look / a heavy SLAM lib). MVP uses freeze-frame composite which is what spec describes: "AI places product on captured image".
-- Real-time floor-grid overlay before capture — added as a follow-up if you want it.
-
-## Files touched (estimate)
-
-- migration (1)
-- `src/lib/ar-fashion.functions.ts` (new)
-- `src/lib/ar-furniture.functions.ts` (new)
-- `src/routes/_authenticated/dashboard.upload.tsx`
-- `src/routes/ar.view.$productId.tsx`
-- `src/components/PricingCards.tsx` (mention 3 AR modes on Growth)
-- `src/integrations/supabase/types.ts` (regenerated)
-- `public/widget.js` (small)
-
-## Order of execution
-
-1. You approve plan.
-2. I request **Replicate connector** + **Remove.bg API key**.
-3. Once linked: migration → upload flow → server fns → viewer modes → widget verify → smoke test.
-
-Approve to proceed and I'll trigger the connector / secret prompts.
+- Real photogrammetry / TripoSR call (left as a single TODO inside `generate3dPreview`).
+- GLB → USDZ conversion.
+- Browser push notifications on long jobs (AI preview takes seconds, not minutes).
