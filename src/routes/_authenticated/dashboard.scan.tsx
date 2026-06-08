@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Camera, Loader2, Sparkles, ScanLine, X } from "lucide-react";
+import { Camera, Sparkles, ScanLine, X, Check, Copy, ExternalLink } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
@@ -17,7 +17,8 @@ const TOTAL_FRAMES = 40;
 const CAPTURE_INTERVAL_MS = 2000;
 const DETECT_INTERVAL_MS = 500;
 
-type Phase = "intro" | "scanning" | "uploading" | "generating" | "done" | "error";
+type Phase = "intro" | "scanning" | "generating" | "done" | "error";
+type GenStep = "capturing" | "cleaning" | "composing";
 
 function ScanPage() {
   const { user } = useAuth();
@@ -30,6 +31,11 @@ function ScanPage() {
   const [count, setCount] = useState(0);
   const [objectVisible, setObjectVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [autoDetect, setAutoDetect] = useState(true);
+  const [genStep, setGenStep] = useState<GenStep>("capturing");
+  const [previewThumb, setPreviewThumb] = useState<string | null>(null);
+  const [embedToken, setEmbedToken] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -44,20 +50,33 @@ function ScanPage() {
   useEffect(() => () => stopAll(), []);
 
   const stopAll = () => {
-    detectTimerRef.current && clearInterval(detectTimerRef.current);
-    captureTimerRef.current && clearInterval(captureTimerRef.current);
+    if (detectTimerRef.current) clearInterval(detectTimerRef.current);
+    if (captureTimerRef.current) clearInterval(captureTimerRef.current);
     detectTimerRef.current = null;
     captureTimerRef.current = null;
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
   };
 
+  const waitForVideoReady = (v: HTMLVideoElement) =>
+    new Promise<void>((resolve) => {
+      if (v.readyState >= 2 && v.videoWidth > 0) return resolve();
+      const on = () => { v.removeEventListener("loadeddata", on); resolve(); };
+      v.addEventListener("loadeddata", on);
+    });
+
   const start = async () => {
     if (!user) return;
     setError(null);
     if (!productName.trim()) { toast.error("Add a product name first"); return; }
 
-    // Create product row
+    // Camera supported?
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError("Your browser doesn't support camera access. Try Chrome/Safari on mobile.");
+      setPhase("error"); return;
+    }
+
+    // Create product row first
     const { data: created, error: insErr } = await supabase.from("ar_products").insert({
       user_id: user.id,
       product_name: productName.trim(),
@@ -71,28 +90,40 @@ function ScanPage() {
     setProductId(created.id);
     productIdRef.current = created.id;
 
-    // Start camera
+    // CRITICAL: mount the video element FIRST, then attach the stream.
+    setPhase("scanning");
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
+      const v = videoRef.current;
+      if (!v) throw new Error("Video element not ready");
+      v.srcObject = stream;
+      await v.play().catch(() => {});
+      await waitForVideoReady(v);
+      console.log("[scan] camera ready", v.videoWidth, "x", v.videoHeight);
     } catch (e: any) {
-      setError("Camera permission denied. Allow camera access in your browser settings.");
+      const name = e?.name ?? "";
+      const msg =
+        name === "NotAllowedError" ? "Camera permission was denied. Enable it in your browser settings and try again."
+        : name === "NotFoundError" ? "No camera found on this device."
+        : name === "NotReadableError" ? "Camera is already in use by another app."
+        : `Couldn't start camera: ${e?.message ?? name ?? "unknown"}`;
+      setError(msg);
       setPhase("error");
+      stopAll();
       return;
     }
 
-    setPhase("scanning");
-
-    // Load MediaPipe object detector from CDN
+    // Try MediaPipe. If unavailable, run without auto-detect.
     try {
-      const vision: any = await import(/* @vite-ignore */ ("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs" as string));
+      const url = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+      const vision: any = await import(/* @vite-ignore */ url);
       const fileset = await vision.FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm",
       );
@@ -100,19 +131,26 @@ function ScanPage() {
         baseOptions: {
           modelAssetPath: "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/1/efficientdet_lite0.tflite",
         },
-        scoreThreshold: 0.35,
+        scoreThreshold: 0.3,
         runningMode: "VIDEO",
       });
+      setAutoDetect(true);
+      console.log("[scan] detector ready");
     } catch (e) {
-      // If detector fails, treat object as always visible — keep the flow working.
+      console.warn("[scan] detector unavailable, fallback to always-capture", e);
       detectorRef.current = null;
+      setAutoDetect(false);
+      objectVisibleRef.current = true;
+      setObjectVisible(true);
     }
 
     // Detection loop
     detectTimerRef.current = setInterval(() => {
       const v = videoRef.current;
       if (!v || v.readyState < 2) return;
-      if (!detectorRef.current) { objectVisibleRef.current = true; setObjectVisible(true); return; }
+      if (!detectorRef.current) {
+        objectVisibleRef.current = true; setObjectVisible(true); return;
+      }
       try {
         const r = detectorRef.current.detectForVideo(v, performance.now());
         const visible = (r?.detections?.length ?? 0) > 0;
@@ -121,7 +159,6 @@ function ScanPage() {
       } catch {/* ignore */}
     }, DETECT_INTERVAL_MS);
 
-    // Capture loop
     captureTimerRef.current = setInterval(() => { void tickCapture(); }, CAPTURE_INTERVAL_MS);
   };
 
@@ -130,7 +167,8 @@ function ScanPage() {
     if (countRef.current >= TOTAL_FRAMES) return;
     const v = videoRef.current, c = canvasRef.current, pid = productIdRef.current, uid = user?.id;
     if (!v || !c || !pid || !uid) return;
-    c.width = v.videoWidth || 1280; c.height = v.videoHeight || 720;
+    if (!v.videoWidth || !v.videoHeight) return;
+    c.width = v.videoWidth; c.height = v.videoHeight;
     const ctx = c.getContext("2d"); if (!ctx) return;
     ctx.drawImage(v, 0, 0, c.width, c.height);
     const blob: Blob | null = await new Promise((res) => c.toBlob((b) => res(b), "image/jpeg", 0.85));
@@ -140,7 +178,7 @@ function ScanPage() {
     const path = `scans/${uid}/${pid}/frame_${String(n).padStart(3, "0")}.jpg`;
     const { error: upErr } = await supabase.storage.from("product-images")
       .upload(path, blob, { contentType: "image/jpeg", upsert: true });
-    if (upErr) return;
+    if (upErr) { console.warn("[scan] upload err", upErr); return; }
     await supabase.from("scan_frames").insert({ product_id: pid, frame_url: path, frame_number: n });
     countRef.current = n;
     setCount(n);
@@ -153,8 +191,21 @@ function ScanPage() {
   const finishScan = async () => {
     stopAll();
     setPhase("generating");
+    setGenStep("cleaning");
+    // 3-step animation timing
+    setTimeout(() => setGenStep("composing"), 1500);
     try {
       await generate({ data: { productId: productIdRef.current! } });
+      // fetch token + thumb
+      const { data } = await supabase.from("ar_products")
+        .select("embed_token, processed_image_url")
+        .eq("id", productIdRef.current!).maybeSingle();
+      if (data?.embed_token) setEmbedToken(data.embed_token);
+      if (data?.processed_image_url) {
+        const { data: signed } = await supabase.storage.from("product-images")
+          .createSignedUrl(data.processed_image_url, 3600);
+        if (signed?.signedUrl) setPreviewThumb(signed.signedUrl);
+      }
       setPhase("done");
       toast.success("AR Ready!");
     } catch (e: any) {
@@ -163,129 +214,243 @@ function ScanPage() {
     }
   };
 
+  const reset = () => {
+    stopAll();
+    setPhase("intro"); setCount(0); countRef.current = 0; setProductName("");
+    setProductId(null); productIdRef.current = null;
+    setPreviewThumb(null); setEmbedToken(null); setError(null);
+  };
+
+  const cancel = () => { stopAll(); setPhase("intro"); setCount(0); countRef.current = 0; };
+
   const hint = (() => {
     if (count < 10) return "Slowly rotate the product to the left";
     if (count < 20) return "Now tilt up slightly";
     if (count < 30) return "Show the back of the product";
     return "Almost done — show the bottom";
   })();
-
+  const angleLabel = count < 10 ? "Left side" : count < 20 ? "Top" : count < 30 ? "Back" : "Bottom";
   const pct = Math.round((count / TOTAL_FRAMES) * 100);
+
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const viewerUrl = embedToken ? `${origin}/ar/${embedToken}` : `${origin}/ar/view/${productId}`;
+  const embedSnippet = `<iframe src="${viewerUrl}" width="100%" height="550" frameborder="0" allow="xr-spatial-tracking; camera" allowfullscreen></iframe>`;
+  const copyEmbed = async () => {
+    await navigator.clipboard.writeText(embedSnippet);
+    setCopied(true); toast.success("Embed code copied");
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  const isCameraPhase = phase === "scanning" || phase === "generating";
 
   return (
     <DashboardShell title="Scan with Camera">
-      {phase === "intro" && (
-        <div className="max-w-xl mx-auto bg-card rounded-2xl p-6 glow-card">
-          <div className="flex items-center gap-3">
-            <span className="w-12 h-12 rounded-2xl grid place-items-center text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}>
-              <ScanLine size={22} />
-            </span>
-            <div>
-              <h3 className="text-ink">Scan a real product</h3>
-              <p className="text-sm" style={{ color: "var(--ink-soft)" }}>Place your product on a clean surface. We'll capture {TOTAL_FRAMES} angles and turn it into an AR-ready preview.</p>
-            </div>
-          </div>
-          <div className="mt-5">
-            <label className="text-xs text-muted uppercase tracking-wide">Product name</label>
-            <input className="input-base mt-1" placeholder="e.g. Velvet Lounge Chair" value={productName} onChange={(e) => setProductName(e.target.value)} />
-          </div>
-          <button onClick={start} className="btn-primary mt-6 w-full justify-center">
-            <Camera size={16} /> Start camera scan
-          </button>
-          <ul className="mt-6 text-xs space-y-2" style={{ color: "var(--ink-soft)" }}>
-            <li>• Use good lighting</li>
-            <li>• Rotate slowly — we auto-capture every 2 seconds</li>
-            <li>• Keep the whole product in frame</li>
-          </ul>
-        </div>
-      )}
-
-      {(phase === "scanning" || phase === "generating") && (
+      {/* Always render the camera elements so refs exist when we attach the stream. */}
+      <div className={isCameraPhase ? "block" : "hidden"}>
         <div className="max-w-2xl mx-auto">
-          <div className="relative rounded-3xl overflow-hidden bg-black aspect-[3/4] sm:aspect-video">
-            <video ref={videoRef} playsInline muted className="absolute inset-0 w-full h-full object-cover" />
+          <div className="relative rounded-3xl overflow-hidden aspect-[3/4] sm:aspect-video"
+               style={{ background: "radial-gradient(ellipse at center, #0F172A 0%, #020617 100%)" }}>
+            <video ref={videoRef} playsInline muted autoPlay
+              className="absolute inset-0 w-full h-full object-cover" />
             <canvas ref={canvasRef} className="hidden" />
-            {/* viewport overlay */}
+
+            {/* darkening vignette */}
+            <div className="absolute inset-0 pointer-events-none"
+                 style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.45), transparent 25%, transparent 65%, rgba(0,0,0,0.6))" }} />
+
+            {/* Detection frame */}
             <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute inset-6 rounded-2xl border-2"
-                style={{ borderColor: objectVisible ? "#10B981" : "rgba(255,255,255,0.45)", transition: "border-color .2s" }} />
-              <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-                <span className="text-xs uppercase tracking-widest px-3 py-1 rounded-full"
-                  style={{ background: objectVisible ? "rgba(16,185,129,0.85)" : "rgba(0,0,0,0.55)", color: "#fff" }}>
-                  {objectVisible ? "Product detected" : "Place product in frame"}
-                </span>
-                <button onClick={() => { stopAll(); setPhase("intro"); setCount(0); countRef.current = 0; }}
-                  className="w-9 h-9 rounded-full grid place-items-center text-white" style={{ background: "rgba(0,0,0,0.55)" }}>
-                  <X size={16} />
-                </button>
+              <div className="absolute inset-6 rounded-2xl border-2 transition-all"
+                style={{
+                  borderColor: objectVisible ? "#10B981" : "rgba(255,255,255,0.5)",
+                  boxShadow: objectVisible ? "0 0 0 6px rgba(16,185,129,0.18)" : "0 0 0 6px rgba(255,255,255,0.06)",
+                  animation: objectVisible ? "none" : "pulse 1.8s ease-in-out infinite",
+                }} />
+              {/* corner ticks */}
+              {([
+                { t: 24, l: 24 }, { t: 24, r: 24 }, { b: 24, l: 24 }, { b: 24, r: 24 },
+              ] as any[]).map((p, i) => (
+                <div key={i} className="absolute w-5 h-5"
+                  style={{
+                    top: p.t, bottom: p.b, left: p.l, right: p.r,
+                    borderTop: p.t !== undefined ? `3px solid ${objectVisible ? "#10B981" : "#fff"}` : undefined,
+                    borderBottom: p.b !== undefined ? `3px solid ${objectVisible ? "#10B981" : "#fff"}` : undefined,
+                    borderLeft: p.l !== undefined ? `3px solid ${objectVisible ? "#10B981" : "#fff"}` : undefined,
+                    borderRight: p.r !== undefined ? `3px solid ${objectVisible ? "#10B981" : "#fff"}` : undefined,
+                  }} />
+              ))}
+            </div>
+
+            {/* Top bar */}
+            <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4"
+                 style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}>
+              <div className="px-3 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-2 text-white"
+                   style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(10px)" }}>
+                <span className="w-2 h-2 rounded-full animate-pulse"
+                      style={{ background: objectVisible ? "#10B981" : "#38BDF8" }} />
+                {objectVisible ? "PRODUCT DETECTED" : autoDetect ? "PLACE PRODUCT IN FRAME" : "AUTO-DETECT OFF · KEEP CENTERED"}
               </div>
+              <div className="px-3 py-1.5 rounded-full text-[11px] font-semibold text-white max-w-[40%] truncate"
+                   style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(10px)" }}>
+                {productName}
+              </div>
+              <button onClick={cancel} aria-label="Cancel"
+                className="w-9 h-9 rounded-full grid place-items-center text-white"
+                style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(10px)" }}>
+                <X size={16} />
+              </button>
             </div>
 
-            {/* progress ring */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
-              <ProgressRing pct={pct} label={`${count}/${TOTAL_FRAMES}`} />
+            {/* Shutter ring */}
+            <div className="absolute left-1/2 -translate-x-1/2"
+                 style={{ bottom: "calc(env(safe-area-inset-bottom) + 28px)" }}>
+              <ShutterRing pct={pct} count={count} total={TOTAL_FRAMES} angle={angleLabel} />
             </div>
 
+            {/* Generating overlay */}
             {phase === "generating" && (
-              <div className="absolute inset-0 grid place-items-center" style={{ background: "rgba(0,0,0,0.78)" }}>
-                <div className="text-center text-white">
-                  <Sparkles size={42} className="mx-auto animate-pulse" />
-                  <div className="font-display text-xl mt-3">Generating your AR preview…</div>
-                  <div className="text-xs opacity-70 mt-1">AI is cleaning up the scan</div>
+              <div className="absolute inset-0 grid place-items-center text-center px-6"
+                   style={{ background: "rgba(2,6,23,0.85)", backdropFilter: "blur(8px)" }}>
+                <div>
+                  <div className="w-20 h-20 mx-auto rounded-full grid place-items-center"
+                       style={{ background: "rgba(56,189,248,0.18)", border: "2px solid #38BDF8", boxShadow: "0 0 40px rgba(56,189,248,0.45)" }}>
+                    <Sparkles size={32} className="text-white animate-pulse" />
+                  </div>
+                  <h3 className="mt-5 font-display text-white text-2xl">Generating your AR preview…</h3>
+                  <div className="mt-5 flex items-center justify-center gap-2 text-xs text-white/80">
+                    <StepDot done label="Capturing" />
+                    <StepDot done={genStep !== "capturing"} label="Cleaning" active={genStep === "cleaning"} />
+                    <StepDot done={genStep === "composing"} label="Composing" active={genStep === "composing"} />
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
           {phase === "scanning" && (
-            <div className="mt-5 bg-card rounded-2xl p-5 glow-card text-center">
-              <div className="text-sm font-semibold text-ink">{hint}</div>
-              <div className="mt-1 text-xs" style={{ color: "var(--ink-soft)" }}>Capturing every 2 seconds while product is in view</div>
+            <div className="mt-5 rounded-2xl p-5 text-center text-white"
+                 style={{ background: "linear-gradient(135deg,#0B1220,#1E293B)" }}>
+              <div className="text-sm font-semibold">{hint}</div>
+              <div className="mt-1 text-xs opacity-70">
+                {autoDetect ? "Auto-capturing every 2 seconds while product is detected" : "Auto-detect off — capturing every 2 seconds"}
+              </div>
             </div>
           )}
         </div>
+      </div>
+
+      {/* Intro */}
+      {phase === "intro" && (
+        <div className="max-w-xl mx-auto bg-card rounded-2xl p-6 glow-card">
+          <div className="flex items-center gap-3">
+            <span className="w-12 h-12 rounded-2xl grid place-items-center text-white"
+                  style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}>
+              <ScanLine size={22} />
+            </span>
+            <div>
+              <h3 className="text-ink">Scan a real product</h3>
+              <p className="text-sm" style={{ color: "var(--ink-soft)" }}>
+                Place your product on a clean surface. We'll capture {TOTAL_FRAMES} angles and turn it into an AR-ready preview.
+              </p>
+            </div>
+          </div>
+          <div className="mt-5">
+            <label className="text-xs text-muted uppercase tracking-wide">Product name</label>
+            <input className="input-base mt-1" placeholder="e.g. Velvet Lounge Chair"
+              value={productName} onChange={(e) => setProductName(e.target.value)} />
+          </div>
+          <button onClick={start} className="btn-primary mt-6 w-full justify-center">
+            <Camera size={16} /> Start camera scan
+          </button>
+          <ul className="mt-6 text-xs space-y-2" style={{ color: "var(--ink-soft)" }}>
+            <li>• Use good, even lighting</li>
+            <li>• Rotate slowly — we auto-capture every 2 seconds</li>
+            <li>• Keep the whole product in the frame</li>
+          </ul>
+        </div>
       )}
 
+      {/* Done */}
       {phase === "done" && (
         <div className="max-w-xl mx-auto bg-card rounded-2xl p-8 text-center glow-card">
-          <span className="w-14 h-14 rounded-2xl grid place-items-center text-white mx-auto" style={{ background: "linear-gradient(135deg,#10B981,#34D399)" }}>
-            <Sparkles size={26} />
+          <span className="w-14 h-14 rounded-2xl grid place-items-center text-white mx-auto"
+                style={{ background: "linear-gradient(135deg,#10B981,#34D399)" }}>
+            <Check size={26} />
           </span>
           <h3 className="text-ink mt-4">Your AR product is ready</h3>
-          <p className="text-sm mt-1" style={{ color: "var(--ink-soft)" }}>You can preview it, copy the embed code, or scan another product.</p>
+          <p className="text-sm mt-1" style={{ color: "var(--ink-soft)" }}>
+            Preview it, copy the embed code, or scan another product.
+          </p>
+          {previewThumb && (
+            <div className="mt-5 mx-auto w-40 h-40 rounded-2xl overflow-hidden border bg-soft"
+                 style={{ borderColor: "var(--border)" }}>
+              <img src={previewThumb} alt="" className="w-full h-full object-contain" />
+            </div>
+          )}
           <div className="mt-6 flex flex-wrap gap-2 justify-center">
-            <button className="btn-primary" onClick={() => navigate({ to: "/dashboard/products" })}>Go to My Products</button>
-            <button className="btn-ghost" onClick={() => { setPhase("intro"); setCount(0); countRef.current = 0; setProductName(""); setProductId(null); productIdRef.current = null; }}>
-              Scan another
+            <a href={viewerUrl} target="_blank" rel="noreferrer" className="btn-primary">
+              <ExternalLink size={14} /> Preview AR
+            </a>
+            <button className="btn-ghost" onClick={copyEmbed}>
+              {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Copied" : "Copy embed"}
             </button>
+            <button className="btn-ghost" onClick={reset}>Scan another</button>
+            <button className="btn-ghost" onClick={() => navigate({ to: "/dashboard/products" })}>My products</button>
           </div>
         </div>
       )}
 
+      {/* Error */}
       {phase === "error" && (
         <div className="max-w-xl mx-auto bg-card rounded-2xl p-8 text-center">
           <h3 className="text-ink">Something went wrong</h3>
           <p className="mt-2 text-sm text-red-600">{error}</p>
-          <button className="btn-primary mt-6" onClick={() => { setPhase("intro"); setError(null); setCount(0); countRef.current = 0; }}>
-            Try again
-          </button>
+          <button className="btn-primary mt-6" onClick={reset}>Try again</button>
         </div>
       )}
+
+      <style>{`
+        @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } }
+      `}</style>
     </DashboardShell>
   );
 }
 
-function ProgressRing({ pct, label }: { pct: number; label: string }) {
-  const r = 36, c = 2 * Math.PI * r;
+function StepDot({ label, done, active }: { label: string; done?: boolean; active?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+      style={{
+        background: done ? "rgba(16,185,129,0.18)" : active ? "rgba(56,189,248,0.2)" : "rgba(255,255,255,0.08)",
+        border: `1px solid ${done ? "#10B981" : active ? "#38BDF8" : "rgba(255,255,255,0.15)"}`,
+      }}>
+      <span className="w-1.5 h-1.5 rounded-full"
+        style={{ background: done ? "#10B981" : active ? "#38BDF8" : "rgba(255,255,255,0.4)" }} />
+      {label}
+    </span>
+  );
+}
+
+function ShutterRing({ pct, count, total, angle }: { pct: number; count: number; total: number; angle: string }) {
+  const r = 54, c = 2 * Math.PI * r;
   const off = c - (pct / 100) * c;
   return (
-    <div className="relative w-24 h-24 grid place-items-center">
-      <svg width={88} height={88} className="rotate-[-90deg]">
-        <circle cx={44} cy={44} r={r} stroke="rgba(255,255,255,0.25)" strokeWidth={6} fill="none" />
-        <circle cx={44} cy={44} r={r} stroke="#38BDF8" strokeWidth={6} fill="none"
-          strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" />
+    <div className="relative w-36 h-36 grid place-items-center">
+      <svg width={140} height={140} className="rotate-[-90deg]">
+        <circle cx={70} cy={70} r={r} stroke="rgba(255,255,255,0.18)" strokeWidth={8} fill="none" />
+        <circle cx={70} cy={70} r={r} stroke="url(#g)" strokeWidth={8} fill="none"
+          strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round"
+          style={{ transition: "stroke-dashoffset .4s ease" }} />
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#38BDF8" />
+            <stop offset="100%" stopColor="#7C3AED" />
+          </linearGradient>
+        </defs>
       </svg>
-      <div className="absolute text-white text-sm font-bold">{label}</div>
+      <div className="absolute text-center text-white">
+        <div className="text-2xl font-bold leading-none">{count}<span className="text-white/50 text-base">/{total}</span></div>
+        <div className="text-[10px] uppercase tracking-widest mt-1 opacity-80">{angle}</div>
+      </div>
     </div>
   );
 }

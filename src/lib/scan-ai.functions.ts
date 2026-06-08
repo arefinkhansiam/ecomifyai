@@ -4,6 +4,39 @@ import { z } from "zod";
 
 const Input = z.object({ productId: z.string().uuid() });
 
+const AI_PROMPT = "Recreate this product as a clean studio 3D-style hero render: centered on a soft neutral background, subtle ground shadow, even product lighting, photoreal materials, no people, no text. Keep the exact product shape and color.";
+
+async function callGeminiHero(dataUrl: string): Promise<{ mime: string; bytes: Buffer }> {
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) throw new Error("Missing LOVABLE_API_KEY");
+  const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash-image",
+      messages: [{
+        role: "user",
+        content: [
+          { type: "text", text: AI_PROMPT },
+          { type: "image_url", image_url: { url: dataUrl } },
+        ],
+      }],
+      modalities: ["image", "text"],
+    }),
+  });
+  if (!ai.ok) {
+    const t = await ai.text();
+    throw new Error(`AI error ${ai.status}: ${t.slice(0, 200)}`);
+  }
+  const aiJson: any = await ai.json();
+  const img = aiJson?.choices?.[0]?.message?.images?.[0]?.image_url?.url
+    ?? aiJson?.choices?.[0]?.message?.content?.find?.((c: any) => c?.image_url)?.image_url?.url;
+  if (!img || typeof img !== "string") throw new Error("AI returned no image");
+  const m = img.match(/^data:(image\/[a-z]+);base64,(.+)$/);
+  if (!m) throw new Error("AI image not a data URL");
+  return { mime: m[1], bytes: Buffer.from(m[2], "base64") };
+}
+
 /**
  * Picks the middle frame from a scan, runs it through Lovable AI Gateway
  * (Gemini image edit) to produce a clean studio "3D-style" hero preview,
@@ -51,40 +84,9 @@ export const generate3dPreview = createServerFn({ method: "POST" })
       if (!signed?.signedUrl) throw new Error("Could not read scan frame");
       const imgRes = await fetch(signed.signedUrl);
       const imgBuf = await imgRes.arrayBuffer();
-      const imgB64 = Buffer.from(imgBuf).toString("base64");
-      const dataUrl = `data:image/jpeg;base64,${imgB64}`;
+      const dataUrl = `data:image/jpeg;base64,${Buffer.from(imgBuf).toString("base64")}`;
 
-      // Lovable AI Gateway: image edit via Gemini
-      const apiKey = process.env.LOVABLE_API_KEY;
-      if (!apiKey) throw new Error("Missing LOVABLE_API_KEY");
-
-      const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash-image",
-          messages: [{
-            role: "user",
-            content: [
-              { type: "text", text: "Recreate this product as a clean studio 3D-style hero render: centered, soft neutral background, subtle ground shadow, even product lighting, photoreal materials, no people, no text. Keep the exact product shape and color." },
-              { type: "image_url", image_url: { url: dataUrl } },
-            ],
-          }],
-          modalities: ["image", "text"],
-        }),
-      });
-      if (!ai.ok) {
-        const t = await ai.text();
-        throw new Error(`AI error ${ai.status}: ${t.slice(0, 200)}`);
-      }
-      const aiJson: any = await ai.json();
-      const img = aiJson?.choices?.[0]?.message?.images?.[0]?.image_url?.url
-        ?? aiJson?.choices?.[0]?.message?.content?.find?.((c: any) => c?.image_url)?.image_url?.url;
-      if (!img || typeof img !== "string") throw new Error("AI returned no image");
-      const m = img.match(/^data:(image\/[a-z]+);base64,(.+)$/);
-      if (!m) throw new Error("AI image not a data URL");
-      const mime = m[1];
-      const bytes = Buffer.from(m[2], "base64");
+      const { mime, bytes } = await callGeminiHero(dataUrl);
       const ext = mime === "image/jpeg" ? "jpg" : "png";
 
       const path = `${userId}/${productId}/preview.${ext}`;
@@ -114,3 +116,55 @@ export const generate3dPreview = createServerFn({ method: "POST" })
       throw e;
     }
   });
+
+/**
+ * Generate the same AI hero render from a single uploaded product image.
+ * Used by the upload page so plain photos become AR-ready like scans.
+ * On failure, returns ok:false but does NOT mark the product failed — the
+ * caller keeps the raw image as a graceful fallback.
+ */
+export const generateAiHeroFromImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => Input.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { productId } = data;
+
+    const { data: product } = await supabase
+      .from("ar_products").select("id, user_id, original_image_url")
+      .eq("id", productId).maybeSingle();
+    if (!product || product.user_id !== userId) throw new Error("Not found");
+    if (!product.original_image_url) return { ok: false, reason: "no_image" as const };
+
+    try {
+      const { data: signed } = await supabase.storage
+        .from("product-images").createSignedUrl(product.original_image_url, 600);
+      if (!signed?.signedUrl) throw new Error("Could not read source image");
+      const res = await fetch(signed.signedUrl);
+      const buf = await res.arrayBuffer();
+      const sourceMime = res.headers.get("content-type") || "image/jpeg";
+      const dataUrl = `data:${sourceMime};base64,${Buffer.from(buf).toString("base64")}`;
+
+      const { mime, bytes } = await callGeminiHero(dataUrl);
+      const ext = mime === "image/jpeg" ? "jpg" : "png";
+      const path = `${userId}/${productId}/preview.${ext}`;
+      const { error: upErr } = await supabase.storage.from("product-images")
+        .upload(path, bytes, { contentType: mime, upsert: true });
+      if (upErr) throw upErr;
+
+      const { data: existing } = await supabase
+        .from("models_3d").select("id").eq("product_id", productId).maybeSingle();
+      if (existing?.id) {
+        await supabase.from("models_3d").update({ preview_url: path, processing_status: "done" }).eq("id", existing.id);
+      } else {
+        await supabase.from("models_3d").insert({ product_id: productId, preview_url: path, processing_status: "done" });
+      }
+
+      await supabase.from("ar_products").update({ processed_image_url: path }).eq("id", productId);
+      return { ok: true as const, previewPath: path };
+    } catch (e: any) {
+      // Don't fail the product — caller already created it as "ready" with the raw image.
+      return { ok: false as const, reason: String(e?.message ?? e) };
+    }
+  });
+

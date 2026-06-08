@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { Box, ExternalLink, Trash2, QrCode, Upload, Copy, Check } from "lucide-react";
+import { Box, ExternalLink, Trash2, QrCode, Upload, Copy, Check, Settings2 } from "lucide-react";
 
 type Product = {
   id: string; product_name: string; status: string; dominant_color: string;
@@ -121,6 +121,9 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
               {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? "Copied" : "Embed"}
             </button>
           )}
+          <Link to="/dashboard/products/$id/customize" params={{ id: p.id }} className="btn-ghost text-[10px]" title="Customize">
+            <Settings2 size={12} /> Edit
+          </Link>
           <Link to="/dashboard/embed" className="btn-ghost text-[10px]"><QrCode size={12} /></Link>
           <button onClick={onDelete} className="btn-ghost text-[10px]" style={{ borderColor: "var(--error)", color: "var(--error)" }}><Trash2 size={12} /></button>
         </div>

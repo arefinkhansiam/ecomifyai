@@ -1,9 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { generateAiHeroFromImage } from "@/lib/scan-ai.functions";
+import { ArLivePreview } from "@/components/ArLivePreview";
 import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown, Shirt, Sofa, Box } from "lucide-react";
 
 type ArMode = "fashion" | "furniture" | "full_3d";
@@ -32,6 +35,7 @@ const GRADIENT_PRESETS = [
 function UploadPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const generateHero = useServerFn(generateAiHeroFromImage);
   const [plan, setPlan] = useState<"free" | "starter" | "growth">("free");
   const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState("");
@@ -145,12 +149,25 @@ function UploadPage() {
       } as any).select().single();
       if (insErr) throw insErr;
 
+      // For image uploads, run the same AI hero pass so plain uploads become
+      // AR-ready (clean studio render) just like camera scans.
+      if (!isModel) {
+        setStep("AI is preparing your AR preview...");
+        try {
+          await generateHero({ data: { productId: created.id } });
+        } catch (e) {
+          console.warn("[upload] AI hero failed, keeping raw image", e);
+          toast.warning("AR preview kept the original image (AI cleanup unavailable).");
+        }
+      }
+
       toast.success("AR product created!");
       setCreatedId(created.id);
     } catch (e: any) {
       toast.error(e.message ?? "Upload failed");
     } finally { setBusy(false); setStep(""); }
   };
+
 
   const origin = typeof window !== "undefined" ? window.location.origin : "https://your-domain.com";
   const productId = createdId ?? "PRODUCT_ID";
@@ -404,21 +421,27 @@ function UploadPage() {
             </div>
           </div>
 
-          <div className="mt-6 rounded-2xl p-8 bg-soft grid place-items-center">
-            <div className="text-[11px] uppercase tracking-wider text-muted mb-3">Live preview</div>
-            <button
-              type="button"
-              style={{
-                background: btnBg, color: fg, padding: sizePad, fontSize: sizeFs,
-                borderRadius: radius, fontWeight: 600, border: "none",
-                boxShadow: "0 10px 28px -8px rgba(2,132,199,0.5)",
-                display: "inline-flex", alignItems: "center", gap: 8,
-              }}
-            >
-              <Sparkles size={16} /> {label || "View in AR"}
-            </button>
-            {showBranding && <div className="mt-3 text-[10px] uppercase tracking-wider text-muted">Powered by Easibie</div>}
+          <div className="mt-6">
+            <div className="text-[11px] uppercase tracking-wider text-muted mb-3 text-center">Live AR preview</div>
+            <ArLivePreview
+              productImage={preview}
+              productName={name || "Your product"}
+              buttonLabel={label || "View in AR"}
+              buttonBg={btnBg}
+              buttonFg={fg}
+              buttonRadius={radius}
+              pageBg={isPaid ? pageBg : "#000000"}
+              fontColor={isPaid ? fontColor : "#FFFFFF"}
+              accent={isPaid ? accentColor : bg}
+              overlay={isPaid ? overlayColor : "rgba(255,255,255,0.14)"}
+              arButtonRadius={isPaid ? arButtonRadius : radius}
+              arButtonText={isPaid ? customButtonText : "View in Your Space"}
+              showBranding={isPaid ? showBranding : true}
+              showProductName={isPaid ? showProductName : true}
+              mode={arMode}
+            />
           </div>
+
 
           <button onClick={upload} disabled={!file || busy || !!createdId} className="btn-primary w-full mt-6">
             {busy ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
