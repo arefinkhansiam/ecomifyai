@@ -4,22 +4,43 @@ import type { LucideIcon } from "lucide-react";
 export function FeatureCard({
   icon: Icon, title, description, accent = "primary", delay = 0,
 }: { icon: LucideIcon; title: string; description: string; accent?: "primary" | "cyan"; delay?: number }) {
-  const color = accent === "cyan" ? "var(--cyan)" : "var(--primary)";
-  const bg = accent === "cyan" ? "rgba(6,182,212,0.15)" : "rgba(124,58,237,0.15)";
+  const gradient =
+    accent === "cyan"
+      ? "linear-gradient(135deg, #06B6D4 0%, #0EA5E9 60%, #38BDF8 100%)"
+      : "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay }}
-      whileHover={{ y: -4 }}
-      className="bg-card rounded-2xl p-8 transition-shadow hover:glow-card"
+      whileHover={{ y: -6 }}
+      className="rounded-2xl p-6 transition-shadow hover:glow-card relative overflow-hidden"
+      style={{
+        background: "rgba(255,255,255,0.85)",
+        backdropFilter: "blur(14px)",
+        border: "1px solid rgba(2,132,199,0.18)",
+        boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)",
+      }}
     >
-      <div className="w-12 h-12 rounded-xl grid place-items-center mb-5" style={{ background: bg }}>
-        <Icon size={24} style={{ color }} />
+      <div
+        className="w-12 h-12 rounded-xl grid place-items-center mb-4"
+        style={{ background: gradient, boxShadow: "0 12px 28px -10px rgba(2,132,199,0.55)" }}
+      >
+        <Icon size={22} color="#ffffff" strokeWidth={2.2} />
       </div>
-      <h3 className="text-white mb-2">{title}</h3>
-      <p className="text-sm">{description}</p>
+      <h3
+        className="mb-2 font-display font-bold text-[18px] leading-tight"
+        style={{
+          backgroundImage: gradient,
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          color: "transparent",
+        }}
+      >
+        {title}
+      </h3>
+      <p className="text-sm" style={{ color: "var(--ink-soft)" }}>{description}</p>
     </motion.div>
   );
 }
