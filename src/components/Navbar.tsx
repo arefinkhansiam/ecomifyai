@@ -4,6 +4,7 @@ import { Menu, X, LogOut, LayoutDashboard, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import logoAsset from "@/assets/ecomify-logo.png.asset.json";
 
 const links = [
   { to: "/", label: "Home" },
