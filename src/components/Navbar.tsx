@@ -4,6 +4,7 @@ import { Menu, X, LogOut, LayoutDashboard, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import logoAsset from "@/assets/ecomify-logo.png.asset.json";
 
 const links = [
   { to: "/", label: "Home" },
@@ -35,20 +36,27 @@ export function Navbar() {
     <>
       <header className="fixed top-3 md:top-5 left-0 right-0 z-50 px-3 md:px-6 pointer-events-none">
         <div
-          className="pointer-events-auto mx-auto max-w-6xl flex items-center justify-between px-4 md:px-6 h-14 md:h-16 rounded-full transition-all"
+          className="pointer-events-auto mx-auto max-w-6xl grid grid-cols-3 md:flex items-center md:justify-between px-4 md:px-6 h-14 md:h-16 rounded-full transition-all"
           style={{
-            background: scrolled ? "rgba(255,255,255,0.65)" : "rgba(255,255,255,0.28)",
+            background: scrolled ? "rgba(255,255,255,0.78)" : "rgba(255,255,255,0.45)",
             backdropFilter: "blur(22px) saturate(160%)",
             WebkitBackdropFilter: "blur(22px) saturate(160%)",
-            border: "1px solid rgba(255,255,255,0.5)",
+            border: "1px solid rgba(255,255,255,0.6)",
             boxShadow: scrolled
               ? "0 20px 50px -20px rgba(2,132,199,0.35), inset 0 1px 0 rgba(255,255,255,0.6)"
               : "0 12px 40px -18px rgba(2,132,199,0.25), inset 0 1px 0 rgba(255,255,255,0.55)",
           }}
         >
-          <Link to="/" className="font-display text-[20px] font-extrabold tracking-tight">
-            <span className="text-cyan">E</span>
-            <span className={scrolled ? "text-ink" : "text-white drop-shadow"}>ASIBIE</span>
+          {/* Mobile: left spacer for centering */}
+          <div className="md:hidden justify-self-start" />
+
+          <Link to="/" className="flex items-center justify-self-center md:justify-self-auto">
+            <img
+              src={logoAsset.url}
+              alt="Ecomify"
+              className="h-7 md:h-8 w-auto object-contain"
+              style={{ filter: "drop-shadow(0 2px 8px rgba(2,132,199,0.25))" }}
+            />
           </Link>
           <nav className="hidden md:flex items-center gap-7">
             {links.map((l) => (
@@ -59,7 +67,7 @@ export function Navbar() {
                 style={{
                   color: pathname === l.to
                     ? "var(--primary)"
-                    : scrolled ? "var(--ink-soft)" : "rgba(255,255,255,0.92)",
+                    : "var(--ink-soft)",
                 }}
               >
                 {l.label}
@@ -97,7 +105,7 @@ export function Navbar() {
                   to="/auth"
                   search={{ mode: "signin" }}
                   className="text-sm font-medium hover:text-primary transition-colors"
-                  style={{ color: scrolled ? "var(--ink-soft)" : "rgba(255,255,255,0.92)" }}
+                  style={{ color: "var(--ink-soft)" }}
                 >
                   Sign In
                 </Link>
@@ -108,9 +116,9 @@ export function Navbar() {
             )}
           </div>
           <button
-            className="md:hidden"
+            className="md:hidden justify-self-end"
             onClick={() => setMenuOpen(true)}
-            style={{ color: scrolled ? "var(--ink)" : "#ffffff" }}
+            style={{ color: "var(--ink)" }}
           >
             <Menu size={24} />
           </button>

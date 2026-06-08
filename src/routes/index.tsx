@@ -47,13 +47,26 @@ function Landing() {
             <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Start for Free</Link>
             <a href="#how" className="btn-ghost"><Play size={16} /> Watch Demo</a>
           </motion.div>
-          <div className="mt-10 flex items-center justify-center gap-4">
-            <div className="flex -space-x-2">
-              {["#0284C7","#06B6D4","#10B981","#F59E0B","#EF4444"].map((c, i) => (
-                <div key={i} className="w-9 h-9 rounded-full border-2 border-[var(--bg)]" style={{ background: c }} />
+          <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
+            <div className="flex -space-x-3">
+              {[
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=faces",
+                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=faces",
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=faces",
+                "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80&h=80&fit=crop&crop=faces",
+                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=faces",
+              ].map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt=""
+                  loading="lazy"
+                  className="w-9 h-9 rounded-full object-cover border-2 border-white"
+                  style={{ boxShadow: "0 4px 10px rgba(2,132,199,0.25)" }}
+                />
               ))}
             </div>
-            <div className="text-sm text-muted">Join 10,000+ store owners</div>
+            <div className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.92)" }}>Join 10,000+ store owners</div>
             <div className="flex gap-1">{[0,1,2,3,4].map(i => <Star key={i} size={14} className="text-cyan" fill="currentColor" />)}</div>
           </div>
           {/* Hero mockup */}
