@@ -289,6 +289,59 @@ function UploadPage() {
                 <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ transform: showBranding ? "translateX(22px)" : "translateX(2px)" }} />
               </button>
             </div>
+
+            {/* AR Page customization (Growth feature, Starter gets partial) */}
+            <div className="p-4 rounded-xl space-y-4" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.05), rgba(56,189,248,0.05))", border: "1px solid rgba(124,58,237,0.18)" }}>
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-semibold text-ink flex items-center gap-2">
+                  AR Page Customization
+                  {!isPaid && <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full text-white" style={{ background: "linear-gradient(135deg,#7C3AED,#38BDF8)" }}><Crown size={9} /> Pro</span>}
+                </div>
+              </div>
+              {!isPaid ? (
+                <p className="text-xs" style={{ color: "var(--ink-soft)" }}>Upgrade to customize the full AR viewer page — background, font colors, accent, custom button text, default camera and more.</p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <ColorField label="Page background" value={pageBg} onChange={setPageBg} />
+                    <ColorField label="Font color" value={fontColor} onChange={setFontColor} />
+                    <ColorField label="Accent" value={accentColor} onChange={setAccentColor} />
+                    <ColorField label="Overlay UI" value={overlayColor} onChange={setOverlayColor} />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted uppercase tracking-wide flex justify-between"><span>AR button radius</span><span>{arButtonRadius}px</span></label>
+                    <input type="range" min={0} max={32} value={arButtonRadius} onChange={(e) => setArButtonRadius(Number(e.target.value))} className="w-full mt-2 accent-sky-500" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted uppercase tracking-wide">Custom button text</label>
+                    <input className="input-base mt-1" value={customButtonText} onChange={(e) => setCustomButtonText(e.target.value)} maxLength={40} placeholder="View in Your Space" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted uppercase tracking-wide">Default camera</label>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      {(["back", "front"] as const).map((c) => (
+                        <button key={c} onClick={() => setDefaultCamera(c)} className="px-3 py-2 rounded-lg text-sm font-medium capitalize border"
+                          style={{ borderColor: defaultCamera === c ? "var(--primary)" : "var(--border)", background: defaultCamera === c ? "rgba(2,132,199,.08)" : "#fff", color: defaultCamera === c ? "var(--primary)" : "var(--ink)" }}>
+                          {c} camera
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 pt-1">
+                    <div className="text-sm text-ink">AR button shadow</div>
+                    <button onClick={() => setArButtonShadow(!arButtonShadow)} className="relative w-11 h-6 rounded-full transition-colors" style={{ background: arButtonShadow ? "var(--primary)" : "#cbd5e1" }}>
+                      <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ transform: arButtonShadow ? "translateX(22px)" : "translateX(2px)" }} />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="text-sm text-ink">Show product name on AR page</div>
+                    <button onClick={() => setShowProductName(!showProductName)} className="relative w-11 h-6 rounded-full transition-colors" style={{ background: showProductName ? "var(--primary)" : "#cbd5e1" }}>
+                      <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ transform: showProductName ? "translateX(22px)" : "translateX(2px)" }} />
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           <div className="mt-6 rounded-2xl p-8 bg-soft grid place-items-center">
