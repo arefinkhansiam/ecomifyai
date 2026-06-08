@@ -80,18 +80,22 @@ export function PricingCards() {
               ★ Most Popular
             </div>
           )}
-          <div className="w-12 h-12 rounded-2xl grid place-items-center mb-4" style={{ background: p.highlight ? "rgba(255,255,255,0.18)" : GRAD, color: "#fff" }}>
-            <p.icon size={20} />
-          </div>
           <div className="text-sm font-semibold uppercase tracking-wider opacity-80">{p.name}</div>
-          <div className="font-display text-5xl font-extrabold mt-1" style={p.highlight ? { color: "#fff" } : { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
-            {p.price}<span className="text-base font-normal opacity-70"> / mo</span>
+          <div className="font-display text-5xl font-extrabold mt-1 flex items-baseline gap-1" style={p.highlight ? { color: "#fff" } : { color: "#0B1220" }}>
+            <span style={p.highlight ? { color: "#fff" } : { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>{p.price}</span>
+            <span className="text-base font-medium" style={{ color: p.highlight ? "rgba(255,255,255,0.75)" : "var(--ink-soft)" }}>/ mo</span>
           </div>
           <p className="text-sm mt-2" style={{ color: p.highlight ? "rgba(255,255,255,0.85)" : "var(--ink-soft)" }}>{p.subtitle}</p>
           <ul className="mt-6 space-y-3 flex-1">
             {p.features.map((f) => (
-              <li key={f} className="flex items-start gap-2 text-sm" style={{ color: p.highlight ? "#fff" : "var(--ink)" }}>
-                <CheckCircle2 size={16} className="shrink-0 mt-0.5" style={{ color: p.highlight ? "#7DD3FC" : "var(--success)" }} /> {f}
+              <li key={f} className="flex items-start gap-2.5 text-sm" style={{ color: p.highlight ? "#fff" : "var(--ink)" }}>
+                <span
+                  className="shrink-0 mt-0.5 w-4 h-4 rounded-full grid place-items-center"
+                  style={{ background: p.highlight ? "rgba(255,255,255,0.2)" : GRAD, color: "#fff" }}
+                >
+                  <Check size={10} strokeWidth={3} />
+                </span>
+                <span>{f}</span>
               </li>
             ))}
           </ul>
