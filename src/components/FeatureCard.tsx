@@ -4,10 +4,8 @@ import type { LucideIcon } from "lucide-react";
 export function FeatureCard({
   icon: Icon, title, description, accent = "primary", delay = 0,
 }: { icon: LucideIcon; title: string; description: string; accent?: "primary" | "cyan"; delay?: number }) {
-  const gradient =
-    accent === "cyan"
-      ? "linear-gradient(135deg, #06B6D4 0%, #0EA5E9 60%, #38BDF8 100%)"
-      : "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
+  const gradient = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
+  void accent;
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
