@@ -4,6 +4,39 @@ import { z } from "zod";
 
 const Input = z.object({ productId: z.string().uuid() });
 
+const AI_PROMPT = "Recreate this product as a clean studio 3D-style hero render: centered on a soft neutral background, subtle ground shadow, even product lighting, photoreal materials, no people, no text. Keep the exact product shape and color.";
+
+async function callGeminiHero(dataUrl: string): Promise<{ mime: string; bytes: Buffer }> {
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) throw new Error("Missing LOVABLE_API_KEY");
+  const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash-image",
+      messages: [{
+        role: "user",
+        content: [
+          { type: "text", text: AI_PROMPT },
+          { type: "image_url", image_url: { url: dataUrl } },
+        ],
+      }],
+      modalities: ["image", "text"],
+    }),
+  });
+  if (!ai.ok) {
+    const t = await ai.text();
+    throw new Error(`AI error ${ai.status}: ${t.slice(0, 200)}`);
+  }
+  const aiJson: any = await ai.json();
+  const img = aiJson?.choices?.[0]?.message?.images?.[0]?.image_url?.url
+    ?? aiJson?.choices?.[0]?.message?.content?.find?.((c: any) => c?.image_url)?.image_url?.url;
+  if (!img || typeof img !== "string") throw new Error("AI returned no image");
+  const m = img.match(/^data:(image\/[a-z]+);base64,(.+)$/);
+  if (!m) throw new Error("AI image not a data URL");
+  return { mime: m[1], bytes: Buffer.from(m[2], "base64") };
+}
+
 /**
  * Picks the middle frame from a scan, runs it through Lovable AI Gateway
  * (Gemini image edit) to produce a clean studio "3D-style" hero preview,
