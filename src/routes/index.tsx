@@ -78,8 +78,8 @@ function Landing() {
                 </div>
                 <model-viewer
                   src="https://modelviewer.dev/shared-assets/models/glTF-Sample-Models/2.0/SheenChair/glTF-Binary/SheenChair.glb"
-                  ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
-                  alt="Modern Lounge Chair AR demo"
+                  ios-src="/models/demo-ar.usdz"
+                  alt="Easibie AR demo"
                   ar
                   ar-modes="webxr scene-viewer quick-look"
                   camera-controls
