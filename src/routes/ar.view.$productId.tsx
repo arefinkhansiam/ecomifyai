@@ -15,7 +15,7 @@ export const Route = createFileRoute("/ar/view/$productId")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("ar_products")
-      .select("id, product_name, product_price, original_image_url, processed_image_url, button_label, button_bg_color, button_text_color, status, is_public, dominant_color")
+      .select("id, product_name, product_price, original_image_url, processed_image_url, button_label, button_bg_color, button_text_color, status, is_public, dominant_color, product_colors, use_gradient, gradient_from, gradient_to, show_branding")
       .eq("id", params.productId)
       .maybeSingle();
     if (error || !data || data.status !== "ready" || !data.is_public) throw notFound();
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/ar/view/$productId")({
         .createSignedUrl(data.original_image_url, 3600);
       imageUrl = signed?.signedUrl ?? null;
     }
-    return { product: data, imageUrl };
+    return { product: data as any, imageUrl };
   },
   notFoundComponent: () => <NotReady />,
   errorComponent: () => <NotReady />,
