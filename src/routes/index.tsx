@@ -126,45 +126,87 @@ function Landing() {
             <h2 className="text-gradient-ocean">How Easibie Works</h2>
             <p className="mt-4">From photo to AR in 3 simple steps.</p>
           </div>
-          <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { n: "01", icon: Camera, title: "Upload Your Product Photo", desc: "Take a photo or upload an existing one. Any angle, any background." },
-              { n: "02", icon: Sparkles, title: "AI Generates Your AR", desc: "Our system processes the image and creates your AR experience automatically." },
-              { n: "03", icon: Share2, title: "Share and Sell More", desc: "Copy your AR link or embed code. Customers view it in their space before buying." },
-            ].map((s, i) => {
-              const grad = i % 2 === 0
-                ? "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)"
-                : "linear-gradient(135deg, #06B6D4 0%, #0EA5E9 60%, #38BDF8 100%)";
-              return (
-              <motion.div key={s.n} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }}
-                className="rounded-2xl p-6 relative"
-                style={{
-                  background: "rgba(255,255,255,0.85)",
-                  backdropFilter: "blur(14px)",
-                  border: "1px solid rgba(2,132,199,0.18)",
-                  boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)",
-                }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl grid place-items-center" style={{ background: grad, boxShadow: "0 12px 28px -10px rgba(2,132,199,0.55)" }}>
-                    <s.icon size={22} color="#ffffff" strokeWidth={2.2} />
-                  </div>
-                  <div className="px-3 py-1 rounded-full text-xs font-extrabold tracking-widest"
-                    style={{ backgroundImage: grad, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent", border: "1px solid rgba(2,132,199,0.25)" }}>
-                    STEP {s.n}
-                  </div>
-                </div>
-                <h3 className="mt-5 font-display font-bold text-[18px] leading-tight"
-                  style={{ backgroundImage: grad, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
-                  {s.title}
-                </h3>
-                <p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>{s.desc}</p>
-              </motion.div>
-              );
-            })}
+          <div className="mt-16 relative">
+            {/* connecting line — desktop horizontal */}
+            <div className="hidden md:block absolute top-7 left-[16.66%] right-[16.66%] h-[2px]" style={{ background: "linear-gradient(90deg, #0B1220, #0369A1, #38BDF8)" }} />
+            {/* connecting line — mobile vertical */}
+            <div className="md:hidden absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[2px]" style={{ background: "linear-gradient(180deg, #0B1220, #0369A1, #38BDF8)" }} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6 relative">
+              {[
+                { n: 1, icon: Camera, title: "Upload Your Product Photo", desc: "Take a photo or upload an existing one. Any angle, any background." },
+                { n: 2, icon: Sparkles, title: "AI Generates Your AR", desc: "Our system processes the image and creates your AR experience automatically." },
+                { n: 3, icon: Share2, title: "Share and Sell More", desc: "Copy your AR link or embed code. Customers view it in their space before buying." },
+              ].map((s, i) => {
+                const grad = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
+                return (
+                  <motion.div key={s.n} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }}
+                    className="flex flex-col items-center text-center relative">
+                    {/* numbered circle */}
+                    <div className="w-14 h-14 rounded-full grid place-items-center font-display font-extrabold text-xl text-white relative z-10"
+                      style={{ background: grad, boxShadow: "0 14px 30px -8px rgba(2,132,199,0.55)", border: "4px solid #ffffff" }}>
+                      {s.n}
+                    </div>
+                    <div className="mt-6 w-full rounded-2xl p-6"
+                      style={{
+                        background: "rgba(255,255,255,0.88)",
+                        backdropFilter: "blur(14px)",
+                        border: "1px solid rgba(2,132,199,0.18)",
+                        boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)",
+                      }}>
+                      <div className="w-12 h-12 rounded-xl grid place-items-center mx-auto" style={{ background: grad, boxShadow: "0 12px 28px -10px rgba(2,132,199,0.55)" }}>
+                        <s.icon size={22} color="#ffffff" strokeWidth={2.2} />
+                      </div>
+                      <h3 className="mt-4 font-display font-bold text-[18px] leading-tight"
+                        style={{ backgroundImage: grad, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+                        {s.title}
+                      </h3>
+                      <p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>{s.desc}</p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
+
+      {/* WHAT IS AR */}
+      <section className="py-24">
+        <div className="mx-auto max-w-5xl px-6">
+          <div className="rounded-3xl p-8 md:p-14 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #0B1220 0%, #0369A1 55%, #38BDF8 100%)",
+              boxShadow: "0 40px 100px -30px rgba(2,132,199,0.55)",
+            }}>
+            <div className="absolute -right-10 -top-10 opacity-20 pointer-events-none">
+              <Box size={260} color="#ffffff" strokeWidth={1} />
+            </div>
+            <div className="relative">
+              <span className="pill" style={{ background: "rgba(255,255,255,0.14)", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)" }}>What is AR?</span>
+              <h2 className="mt-6 text-white">What is Augmented Reality (AR)?</h2>
+              <p className="mt-5 text-white/85 text-[17px] leading-relaxed max-w-3xl">
+                Augmented Reality (AR) is a technology that overlays digital information — like images, 3D models, or data — onto the real world through a device's camera.
+              </p>
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { t: "How it works", d: "Uses computer vision to detect surfaces and place digital objects accurately in your environment." },
+                  { t: "Visual Try-on", d: "Customers can see how products look in their actual space before making a purchase decision." },
+                  { t: "Better Engagement", d: "Reduces return rates and increases customer confidence through interactive visualization." },
+                ].map((f) => (
+                  <div key={f.t} className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)", backdropFilter: "blur(8px)" }}>
+                    <div className="font-display font-bold text-white">{f.t}</div>
+                    <p className="mt-2 text-sm text-white/85">{f.d}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-8">
+                <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Launch Your Store Free</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       {/* PRICING */}
       <section id="pricing" className="py-24">
