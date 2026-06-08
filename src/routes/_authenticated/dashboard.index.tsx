@@ -13,7 +13,7 @@ const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
 
 function Dashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState<{ total_products: number; ready_products: number; total_views: number; total_embeds: number; plan: string; plan_limit: number } | null>(null);
+  const [stats, setStats] = useState<{ total_products: number; ready_products: number; total_views: number; total_embeds: number; plan: string; plan_limit: number; ar_slots_used: number; sessions_this_month: number } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -26,11 +26,14 @@ function Dashboard() {
     { label: "Total Products", value: stats?.total_products ?? 0, icon: Box, accent: "#0369A1" },
     { label: "Ready for AR", value: stats?.ready_products ?? 0, icon: Sparkles, accent: "#0369A1" },
     { label: "Total AR Views", value: stats?.total_views ?? 0, icon: Eye, accent: "#0369A1" },
-    { label: "Embed Count", value: stats?.total_embeds ?? 0, icon: Code, accent: "#0369A1" },
+    { label: "Sessions this month", value: stats?.sessions_this_month ?? 0, icon: TrendingUp, accent: "#0369A1" },
   ];
 
   const plan = stats?.plan ?? "free";
   const isPaid = plan !== "free";
+  const slotsUsed = stats?.ar_slots_used ?? 0;
+  const slotLimit = stats?.plan_limit ?? 1;
+  const pct = Math.min(100, (slotsUsed / Math.max(1, slotLimit)) * 100);
 
   return (
     <DashboardShell title="Dashboard">
@@ -63,7 +66,7 @@ function Dashboard() {
         {[
           { to: "/dashboard/upload", icon: Upload, title: "Upload a product", body: "Drag in a photo, get a live AR link in seconds." },
           { to: "/dashboard/products", icon: Box, title: "Manage products", body: "View, edit and share your AR products." },
-          { to: "/dashboard/analytics", icon: TrendingUp, title: "See analytics", body: "Track AR views, devices and trends." },
+          { to: "/dashboard/behaviour", icon: TrendingUp, title: "Customer behaviour", body: "See how visitors engage with your AR." },
         ].map((q) => (
           <Link key={q.to} to={q.to} className="rounded-2xl p-6 transition-transform hover:-translate-y-1 group"
             style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(14px)", border: "1px solid rgba(2,132,199,0.15)", boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)" }}>
@@ -83,18 +86,19 @@ function Dashboard() {
         <div className="flex justify-between items-center flex-wrap gap-4">
           <div>
             <div className="text-xs uppercase tracking-wider opacity-80 flex items-center gap-2">
-              {isPaid && <Crown size={12} />} Plan usage · {plan}
+              {isPaid && <Crown size={12} />} AR slots · {plan}
             </div>
-            <div className="font-display text-2xl md:text-3xl font-extrabold mt-1">
-              {stats?.total_products ?? 0} / {stats?.plan_limit ?? 1} AR products
+            <div className="font-display text-2xl md:text-3xl font-extrabold mt-1" title="Deleting an AR product does not recover your slot. Each plan allows a fixed number of AR creations total.">
+              {slotsUsed} of {slotLimit} AR slots used
             </div>
+            <div className="text-xs mt-1 opacity-80">Slots are permanent — deleting a product does not give a slot back.</div>
           </div>
           <Link to="/dashboard/billing" className="rounded-full px-5 py-2.5 text-sm font-semibold text-ink" style={{ background: "#fff" }}>
             {isPaid ? "Manage" : "Upgrade"} →
           </Link>
         </div>
         <div className="mt-4 h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.2)" }}>
-          <div className="h-full" style={{ width: `${Math.min(100, ((stats?.total_products ?? 0) / Math.max(1, stats?.plan_limit ?? 1)) * 100)}%`, background: "linear-gradient(90deg,#38BDF8,#fff)" }} />
+          <div className="h-full" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#38BDF8,#fff)" }} />
         </div>
       </div>
     </DashboardShell>

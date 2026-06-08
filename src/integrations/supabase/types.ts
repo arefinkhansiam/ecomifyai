@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       ar_products: {
         Row: {
+          ar_customization: Json
           ar_viewer_url: string | null
           button_bg_color: string
           button_border_radius: number
@@ -51,6 +52,7 @@ export type Database = {
           views_count: number
         }
         Insert: {
+          ar_customization?: Json
           ar_viewer_url?: string | null
           button_bg_color?: string
           button_border_radius?: number
@@ -86,6 +88,7 @@ export type Database = {
           views_count?: number
         }
         Update: {
+          ar_customization?: Json
           ar_viewer_url?: string | null
           button_bg_color?: string
           button_border_radius?: number
@@ -121,6 +124,71 @@ export type Database = {
           views_count?: number
         }
         Relationships: []
+      }
+      ar_sessions: {
+        Row: {
+          ar_mode: string | null
+          camera_used: string | null
+          country: string | null
+          created_at: string
+          device_type: string | null
+          did_close_manually: boolean
+          did_interact: boolean
+          id: string
+          ip_hash: string | null
+          os_type: string | null
+          product_id: string
+          referrer: string | null
+          session_id: string
+          time_spent_seconds: number
+          user_agent: string | null
+          vendor_id: string
+        }
+        Insert: {
+          ar_mode?: string | null
+          camera_used?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          did_close_manually?: boolean
+          did_interact?: boolean
+          id?: string
+          ip_hash?: string | null
+          os_type?: string | null
+          product_id: string
+          referrer?: string | null
+          session_id: string
+          time_spent_seconds?: number
+          user_agent?: string | null
+          vendor_id: string
+        }
+        Update: {
+          ar_mode?: string | null
+          camera_used?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          did_close_manually?: boolean
+          did_interact?: boolean
+          id?: string
+          ip_hash?: string | null
+          os_type?: string | null
+          product_id?: string
+          referrer?: string | null
+          session_id?: string
+          time_spent_seconds?: number
+          user_agent?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ar_sessions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "ar_products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ar_views: {
         Row: {
@@ -207,31 +275,64 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ar_slots_used: number
           avatar_url: string | null
+          business_name: string | null
+          country: string | null
           created_at: string | null
           email: string | null
           full_name: string | null
           id: string
+          is_free_trial_growth: boolean
+          notify_on_scan: boolean
+          notify_product_tips: boolean
+          notify_weekly_summary: boolean
+          phone: string | null
           store_name: string | null
+          timezone: string | null
           updated_at: string | null
+          user_sequence_number: number | null
+          website_url: string | null
         }
         Insert: {
+          ar_slots_used?: number
           avatar_url?: string | null
+          business_name?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id: string
+          is_free_trial_growth?: boolean
+          notify_on_scan?: boolean
+          notify_product_tips?: boolean
+          notify_weekly_summary?: boolean
+          phone?: string | null
           store_name?: string | null
+          timezone?: string | null
           updated_at?: string | null
+          user_sequence_number?: number | null
+          website_url?: string | null
         }
         Update: {
+          ar_slots_used?: number
           avatar_url?: string | null
+          business_name?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
+          is_free_trial_growth?: boolean
+          notify_on_scan?: boolean
+          notify_product_tips?: boolean
+          notify_weekly_summary?: boolean
+          phone?: string | null
           store_name?: string | null
+          timezone?: string | null
           updated_at?: string | null
+          user_sequence_number?: number | null
+          website_url?: string | null
         }
         Relationships: []
       }
