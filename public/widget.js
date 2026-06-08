@@ -23,6 +23,52 @@
   placeholder.style.display = "inline-block";
   currentScript.parentNode.insertBefore(placeholder, currentScript);
 
+  // ----- Session tracking -----
+  function uuid() {
+    if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0, v = c === "x" ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  var session = null;
+  function startSession(camera) {
+    session = {
+      session_id: uuid(),
+      start: Date.now(),
+      camera_used: camera || "back",
+      ar_mode: "model-viewer",
+      did_interact: false,
+      did_close_manually: false,
+    };
+  }
+  function markInteract() { if (session) session.did_interact = true; }
+  function endSession(closedManually) {
+    if (!session) return;
+    var payload = {
+      product_id: productId,
+      session_id: session.session_id,
+      user_agent: navigator.userAgent,
+      referrer: document.referrer || null,
+      time_spent_seconds: Math.max(0, Math.round((Date.now() - session.start) / 1000)),
+      camera_used: session.camera_used,
+      ar_mode: session.ar_mode,
+      did_interact: session.did_interact,
+      did_close_manually: !!closedManually,
+    };
+    session = null;
+    var url = origin + "/api/public/track-ar-session";
+    try {
+      var blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+      if (navigator.sendBeacon && navigator.sendBeacon(url, blob)) return;
+    } catch (e) {}
+    fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(function () {});
+  }
+  // Expose for AR viewer iframe to call
+  window.__easibieMarkInteract = markInteract;
+  window.__easibieEndSession = endSession;
+
   function render(cfg) {
     var label = overrideLabel || cfg.button_label || "View in AR";
     var bg = overrideBg || cfg.button_bg_color || "#0284C7";
@@ -52,13 +98,15 @@
   }
 
   function openAR(id) {
+    startSession("back");
     var url = origin + "/ar/view/" + encodeURIComponent(id);
     var isMobile = /Mobi|Android|iPhone|iPad/.test(navigator.userAgent);
     if (isMobile) {
+      // Send session on unload before redirect
+      window.addEventListener("pagehide", function () { endSession(false); }, { once: true });
       window.location.href = url;
       return;
     }
-    // Desktop: full-screen overlay iframe
     var wrap = document.createElement("div");
     wrap.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(11,18,32,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;animation:easibieFade .25s ease both;";
     var inner = document.createElement("div");
@@ -70,7 +118,7 @@
     var close = document.createElement("button");
     close.innerHTML = "&times;";
     close.style.cssText = "position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:999px;border:0;background:rgba(255,255,255,.92);color:#0B1220;font-size:22px;cursor:pointer;font-weight:600;z-index:2;";
-    close.onclick = function () { wrap.remove(); };
+    close.onclick = function () { endSession(true); wrap.remove(); };
     inner.appendChild(iframe); inner.appendChild(close); wrap.appendChild(inner);
     document.body.appendChild(wrap);
     if (!document.getElementById("easibie-kf")) {
@@ -86,7 +134,6 @@
     });
   }
 
-  // Fetch product config (RLS: ready + public). Fall back to defaults if blocked.
   fetch(SUPABASE_URL + "/rest/v1/ar_products?id=eq." + encodeURIComponent(productId) +
     "&select=button_label,button_bg_color,button_text_color,button_border_radius,button_size", {
     headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY },
