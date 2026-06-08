@@ -28,17 +28,21 @@ function Checkout() {
     setProcessing(true);
     try {
       const limit = plan === "starter" ? 10 : 50;
+      const { data: prof } = await supabase.from("profiles").select("is_free_trial_growth").eq("id", user.id).maybeSingle();
+      const free = plan === "growth" && (prof as any)?.is_free_trial_growth === true;
       const { error } = await supabase.from("user_plans").update({
-        plan, ar_product_limit: limit, billing_status: "trialing",
+        plan, ar_product_limit: limit, billing_status: free ? "active" : "trialing",
         billing_start_date: new Date().toISOString(),
-        billing_end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        billing_end_date: free ? null : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       }).eq("user_id", user.id);
       if (error) throw error;
-      await supabase.from("payment_history").insert({
-        user_id: user.id, plan, amount_usd: plan === "starter" ? 10 : 39,
-        status: "paid", billing_period_start: new Date().toISOString(),
-        billing_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      });
+      if (!free) {
+        await supabase.from("payment_history").insert({
+          user_id: user.id, plan, amount_usd: plan === "starter" ? 10 : 39,
+          status: "paid", billing_period_start: new Date().toISOString(),
+          billing_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+      }
       toast.success(`Welcome to ${planDef.name}!`);
       navigate({ to: "/dashboard/billing" });
     } catch (e: any) {
