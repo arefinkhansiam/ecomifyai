@@ -128,17 +128,40 @@ function Landing() {
           </div>
           <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { n: "01", color: "var(--cyan)", icon: Camera, title: "Upload Your Product Photo", desc: "Take a photo or upload an existing one. Any angle, any background." },
-              { n: "02", color: "var(--primary)", icon: Sparkles, title: "AI Generates Your AR", desc: "Our system processes the image and creates your AR experience automatically." },
-              { n: "03", color: "var(--cyan)", icon: Share2, title: "Share and Sell More", desc: "Copy your AR link or embed code. Customers view it in their space before buying." },
-            ].map((s, i) => (
-              <motion.div key={s.n} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }} className="bg-card rounded-2xl p-8 relative glow-card">
-                <div className="inline-block px-3 py-1 rounded-full text-xs font-bold" style={{ background: `${s.color}20`, color: s.color }}>{s.n}</div>
-                <s.icon size={28} className="mt-4 text-primary" />
-                <h3 className="mt-4 text-ink">{s.title}</h3>
-                <p className="mt-2 text-sm">{s.desc}</p>
+              { n: "01", icon: Camera, title: "Upload Your Product Photo", desc: "Take a photo or upload an existing one. Any angle, any background." },
+              { n: "02", icon: Sparkles, title: "AI Generates Your AR", desc: "Our system processes the image and creates your AR experience automatically." },
+              { n: "03", icon: Share2, title: "Share and Sell More", desc: "Copy your AR link or embed code. Customers view it in their space before buying." },
+            ].map((s, i) => {
+              const grad = i % 2 === 0
+                ? "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)"
+                : "linear-gradient(135deg, #06B6D4 0%, #0EA5E9 60%, #38BDF8 100%)";
+              return (
+              <motion.div key={s.n} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }}
+                className="rounded-2xl p-6 relative"
+                style={{
+                  background: "rgba(255,255,255,0.85)",
+                  backdropFilter: "blur(14px)",
+                  border: "1px solid rgba(2,132,199,0.18)",
+                  boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl grid place-items-center" style={{ background: grad, boxShadow: "0 12px 28px -10px rgba(2,132,199,0.55)" }}>
+                    <s.icon size={22} color="#ffffff" strokeWidth={2.2} />
+                  </div>
+                  <div className="px-3 py-1 rounded-full text-xs font-extrabold tracking-widest"
+                    style={{ backgroundImage: grad, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent", border: "1px solid rgba(2,132,199,0.25)" }}>
+                    STEP {s.n}
+                  </div>
+                </div>
+                <h3 className="mt-5 font-display font-bold text-[18px] leading-tight"
+                  style={{ backgroundImage: grad, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+                  {s.title}
+                </h3>
+                <p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>{s.desc}</p>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
