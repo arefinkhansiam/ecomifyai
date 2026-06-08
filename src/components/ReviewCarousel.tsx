@@ -17,9 +17,8 @@ export function ReviewCarousel() {
         {items.map((r, i) => (
           <div
             key={i}
-            className="rounded-2xl p-7 mr-6"
+            className="rounded-2xl p-5 sm:p-7 mr-4 sm:mr-6 w-[78vw] sm:w-auto"
             style={{
-              minWidth: 320,
               maxWidth: 360,
               background: "rgba(255,255,255,0.85)",
               backdropFilter: "blur(14px)",
