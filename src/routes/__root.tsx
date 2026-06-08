@@ -57,6 +57,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Easibie — AI-Powered AR for E-Commerce" },
       { name: "twitter:description", content: "Turn any product photo into a live AR experience. No 3D modeling, no app downloads. Just upload, generate, and sell more." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a77039ba-709a-4283-8ed5-dcf2b6ae8c52/id-preview-541cac40--cf67ac36-8498-48f8-aa46-849ecb68157b.lovable.app-1780828070252.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a77039ba-709a-4283-8ed5-dcf2b6ae8c52/id-preview-541cac40--cf67ac36-8498-48f8-aa46-849ecb68157b.lovable.app-1780828070252.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
