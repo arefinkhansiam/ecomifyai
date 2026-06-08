@@ -1,62 +1,66 @@
 
-# AR Scan-to-3D Module (integrated with existing AR system)
+# Fix scanning, auto-AR for uploads, live customization, polish
 
-I'll extend the current `ar_products` table and dashboard rather than create parallel tables, so vendors get one unified product list. A new "Scan with camera" mode joins the existing Furniture / Fashion / Full-3D modes.
+Four concrete fixes — each is independent so they all ship together but degrade gracefully if one fails.
 
-## What gets built
+---
 
-### 1. Vendor scan flow (`/dashboard/scan`)
-- Vendor enters product name → product row created with `status='scanning'`, `ar_mode='scan_ai'`.
-- Browser opens back camera (`getUserMedia { facingMode: "environment" }`).
-- MediaPipe Object Detector (CDN `@mediapipe/tasks-vision`) runs every 500 ms on the live feed; green bbox when an object is in frame, otherwise "Place product in front of camera".
-- Auto-capture one JPEG every 2 s while an object is detected, uploaded to `product-images` bucket at `scans/{productId}/frame_{n}.jpg`, URL recorded in `scan_frames`.
-- Circular progress ring 0→40 frames; rotation hint text changes every 10 frames ("rotate left", "tilt up", "show bottom", "show back").
-- After 40 frames camera stops, status flips to `processing`.
+## 1. Fix the scanner that "doesn't work"
 
-### 2. AI 3D preview generation
-- A `createServerFn` picks frame #20 as the primary shot.
-- Calls Lovable AI Gateway (`google/gemini-2.5-flash-image`) to produce a clean studio "3D-style" hero render (turntable look on transparent background). Result PNG saved to `models_3d.preview_url`.
-- Also stores the cleaned hero image as the product's `model_url` fallback so the existing viewer keeps working.
-- `processing_status` flows: `pending → generating → done | failed`; product `status` → `ready` on success.
-- A clear banner in the viewer: "AI 3D preview — real GLB/USDZ coming when a 3D service is connected." Real TripoSR/Meshy integration is left as a single swap-in point in this function (one TODO, one place).
+The real bug: the `<video>` element is only rendered when `phase === "scanning"`. The current code calls `getUserMedia` → sets `videoRef.current.srcObject` → then flips phase. So `videoRef.current` is `null` at the moment we try to attach the stream and `play()`. On most devices that means the camera light turns on, no frames render, no detection runs, no frames are captured → "scanning is not working".
 
-### 3. Embed token & widget
-- Add `embed_token` (unique, `crypto.randomUUID()`) and `view_count` to `ar_products` (no separate `ar_widgets` table — same purpose, less duplication).
-- Public viewer route: `/ar/$token`.
-  - Loads `<model-viewer>` from Google CDN.
-  - `src` = GLB if present, else the AI preview image rendered in a 360° spin frame; `ios-src` = USDZ when present.
-  - Attributes: `ar`, `ar-modes="webxr scene-viewer quick-look"`, `camera-controls`, `auto-rotate`, `shadow-intensity="1"`.
-  - Shows product name + description overlay, increments `view_count`.
-- Dashboard card gets two new buttons: **Preview AR** (opens `/ar/$token`) and **Copy embed code** (copies the `<iframe>` snippet with `allow="xr-spatial-tracking; camera"`).
+Fixes in `src/routes/_authenticated/dashboard.scan.tsx`:
+- Always render `<video>` and `<canvas>` (hidden behind the intro card when not scanning) so `videoRef.current` exists before stream attach.
+- Flip `setPhase("scanning")` BEFORE attaching the stream, and use a small `requestAnimationFrame` to make sure the element is mounted.
+- Wait for `loadedmetadata` before starting the detection/capture loops; today the loops can fire while `videoWidth` is 0.
+- Better error handling: surface `NotAllowedError`, `NotFoundError`, and "browser doesn't support camera" as distinct toasts.
+- If MediaPipe CDN load fails (offline, blocked CDN, slow network), keep the auto-capture but show a small "auto-detect off — keep product centered" hint instead of silently pretending an object is detected.
+- Add a one-shot console log per stage so the next failure is debuggable.
 
-### 4. Dashboard polish
-- Status badges: Scanning / Processing / Ready / Failed.
-- Toast notification when status flips to Ready.
-- Loading skeletons, dark modern theme using existing tokens.
+## 2. Random uploaded image → AR ready (same AI pass as scan)
 
-## Database changes (single migration)
+Today uploading a plain photo just stores the raw file. The viewer shows that raw photo, which looks ugly. User wants uploads to behave like scans.
 
-- `ar_products`: add `embed_token text unique default`, `view_count int default 0`; extend `ar_mode` to include `'scan_ai'`.
-- New table `scan_frames` (`id`, `product_id` FK, `frame_url`, `frame_number`, `created_at`) with RLS scoped to product owner + GRANTs.
-- New table `models_3d` (`id`, `product_id` FK, `preview_url`, `glb_url`, `usdz_url`, `processing_status`, `external_task_id`, timestamps) with RLS + GRANTs.
-- Backfill `embed_token` for existing rows.
+Changes:
+- New server fn `generateAiHeroFromImage({ productId })` in `src/lib/scan-ai.functions.ts` (reuses the existing Gemini image-edit prompt; takes the product's `original_image_url` as the source instead of scan frames). Stores the cleaned hero render in `processed_image_url` and creates a `models_3d` row with `preview_url` so the existing viewer + dashboard treat the upload identically to a scan.
+- `dashboard.upload.tsx`: after the insert, set `status='processing'`, call the new server fn, then set `status='ready'`. Show the same "AI is preparing your AR preview…" overlay the scan page uses, so uploads visibly produce an AR-ready output.
+- If the AI call fails, keep `status='ready'` with the original photo (graceful fallback) and toast a warning — user still gets a working AR product, just without the cleaned hero.
 
-## Server functions / routes
+## 3. Customize options that are actually workable
 
-- `src/lib/scan.functions.ts` — `createScanProduct`, `saveScanFrame`, `finalizeScan` (triggers AI step).
-- `src/lib/scan-ai.functions.ts` — `generate3dPreview` (Lovable AI image edit on frame #20).
-- `src/routes/ar.$token.tsx` — public viewer (server fn loads product + increments view count via `supabaseAdmin`, no auth required).
+The customization fields ARE wired to the viewer, but the upload page gives no live feedback so users never see what they're tuning. And there's no way to edit after creating.
 
-## Technical notes
+Changes:
+- `dashboard.upload.tsx`: add a sticky right-side **Live AR preview** panel that re-renders on every change — shows the AR page mock (page bg + product image + accent button + font color + branding). Same renderer used in the actual viewer so what-you-see-is-what-you-get.
+- Add a `Reset to defaults` button next to the customization section.
+- New route `src/routes/_authenticated/dashboard.products.$id.customize.tsx`: a dedicated edit page for an existing product. Loads the row, re-uses the same controls + live preview, saves back to `ar_products`. Linked from the product card via a new pencil button.
+- Add 2 small but commonly-asked controls: **AR badge text** (replaces "PLACE IT" / "TRY-ON") and **Show "Powered by Easibie" branding** (already in DB as `show_branding`, just expose it for paid users in the edit page).
 
-- MediaPipe runs entirely client-side; no key needed.
-- Lovable AI Gateway is used for the "3D preview" image (no external HF/Replicate dependency).
-- USDZ conversion intentionally skipped; iPhone falls back to the 3D viewer until a real GLB pipeline is plugged in.
-- Public viewer uses a server fn that loads `supabaseAdmin` inside the handler to keep the import graph client-safe.
-- Embed `<iframe>` includes `allow="xr-spatial-tracking; camera"` — required for AR in iframes.
+## 4. Make the scan UI as polished as the try-on viewer
 
-## Out of scope this turn
+Match the look of `/ar/view/$productId` (dark glass, blurred pills, big shutter ring, animated processing overlay):
 
-- Real photogrammetry / TripoSR call (left as a single TODO inside `generate3dPreview`).
-- GLB → USDZ conversion.
-- Browser push notifications on long jobs (AI preview takes seconds, not minutes).
+- Full-screen dark gradient backdrop for the scan stage (not the dashboard light background).
+- Top bar = blurred-glass pills: live indicator with animated dot, product name, close button — identical to `TopBar` in the viewer.
+- Detection bbox pulses sky-blue when nothing detected, locks emerald when an object is in frame.
+- Replace the bottom ring with a larger "shutter-ring" style: circular progress with the current angle hint ("Left side", "Top", "Back", "Bottom") inside, plus a thin animated radar sweep behind it.
+- "Generating your AR preview…" overlay uses the same gradient + Sparkles loop as the viewer's processing screen, with a 3-step progress (Capturing → Cleaning → Composing).
+- Done screen: big checkmark, product hero preview thumbnail, primary `Preview AR` button + secondary `Copy embed code` + `Scan another`.
+- Mobile-first sizing: stage uses `100dvh` minus headers; safe-area insets respected; orientation lock hint when in portrait on tablet.
+
+---
+
+## Files changed
+
+- `src/routes/_authenticated/dashboard.scan.tsx` — render order fix, polish, better errors.
+- `src/lib/scan-ai.functions.ts` — add `generateAiHeroFromImage` (reuses existing Gemini call).
+- `src/routes/_authenticated/dashboard.upload.tsx` — auto-AI for uploaded images, live preview panel.
+- `src/routes/_authenticated/dashboard.products.$id.customize.tsx` — new edit page.
+- `src/routes/_authenticated/dashboard.products.tsx` — pencil button → customize page.
+- `src/components/ArLivePreview.tsx` — small shared component used by upload + customize.
+
+## Out of scope
+
+- Real GLB / USDZ generation (still requires a paid 3D pipeline — flagged earlier).
+- Changing the public viewer itself (it already consumes all the customization fields).
+- Multi-product batch editing.
