@@ -13,10 +13,19 @@ export const Route = createFileRoute("/_authenticated/dashboard/upload")({
 type Size = "small" | "medium" | "large";
 
 const PRESET_COLORS = ["#0B1220", "#0EA5E9", "#38BDF8", "#7C3AED", "#10B981", "#F59E0B", "#EF4444", "#FFFFFF"];
+const GRADIENT_PRESETS = [
+  { name: "Ocean", from: "#0369A1", to: "#38BDF8" },
+  { name: "Sunset", from: "#F59E0B", to: "#EF4444" },
+  { name: "Violet", from: "#7C3AED", to: "#EC4899" },
+  { name: "Forest", from: "#065F46", to: "#10B981" },
+  { name: "Midnight", from: "#0B1220", to: "#4338CA" },
+  { name: "Candy", from: "#EC4899", to: "#38BDF8" },
+];
 
 function UploadPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [plan, setPlan] = useState<"free" | "starter" | "growth">("free");
   const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
@@ -29,13 +38,24 @@ function UploadPage() {
   const [newColor, setNewColor] = useState("#0EA5E9");
 
   const [label, setLabel] = useState("View in AR");
-  const [useGradient, setUseGradient] = useState(true);
+  const [useGradient, setUseGradient] = useState(false);
   const [bg, setBg] = useState("#0369A1");
   const [bg2, setBg2] = useState("#38BDF8");
   const [fg, setFg] = useState("#FFFFFF");
   const [radius, setRadius] = useState(14);
   const [size, setSize] = useState<Size>("medium");
   const [showBranding, setShowBranding] = useState(true);
+
+  const isPaid = plan !== "free";
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("user_plans").select("plan").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+      const p = (data?.plan as any) ?? "free";
+      setPlan(p);
+      if (p === "free") { setUseGradient(false); setShowBranding(true); }
+    });
+  }, [user]);
 
   const onFile = (f: File | null) => {
     if (!f) return;
