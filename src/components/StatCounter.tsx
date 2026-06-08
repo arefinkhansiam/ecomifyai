@@ -32,10 +32,18 @@ export function StatCounter({ target, suffix = "", label }: { target: number; su
 
   return (
     <div ref={ref} className="text-center">
-      <div className="font-display font-extrabold text-white text-4xl md:text-5xl">
+      <div
+        className="font-display font-extrabold text-4xl md:text-5xl"
+        style={{
+          backgroundImage: "linear-gradient(135deg, #0B1220 0%, #0369A1 45%, #38BDF8 100%)",
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          color: "transparent",
+        }}
+      >
         {value.toLocaleString()}{suffix}
       </div>
-      <div className="mt-2 text-sm text-muted">{label}</div>
+      <div className="mt-2 text-sm font-medium" style={{ color: "var(--ink-soft)" }}>{label}</div>
     </div>
   );
 }
