@@ -105,7 +105,7 @@ export function Navbar() {
                   to="/auth"
                   search={{ mode: "signin" }}
                   className="text-sm font-medium hover:text-primary transition-colors"
-                  style={{ color: scrolled ? "var(--ink-soft)" : "rgba(255,255,255,0.92)" }}
+                  style={{ color: "var(--ink-soft)" }}
                 >
                   Sign In
                 </Link>
@@ -116,9 +116,9 @@ export function Navbar() {
             )}
           </div>
           <button
-            className="md:hidden"
+            className="md:hidden justify-self-end"
             onClick={() => setMenuOpen(true)}
-            style={{ color: scrolled ? "var(--ink)" : "#ffffff" }}
+            style={{ color: "var(--ink)" }}
           >
             <Menu size={24} />
           </button>
