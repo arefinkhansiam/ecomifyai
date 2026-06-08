@@ -471,7 +471,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_dashboard_stats: { Args: { uid: string }; Returns: Json }
+      get_user_dashboard_stats: { Args: { uid?: string }; Returns: Json }
       increment_ar_views: {
         Args: { p_capability: string; p_device: string; p_product_id: string }
         Returns: undefined
