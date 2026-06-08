@@ -258,7 +258,8 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" }) {
 
   const close = () => { tracker.sendSession(true); streamRef.current?.getTracks().forEach((t) => t.stop()); exitView(); };
 
-  const badge = mode === "fashion" ? "TRY-ON" : "PLACE IT";
+  const customBadge = (product.ar_customization as any)?.ar_badge_text as string | undefined;
+  const badge = customBadge?.trim() ? customBadge.trim().toUpperCase() : (mode === "fashion" ? "TRY-ON" : "PLACE IT");
   const captureHint = mode === "fashion" ? "Stand in frame, then capture" : "Aim at the spot, then capture";
 
   return (
