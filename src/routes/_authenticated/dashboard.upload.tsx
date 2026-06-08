@@ -4,7 +4,14 @@ import { toast } from "sonner";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown } from "lucide-react";
+import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown, Shirt, Sofa, Box } from "lucide-react";
+
+type ArMode = "fashion" | "furniture" | "full_3d";
+const MODE_INFO: Record<ArMode, { label: string; desc: string; Icon: any; accept: string; hint: string }> = {
+  fashion:   { label: "Fashion try-on", desc: "Shirts, t-shirts, tops",          Icon: Shirt, accept: "image/jpeg,image/png,image/webp", hint: "Upload garment photo (JPG / PNG / WebP)" },
+  furniture: { label: "Furniture / Decor", desc: "Place in customer's room",     Icon: Sofa,  accept: "image/jpeg,image/png,image/webp", hint: "Upload product photo (JPG / PNG / WebP)" },
+  full_3d:   { label: "Full 3D AR",      desc: "Real-time 3D in their space",    Icon: Box,   accept: ".glb,.gltf,model/gltf-binary", hint: "Upload GLB or GLTF 3D model" },
+};
 
 export const Route = createFileRoute("/_authenticated/dashboard/upload")({
   component: UploadPage,
