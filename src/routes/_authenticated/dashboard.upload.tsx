@@ -172,8 +172,34 @@ function UploadPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: image upload + colors */}
         <div className="bg-card rounded-2xl p-6 glow-card">
-          <h4 className="text-ink">1. Product image</h4>
-          <label className="block mt-4">
+          <h4 className="text-ink">1. Choose AR mode</h4>
+          <p className="text-sm mt-1" style={{ color: "var(--ink-soft)" }}>How will customers experience this product?</p>
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {(Object.keys(MODE_INFO) as ArMode[]).map((m) => {
+              const info = MODE_INFO[m];
+              const active = arMode === m;
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => { setArMode(m); setFile(null); setPreview(null); }}
+                  className="text-left p-3 rounded-xl border transition-all"
+                  style={{
+                    borderColor: active ? "var(--primary)" : "var(--border)",
+                    background: active ? "linear-gradient(135deg, rgba(2,132,199,0.10), rgba(56,189,248,0.06))" : "#fff",
+                    boxShadow: active ? "0 8px 24px -12px rgba(2,132,199,0.45)" : "none",
+                  }}
+                >
+                  <info.Icon size={20} style={{ color: active ? "var(--primary)" : "var(--ink-soft)" }} />
+                  <div className="mt-2 text-sm font-semibold text-ink">{info.label}</div>
+                  <div className="text-[11px] mt-0.5" style={{ color: "var(--ink-soft)" }}>{info.desc}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          <h4 className="text-ink mt-6">2. {arMode === "full_3d" ? "3D model file" : "Product image"}</h4>
+          <label className="block mt-3">
             <div
               className="border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-colors hover:border-primary bg-soft"
               onDragOver={(e) => e.preventDefault()}
@@ -181,14 +207,20 @@ function UploadPage() {
             >
               {preview ? (
                 <img src={preview} alt="preview" className="max-h-60 mx-auto object-contain" />
+              ) : file && arMode === "full_3d" ? (
+                <div className="flex flex-col items-center gap-2">
+                  <Box size={48} className="text-primary" />
+                  <div className="font-display text-lg text-ink">{file.name}</div>
+                  <p className="text-xs">{(file.size / 1024 / 1024).toFixed(1)} MB · ready to upload</p>
+                </div>
               ) : (
                 <>
                   <UploadCloud size={48} className="mx-auto text-primary" />
-                  <div className="mt-4 font-display text-lg text-ink">Drop a photo here</div>
-                  <p className="text-sm mt-1">JPG, PNG or WebP. Max 10MB.</p>
+                  <div className="mt-4 font-display text-lg text-ink">Drop a {arMode === "full_3d" ? "GLB/GLTF file" : "photo"} here</div>
+                  <p className="text-sm mt-1">{MODE_INFO[arMode].hint}. Max {arMode === "full_3d" ? "50MB" : "10MB"}.</p>
                 </>
               )}
-              <input type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
+              <input type="file" accept={MODE_INFO[arMode].accept} hidden onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
             </div>
           </label>
 
