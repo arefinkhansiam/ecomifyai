@@ -46,6 +46,17 @@ function UploadPage() {
   const [size, setSize] = useState<Size>("medium");
   const [showBranding, setShowBranding] = useState(true);
 
+  // AR Page customization (paid)
+  const [pageBg, setPageBg] = useState("#000000");
+  const [fontColor, setFontColor] = useState("#FFFFFF");
+  const [accentColor, setAccentColor] = useState("#38BDF8");
+  const [overlayColor, setOverlayColor] = useState("rgba(255,255,255,0.14)");
+  const [arButtonRadius, setArButtonRadius] = useState(14);
+  const [arButtonShadow, setArButtonShadow] = useState(true);
+  const [customButtonText, setCustomButtonText] = useState("View in Your Space");
+  const [defaultCamera, setDefaultCamera] = useState<"front" | "back">("back");
+  const [showProductName, setShowProductName] = useState(true);
+
   const isPaid = plan !== "free";
 
   useEffect(() => {
