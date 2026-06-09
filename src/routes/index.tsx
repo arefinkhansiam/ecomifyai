@@ -101,12 +101,6 @@ function Landing() {
                   touch-action="pan-y"
                   style={{ width: "100%", height: "100%", background: "linear-gradient(180deg, #f6fafe 0%, #e0f2fe 100%)", "--poster-color": "transparent" } as any}
                 />
-                <div className="absolute bottom-6 left-4 right-4 z-10">
-                  <div className="bg-card/95 backdrop-blur-md rounded-xl p-3 shadow-lg">
-                    <div className="text-[10px] uppercase tracking-wider text-muted">Live AR Demo · Tap & drag</div>
-                    <div className="text-sm font-semibold text-ink">Modern Lounge Chair</div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
