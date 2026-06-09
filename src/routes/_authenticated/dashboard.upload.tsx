@@ -80,7 +80,7 @@ function UploadPage() {
   const [colors, setColors] = useState<string[]>([]);
   const [newColor, setNewColor] = useState("#0EA5E9");
 
-  const [label, setLabel] = useState("View in AR");
+  const [label, setLabel] = useState("View Try-On");
   const [useGradient, setUseGradient] = useState(false);
   const [bg, setBg] = useState("#0369A1");
   const [bg2, setBg2] = useState("#38BDF8");
@@ -89,7 +89,7 @@ function UploadPage() {
   const [size, setSize] = useState<Size>("medium");
   const [showBranding, setShowBranding] = useState(true);
 
-  // AR Page customization (paid)
+  // Try-On Page customization (paid)
   const [pageBg, setPageBg] = useState("#000000");
   const [fontColor, setFontColor] = useState("#FFFFFF");
   const [accentColor, setAccentColor] = useState("#38BDF8");
@@ -305,7 +305,7 @@ function UploadPage() {
             </div>
           ) : (
             <>
-              <h4 className="text-ink">1. Choose AR mode</h4>
+              <h4 className="text-ink">1. Choose Try-On mode</h4>
               <p className="text-sm mt-1" style={{ color: "var(--ink-soft)" }}>How will customers experience this product?</p>
               <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {(Object.keys(MODE_INFO) as ArMode[]).map((m) => {
@@ -391,37 +391,12 @@ function UploadPage() {
             <input className="input-base mt-1" value={name} onChange={(e) => setName(e.target.value)} placeholder="Modern Lounge Chair" />
           </div>
 
-          {/* Color variants */}
-          <div className="mt-5">
-            <label className="text-xs text-muted uppercase tracking-wide">Available colors (optional)</label>
-            <p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>Customers can pick from these when viewing in AR.</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {colors.map((c) => (
-                <div key={c} className="relative group">
-                  <div className="w-9 h-9 rounded-full border-2 border-white shadow" style={{ background: c }} />
-                  <button onClick={() => setColors(colors.filter((x) => x !== c))}
-                    className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-black text-white grid place-items-center opacity-0 group-hover:opacity-100">
-                    <X size={10} />
-                  </button>
-                </div>
-              ))}
-              <div className="flex items-center gap-2 border rounded-full px-2 py-1" style={{ borderColor: "var(--border)" }}>
-                <input type="color" value={newColor} onChange={(e) => setNewColor(e.target.value)} className="w-7 h-7 rounded-full cursor-pointer bg-transparent border-0" />
-                <button onClick={addColor} className="text-xs font-semibold text-primary inline-flex items-center gap-1"><Plus size={12} /> Add</button>
-              </div>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {PRESET_COLORS.map((c) => (
-                <button key={c} onClick={() => !colors.includes(c) && setColors([...colors, c])}
-                  className="w-6 h-6 rounded-full border" style={{ background: c, borderColor: "var(--border)" }} title={c} />
-              ))}
-            </div>
-          </div>
+          {/* Available colors removed — variants live on the product page */}
         </div>
 
         {/* Right: button customization + live preview */}
         <div className="bg-card rounded-2xl p-6 glow-card">
-          <h4 className="text-ink">2. Customize your AR button</h4>
+          <h4 className="text-ink">2. Customize your Try-On button</h4>
           <div className="mt-4 space-y-4">
             <div>
               <label className="text-xs text-muted uppercase tracking-wide">Button label</label>
@@ -502,11 +477,11 @@ function UploadPage() {
               </button>
             </div>
 
-            {/* AR Page customization (Growth feature, Starter gets partial) */}
+            {/* Try-On Page customization (Growth feature, Starter gets partial) */}
             <div className="p-4 rounded-xl space-y-4" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.05), rgba(56,189,248,0.05))", border: "1px solid rgba(124,58,237,0.18)" }}>
               <div className="flex items-center justify-between">
                 <div className="text-sm font-semibold text-ink flex items-center gap-2">
-                  AR Page Customization
+                  Try-On Page Customization
                   {!isPaid && <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full text-white" style={{ background: "linear-gradient(135deg,#7C3AED,#38BDF8)" }}><Crown size={9} /> Pro</span>}
                 </div>
               </div>
@@ -521,7 +496,7 @@ function UploadPage() {
                     <ColorField label="Overlay UI" value={overlayColor} onChange={setOverlayColor} />
                   </div>
                   <div>
-                    <label className="text-xs text-muted uppercase tracking-wide flex justify-between"><span>AR button radius</span><span>{arButtonRadius}px</span></label>
+                    <label className="text-xs text-muted uppercase tracking-wide flex justify-between"><span>Try-On button radius</span><span>{arButtonRadius}px</span></label>
                     <input type="range" min={0} max={32} value={arButtonRadius} onChange={(e) => setArButtonRadius(Number(e.target.value))} className="w-full mt-2 accent-sky-500" />
                   </div>
                   <div>
@@ -540,7 +515,7 @@ function UploadPage() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-4 pt-1">
-                    <div className="text-sm text-ink">AR button shadow</div>
+                    <div className="text-sm text-ink">Try-On button shadow</div>
                     <button onClick={() => setArButtonShadow(!arButtonShadow)} className="relative w-11 h-6 rounded-full transition-colors" style={{ background: arButtonShadow ? "var(--primary)" : "#cbd5e1" }}>
                       <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ transform: arButtonShadow ? "translateX(22px)" : "translateX(2px)" }} />
                     </button>
@@ -561,7 +536,7 @@ function UploadPage() {
             <ArLivePreview
               productImage={preview}
               productName={name || "Your product"}
-              buttonLabel={label || "View in AR"}
+              buttonLabel={label || "View Try-On"}
               buttonBg={btnBg}
               buttonFg={fg}
               buttonRadius={radius}
@@ -580,7 +555,7 @@ function UploadPage() {
 
           <button onClick={upload} disabled={!file || busy || !!createdId} className="btn-primary w-full mt-6">
             {busy ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
-            {busy ? step || "Working..." : createdId ? "Created ✓" : "Create AR Product"}
+            {busy ? step || "Working..." : createdId ? "Created ✓" : "Create Try-On Product"}
           </button>
 
           {(busy || createdId || logs.length > 0) && (
@@ -597,7 +572,7 @@ function UploadPage() {
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               <h4 className="text-ink">3. Add it to your store</h4>
-              <p className="text-sm">Paste this snippet wherever you want the AR button to appear.</p>
+              <p className="text-sm">Paste this snippet wherever you want your Try-On button to appear.</p>
             </div>
             <Link to="/dashboard/products" className="btn-ghost">Go to products →</Link>
           </div>
@@ -629,7 +604,7 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
 function UploadTimeline({ steps }: { steps: TimelineStep[] }) {
   return (
     <div className="rounded-2xl p-4 bg-soft" style={{ border: "1px solid var(--border)" }}>
-      <div className="text-[11px] uppercase tracking-wider font-semibold text-muted">AR / Scan progress</div>
+      <div className="text-[11px] uppercase tracking-wider font-semibold text-muted">Build progress</div>
       <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
         {steps.map((step) => (
           <div key={step.label} className="flex items-start gap-2 text-xs" style={{ color: "var(--ink-soft)" }}>
