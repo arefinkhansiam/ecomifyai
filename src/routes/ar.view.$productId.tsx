@@ -15,7 +15,7 @@ export const Route = createFileRoute("/ar/view/$productId")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("ar_products")
-      .select("id, product_name, original_image_url, processed_image_url, glb_url, usdz_url, button_label, button_bg_color, button_text_color, status, is_public, dominant_color, product_colors, show_branding, ar_customization, ar_mode")
+      .select("id, product_name, original_image_url, processed_image_url, glb_url, usdz_url, button_label, button_bg_color, button_text_color, status, is_public, dominant_color, product_colors, show_branding, ar_customization, ar_mode, ar_subtype")
       .eq("id", params.productId)
       .maybeSingle();
     if (error || !data || data.status !== "ready" || !data.is_public) throw notFound();
@@ -151,8 +151,12 @@ function ARRouter() {
    ============================================================ */
 function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" }) {
   const { product, imageUrl } = Route.useLoaderData();
+  const subtype: "top" | "bottom" | "accessory" | "jewellery" | undefined = (product as any).ar_subtype ?? undefined;
   const cust = useCustomization(product);
-  const initialFacing: "user" | "environment" = (mode === "fashion" || mode === "makeup") ? "user" : (cust.defaultCam === "front" ? "user" : "environment");
+  // Fashion + Makeup default to selfie (user). Accessories that go on hands/wrists (watch, ring, bracelet)
+  // still use selfie cam because the body part is usually in front of the user. Furniture = back cam.
+  const initialFacing: "user" | "environment" =
+    (mode === "fashion" || mode === "makeup") ? "user" : (cust.defaultCam === "front" ? "user" : "environment");
   const [facing, setFacing] = useState<"user" | "environment">(initialFacing);
   const camLabel: "front" | "back" = facing === "user" ? "front" : "back";
   const tracker = useSessionTracker(product, camLabel, mode);
