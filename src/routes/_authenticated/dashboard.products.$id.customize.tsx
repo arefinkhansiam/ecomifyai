@@ -253,10 +253,20 @@ function Toggle({ label, on, onChange, gated }: { label: string; on: boolean; on
       </div>
       <button onClick={() => { if (gated) { toast.info("Paid feature"); return; } onChange(!on); }}
         disabled={gated}
-        className="relative w-11 h-6 rounded-full transition-colors shrink-0"
-        style={{ background: on ? "var(--primary)" : "#cbd5e1", opacity: gated ? 0.5 : 1 }}>
-        <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform"
-              style={{ transform: on ? "translateX(22px)" : "translateX(2px)" }} />
+        type="button"
+        className="relative w-12 h-7 rounded-full transition-colors shrink-0 border"
+        style={{
+          background: on ? "var(--primary)" : "#e2e8f0",
+          borderColor: on ? "var(--primary)" : "#cbd5e1",
+          opacity: gated ? 0.5 : 1,
+        }}>
+        <span
+          className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white transition-transform"
+          style={{
+            transform: on ? "translateX(20px)" : "translateX(0px)",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.06)",
+          }}
+        />
       </button>
     </div>
   );
