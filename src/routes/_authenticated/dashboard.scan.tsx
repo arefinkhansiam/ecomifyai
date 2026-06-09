@@ -386,20 +386,34 @@ function ScanPage() {
         </div>
       </div>
 
-      {/* Intro */}
       {phase === "intro" && (
         <div className="max-w-xl mx-auto bg-card rounded-2xl p-6 glow-card">
+          {search.mode && (
+            <Link to="/dashboard/create" className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary mb-3">
+              <ArrowLeft size={12} /> Change category
+            </Link>
+          )}
           <div className="flex items-center gap-3">
             <span className="w-12 h-12 rounded-2xl grid place-items-center text-white"
                   style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}>
               <ScanLine size={22} />
             </span>
             <div>
-              <h3 className="text-ink">Scan a real product</h3>
+              <h3 className="text-ink">
+                Scan a {arMode === "fashion" ? (subtype ?? "fashion item") : arMode === "makeup" ? "makeup product" : arMode === "furniture" ? "furniture piece" : "product"}
+              </h3>
               <p className="text-sm" style={{ color: "var(--ink-soft)" }}>
-                Place your product on a clean surface. We'll capture {TOTAL_FRAMES} angles and turn it into an AR-ready preview.
+                Follow the on-screen direction for each angle. We capture {TOTAL_FRAMES} frames and turn it into an AR-ready preview.
               </p>
             </div>
+          </div>
+          <div className="mt-4 p-3 rounded-xl text-xs" style={{ background: "rgba(2,132,199,0.06)", border: "1px solid rgba(2,132,199,0.18)", color: "var(--ink-soft)" }}>
+            <div className="font-semibold text-ink mb-1">You'll be guided through:</div>
+            <ol className="space-y-0.5 ml-1">
+              {guidance.map((g, i) => (
+                <li key={i}>{i + 1}. <span className="font-medium text-ink">{g.label}</span> — {g.hint}</li>
+              ))}
+            </ol>
           </div>
           <div className="mt-5">
             <label className="text-xs text-muted uppercase tracking-wide">Product name</label>
