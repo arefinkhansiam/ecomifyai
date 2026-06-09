@@ -37,13 +37,15 @@ export const Route = createFileRoute("/api/public/ar-compose")({
 
           const { data: prod, error } = await supabaseAdmin
             .from("ar_products")
-            .select("id, original_image_url, processed_image_url, is_public, status, ar_mode")
+            .select("id, original_image_url, processed_image_url, is_public, status, ar_mode, ar_subtype")
             .eq("id", data.productId)
             .maybeSingle();
           if (error || !prod) return Response.json({ error: "Product not found" }, { status: 404, headers: CORS });
           if (!prod.is_public || prod.status !== "ready") {
             return Response.json({ error: "Product not available" }, { status: 403, headers: CORS });
           }
+          const subtype = (data.subtype ?? (prod as any).ar_subtype) as
+            | "top" | "bottom" | "accessory" | "jewellery" | null | undefined;
 
           let productImageUrl = prod.processed_image_url as string | null;
           if (!productImageUrl && prod.original_image_url) {
@@ -62,12 +64,26 @@ export const Route = createFileRoute("/api/public/ar-compose")({
           const key = process.env.LOVABLE_API_KEY;
           if (!key) return Response.json({ error: "AI not configured" }, { status: 500, headers: CORS });
 
+          const fashionPrompt = (() => {
+            if (subtype === "bottom") {
+              return `Virtual try-on. FIRST image: a person standing. SECOND image: a bottom garment (pants / jeans / trousers / skirt / shorts). Generate a photorealistic image of the SAME person wearing the bottom garment. Preserve the person's face, hair, pose, upper body, skin tone, lighting and background EXACTLY. Replace only the bottom garment with the new one — fit naturally to the legs/waist, realistic folds, accurate length, shadows and shading matching the scene light. Do NOT change shoes, top, accessories or background. Return only the resulting image.`;
+            }
+            if (subtype === "accessory") {
+              return `Virtual try-on. FIRST image: a person. SECOND image: a single accessory (watch / bag / hat / glasses / shoes / belt). Generate a photorealistic image of the SAME person wearing/holding ONLY that accessory in the natural location (watch on wrist, hat on head, glasses on face, bag in hand, shoes on feet). Preserve the person's face, hair, pose, body shape, skin tone, clothing, lighting and background EXACTLY. Match scale, perspective, and shadows. Do NOT change anything else. Return only the resulting image.`;
+            }
+            if (subtype === "jewellery") {
+              return `Virtual jewellery try-on. FIRST image: a person (selfie or upper body). SECOND image: a piece of jewellery (necklace / earrings / ring / bracelet). Place the jewellery photorealistically on the correct body part (necklace on neckline, earrings on earlobes, ring on finger, bracelet on wrist). Match scale, metal reflections, gemstone sparkle, and shadows to the scene lighting. Preserve the person's identity, skin texture, hair, pose, clothing and background EXACTLY. Do NOT change face shape or smooth skin. Return only the resulting image.`;
+            }
+            // default: top / shirt / dress
+            return `Virtual try-on. FIRST image: a person. SECOND image: a top garment (shirt / t-shirt / blouse / jacket / dress). Generate a photorealistic image of the SAME person wearing the top garment. Preserve the person's face, hair, pose, body shape, skin tone, lower-body clothing, lighting and background EXACTLY. The garment must fit naturally with realistic folds, shadows, and shading matching the scene light. Do NOT change anything besides the upper-body garment. Return only the resulting image.`;
+          })();
           const prompt =
             data.mode === "fashion"
-              ? `Virtual try-on. FIRST image: a person. SECOND image: a clothing item (shirt / t-shirt / top). Generate a photorealistic image of the SAME person wearing the clothing item. Preserve the person's face, hair, pose, body shape, skin tone, lighting and background exactly. The clothing must fit naturally with realistic folds, shadows, and shading matching the scene light. Return only the resulting image.`
+              ? fashionPrompt
               : data.mode === "makeup"
               ? `Virtual makeup try-on. FIRST image: a selfie of a person's face. SECOND image: a makeup product (lipstick / eyeshadow / foundation / blush / etc.) — use it as the COLOR and FINISH reference. Apply that makeup to the person's face photorealistically. Preserve the person's identity, facial features, pose, hair, skin texture, lighting, and background EXACTLY. Only modify the relevant area (lips for lipstick, eyelids for eyeshadow, cheeks for blush, full face for foundation). Match the product's exact shade, opacity, and finish (matte, glossy, shimmer). No skin smoothing, no face shape changes, no filters. Return only the resulting image.`
               : `Interior visualisation. FIRST image: a real room photo from a phone camera. SECOND image: a product (furniture / decor) on its own (possibly with a background). Place the product naturally inside the room with correct perspective, realistic scale, ground contact shadows, and lighting matching the room. Remove the product's original background. Keep the room background unchanged. Return only the resulting composed image.`;
+
 
           const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
