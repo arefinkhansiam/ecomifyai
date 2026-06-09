@@ -161,7 +161,7 @@ export const generateAiHeroFromImage = createServerFn({ method: "POST" })
       const sourceMime = res.headers.get("content-type") || "image/jpeg";
       const dataUrl = `data:${sourceMime};base64,${Buffer.from(buf).toString("base64")}`;
 
-      const { mime, bytes } = await callGeminiHero(dataUrl);
+      const { mime, bytes } = await callGeminiHero(dataUrl, promptForCategory((product as any).ar_mode, (product as any).ar_subtype));
       const ext = mime === "image/jpeg" ? "jpg" : "png";
       const path = `${userId}/${productId}/preview.${ext}`;
       const { error: upErr } = await supabase.storage.from("product-images")
