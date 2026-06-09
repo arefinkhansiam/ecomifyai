@@ -7,17 +7,27 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { generateAiHeroFromImage } from "@/lib/scan-ai.functions";
 import { ArLivePreview } from "@/components/ArLivePreview";
-import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown, Shirt, Sofa, Box, Sparkle } from "lucide-react";
+import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown, Shirt, Sofa, Box, Sparkle, ArrowLeft } from "lucide-react";
 
 type ArMode = "fashion" | "furniture" | "makeup" | "full_3d";
+type ClothingSub = "top" | "bottom" | "accessory" | "jewellery";
 const MODE_INFO: Record<ArMode, { label: string; desc: string; Icon: any; accept: string; hint: string }> = {
-  fashion:   { label: "Fashion try-on",   desc: "Shirts, t-shirts, tops",         Icon: Shirt,   accept: "image/jpeg,image/png,image/webp", hint: "Upload garment photo (JPG / PNG / WebP)" },
-  furniture: { label: "Furniture / Decor", desc: "Place in customer's room",      Icon: Sofa,    accept: "image/jpeg,image/png,image/webp", hint: "Upload product photo (JPG / PNG / WebP)" },
-  makeup:    { label: "Makeup try-on",    desc: "Lipstick, eyeshadow, blush",     Icon: Sparkle, accept: "image/jpeg,image/png,image/webp", hint: "Upload product / swatch photo (JPG / PNG / WebP)" },
-  full_3d:   { label: "Full 3D AR",       desc: "Real-time 3D in their space",    Icon: Box,     accept: ".glb,.gltf,model/gltf-binary",    hint: "Upload GLB or GLTF 3D model" },
+  fashion:   { label: "Fashion try-on",   desc: "Shirts, pants, accessories, jewellery", Icon: Shirt,   accept: "image/jpeg,image/png,image/webp", hint: "Upload garment / accessory photo (JPG / PNG / WebP)" },
+  furniture: { label: "Furniture / Decor", desc: "Place in customer's room",             Icon: Sofa,    accept: "image/jpeg,image/png,image/webp", hint: "Upload product photo (JPG / PNG / WebP)" },
+  makeup:    { label: "Makeup try-on",    desc: "Lipstick, eyeshadow, blush",            Icon: Sparkle, accept: "image/jpeg,image/png,image/webp", hint: "Upload product / swatch photo (JPG / PNG / WebP)" },
+  full_3d:   { label: "Full 3D AR",       desc: "Real-time 3D in their space",           Icon: Box,     accept: ".glb,.gltf,model/gltf-binary",    hint: "Upload GLB or GLTF 3D model" },
 };
 
+type UploadSearch = { mode?: ArMode; subtype?: ClothingSub };
+
 export const Route = createFileRoute("/_authenticated/dashboard/upload")({
+  validateSearch: (s: Record<string, unknown>): UploadSearch => {
+    const m = s.mode as ArMode | undefined;
+    const sub = s.subtype as ClothingSub | undefined;
+    const okMode = m && ["fashion", "furniture", "makeup", "full_3d"].includes(m) ? m : undefined;
+    const okSub = sub && ["top", "bottom", "accessory", "jewellery"].includes(sub) ? sub : undefined;
+    return { mode: okMode, subtype: okSub };
+  },
   component: UploadPage,
 });
 
@@ -36,6 +46,7 @@ const GRADIENT_PRESETS = [
 function UploadPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const generateHero = useServerFn(generateAiHeroFromImage);
   const [plan, setPlan] = useState<"free" | "starter" | "growth">("free");
   const [file, setFile] = useState<File | null>(null);
@@ -45,7 +56,10 @@ function UploadPage() {
   const [step, setStep] = useState("");
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const [arMode, setArMode] = useState<ArMode>("furniture");
+  const [arMode, setArMode] = useState<ArMode>(search.mode ?? "furniture");
+  const [subtype] = useState<ClothingSub | undefined>(search.subtype);
+  // If user came from /dashboard/create, lock the mode picker to that choice.
+  const modeLocked = !!search.mode;
 
   const [colors, setColors] = useState<string[]>([]);
   const [newColor, setNewColor] = useState("#0EA5E9");
