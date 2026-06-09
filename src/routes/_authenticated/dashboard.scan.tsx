@@ -25,8 +25,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/scan")({
   component: ScanPage,
 });
 
-const TOTAL_FRAMES = 40;
-const CAPTURE_INTERVAL_MS = 2000;
+const TOTAL_FRAMES = 12;
+const CAPTURE_INTERVAL_MS = 1500;
 const DETECT_INTERVAL_MS = 500;
 
 type Phase = "intro" | "scanning" | "generating" | "done" | "error";
