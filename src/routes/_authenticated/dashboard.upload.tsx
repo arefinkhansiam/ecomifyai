@@ -32,6 +32,17 @@ export const Route = createFileRoute("/_authenticated/dashboard/upload")({
 });
 
 type Size = "small" | "medium" | "large";
+type TimelineStep = { label: string; status: "pending" | "active" | "done" | "error"; at?: string; error?: string };
+type UploadLog = { label: string; value: string; at: string };
+
+const stamp = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+const initialTimeline = (): TimelineStep[] => [
+  { label: "Upload", status: "pending" },
+  { label: "Scanning", status: "pending" },
+  { label: "Angle capture", status: "pending" },
+  { label: "Mockup generation", status: "pending" },
+  { label: "AR render", status: "pending" },
+];
 
 const PRESET_COLORS = ["#0B1220", "#0EA5E9", "#38BDF8", "#7C3AED", "#10B981", "#F59E0B", "#EF4444", "#FFFFFF"];
 const GRADIENT_PRESETS = [
