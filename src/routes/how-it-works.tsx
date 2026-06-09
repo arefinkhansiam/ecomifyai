@@ -80,7 +80,7 @@ function HowItWorks() {
           <p className="mt-3 text-white/85">Your first try-on product is free forever.</p>
           <div className="mt-7 flex flex-col sm:flex-row justify-center items-center gap-3">
             <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)", minWidth: 220 }}>
-              <Sparkles size={16} /> Start Free
+              Start Free
             </Link>
             <Link to="/try-ar" className="text-sm font-semibold text-white/90 hover:text-white underline-offset-4 hover:underline px-4 py-2">Try the live demo →</Link>
           </div>

@@ -53,7 +53,7 @@ function Landing() {
             className="mt-10 flex flex-wrap justify-center gap-4"
           >
             <Link to="/auth" search={{ mode: "signup" }} className="btn-cyan">Start for Free</Link>
-            <Link to="/try-ar" className="btn-outline-cyan"><Play size={16} /> See a Try-On</Link>
+            <Link to="/try-ar" className="btn-outline-cyan">See a Try-On</Link>
           </motion.div>
           <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
             <div className="flex -space-x-3">
@@ -219,7 +219,7 @@ function Landing() {
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)" }}>Start Free — No Card</Link>
-                <Link to="/try-ar" className="btn-ghost" style={{ background: "transparent", color: "#fff", borderColor: "rgba(255,255,255,0.35)" }}><Play size={16} /> See It in Action</Link>
+                <Link to="/try-ar" className="btn-ghost" style={{ background: "transparent", color: "#fff", borderColor: "rgba(255,255,255,0.35)" }}>See It in Action</Link>
               </div>
             </div>
           </div>
@@ -267,7 +267,7 @@ function Landing() {
           <p className="mt-4 text-white/80">Join 10,000+ stores already using Easibie. Your first try-on product is free forever.</p>
           <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-3">
             <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)", minWidth: 220 }}>
-              <Sparkles size={16} /> Create Free Account
+              Create Free Account
             </Link>
             <Link to="/pricing" className="text-sm font-semibold text-white/90 hover:text-white underline-offset-4 hover:underline px-4 py-2">See pricing →</Link>
           </div>
