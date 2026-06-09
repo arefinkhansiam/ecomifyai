@@ -30,6 +30,7 @@ export type Database = {
           embed_count: number
           embed_token: string | null
           error_message: string | null
+          extra_images: string[]
           file_size_bytes: number | null
           glb_url: string | null
           gradient_from: string | null
@@ -70,6 +71,7 @@ export type Database = {
           embed_count?: number
           embed_token?: string | null
           error_message?: string | null
+          extra_images?: string[]
           file_size_bytes?: number | null
           glb_url?: string | null
           gradient_from?: string | null
@@ -110,6 +112,7 @@ export type Database = {
           embed_count?: number
           embed_token?: string | null
           error_message?: string | null
+          extra_images?: string[]
           file_size_bytes?: number | null
           glb_url?: string | null
           gradient_from?: string | null
