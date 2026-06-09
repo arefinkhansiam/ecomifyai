@@ -19,7 +19,17 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
+function useClock() {
+  const [now, setNow] = (require("react") as typeof import("react")).useState(() => new Date());
+  (require("react") as typeof import("react")).useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
 function Landing() {
+  const clock = useClock();
   return (
     <MarketingShell>
       {/* HERO */}
