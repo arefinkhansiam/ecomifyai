@@ -227,11 +227,16 @@ function ScanPage() {
   const manualCapture = () => { void tickCapture(true); };
 
   const tickCapture = async (force = false) => {
-    if (!force && !objectVisibleRef.current) return;
+    if (!force && !objectVisibleRef.current) {
+      addDiagnostic("Detection", `Waiting for product · confidence ${Math.round(confidenceRef.current * 100)}%`);
+      return;
+    }
     if (countRef.current >= TOTAL_FRAMES) return;
     const v = videoRef.current, c = canvasRef.current, pid = productIdRef.current, uid = user?.id;
     if (!v || !c || !pid || !uid) return;
     if (!v.videoWidth || !v.videoHeight) return;
+    const started = performance.now();
+    markStep("Angle capture", "active");
     c.width = v.videoWidth; c.height = v.videoHeight;
     const ctx = c.getContext("2d"); if (!ctx) return;
     ctx.drawImage(v, 0, 0, c.width, c.height);
@@ -242,14 +247,18 @@ function ScanPage() {
     const path = `scans/${uid}/${pid}/frame_${String(n).padStart(3, "0")}.jpg`;
     const { error: upErr } = await supabase.storage.from("product-images")
       .upload(path, blob, { contentType: "image/jpeg", upsert: true });
-    if (upErr) { console.warn("[scan] upload err", upErr); return; }
+    if (upErr) { console.warn("[scan] upload err", upErr); addDiagnostic("Upload error", upErr.message); return; }
     await supabase.from("scan_frames").insert({ product_id: pid, frame_url: path, frame_number: n });
+    const ms = Math.round(performance.now() - started);
+    setCaptureLatency(ms);
     countRef.current = n;
     setCount(n);
+    addDiagnostic("Captured", `${angleForCount(n - 1)} frame ${n}/${TOTAL_FRAMES} · ${ms}ms · confidence ${Math.round(confidenceRef.current * 100)}%`);
     await supabase.from("ar_products").update({
-      processing_progress: Math.round((n / TOTAL_FRAMES) * 50),
+      processing_step: `angle_${angleForCount(n - 1).toLowerCase().replace(/\W+/g, "_")}`,
+      processing_progress: Math.max(10, Math.round((n / TOTAL_FRAMES) * 60)),
     }).eq("id", pid);
-    if (n >= TOTAL_FRAMES) await finishScan();
+    if (n >= TOTAL_FRAMES) { markStep("Angle capture", "done"); await finishScan(); }
   };
 
   const finishScan = async () => {
