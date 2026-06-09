@@ -310,34 +310,34 @@ function ScanPage() {
   const guidance = (() => {
     if (arMode === "fashion" && subtype === "jewellery") {
       return [
-        { until: 10, hint: "Lay it flat on a clean surface, top view",  label: "Top" },
-        { until: 20, hint: "Tilt 45° — show the clasp/details",          label: "Side" },
-        { until: 30, hint: "Flip to back — show the closure",            label: "Back" },
-        { until: 40, hint: "Close-up of any stones or engravings",       label: "Detail" },
+        { until: 3, hint: "Lay it flat on a clean surface, top view",  label: "Top" },
+        { until: 6, hint: "Tilt 45° — show the clasp/details",          label: "Side" },
+        { until: 9, hint: "Flip to back — show the closure",            label: "Back" },
+        { until: 12, hint: "Close-up of any stones or engravings",       label: "Detail" },
       ];
     }
     if (arMode === "fashion") {
       return [
-        { until: 10, hint: "Lay the item flat — full front view",       label: "Front" },
-        { until: 20, hint: "Smooth out wrinkles, rotate slowly left",   label: "Left" },
-        { until: 30, hint: "Flip to back side, full view",              label: "Back" },
-        { until: 40, hint: "Close-ups of tag, fabric, stitching",       label: "Detail" },
+        { until: 3, hint: "Lay the item flat — full front view",       label: "Front" },
+        { until: 6, hint: "Smooth out wrinkles, rotate slowly left",   label: "Left" },
+        { until: 9, hint: "Flip to back side, full view",              label: "Back" },
+        { until: 12, hint: "Close-ups of tag, fabric, stitching",       label: "Detail" },
       ];
     }
     if (arMode === "makeup") {
       return [
-        { until: 10, hint: "Front of the product, label visible",        label: "Front" },
-        { until: 20, hint: "Open it — show the actual color / swatch",   label: "Swatch" },
-        { until: 30, hint: "Rotate slowly, capture every side",          label: "Side" },
-        { until: 40, hint: "Close-up of the shade / finish",             label: "Detail" },
+        { until: 3, hint: "Front of the product, label visible",        label: "Front" },
+        { until: 6, hint: "Open it — show the actual color / swatch",   label: "Swatch" },
+        { until: 9, hint: "Rotate slowly, capture every side",          label: "Side" },
+        { until: 12, hint: "Close-up of the shade / finish",             label: "Detail" },
       ];
     }
     // furniture / generic object
     return [
-      { until: 10, hint: "Front view — keep whole product in frame",   label: "Front" },
-      { until: 20, hint: "Rotate to the left side",                    label: "Left" },
-      { until: 30, hint: "Now show the back",                          label: "Back" },
-      { until: 40, hint: "Top-down and any unique details",            label: "Top" },
+      { until: 3, hint: "Front view — keep whole product in frame",   label: "Front" },
+      { until: 6, hint: "Rotate to the left side",                    label: "Left" },
+      { until: 9, hint: "Now show the back",                          label: "Back" },
+      { until: 12, hint: "Top-down and any unique details",            label: "Top" },
     ];
   })();
   function angleForCount(frameIndex: number) {
