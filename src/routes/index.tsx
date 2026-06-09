@@ -9,6 +9,9 @@ import { FeatureCard } from "@/components/FeatureCard";
 import { PricingCards } from "@/components/PricingCards";
 import { StatCounter } from "@/components/StatCounter";
 import { ReviewCarousel } from "@/components/ReviewCarousel";
+import { InlineTryOnDemo } from "@/components/InlineTryOnDemo";
+import demoBefore from "@/assets/demo-before.jpg";
+import demoAfter from "@/assets/demo-after.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -73,15 +76,15 @@ function Landing() {
             <div className="flex gap-1">{[0,1,2,3,4].map(i => <Star key={i} size={14} className="text-cyan" fill="currentColor" />)}</div>
           </div>
 
-          {/* Before / after preview */}
+          {/* Before / after preview — real correlated photos */}
           <div className="mt-16 grid grid-cols-2 gap-3 sm:gap-6 max-w-3xl mx-auto">
             {[
-              { label: "Shopper photo", img: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&h=1000&fit=crop", tag: "Before" },
-              { label: "AI try-on result", img: "https://images.unsplash.com/photo-1495121605193-b116b5b9c5fe?w=800&h=1000&fit=crop", tag: "After" },
+              { label: "Shopper photo", img: demoBefore, tag: "Before" },
+              { label: "AI try-on result", img: demoAfter, tag: "After" },
             ].map((c, i) => (
               <motion.div key={c.tag} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 + i * 0.15 }}
                 className="rounded-2xl overflow-hidden relative" style={{ boxShadow: "0 30px 80px -25px rgba(2,132,199,0.45)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                <img src={c.img} alt={c.label} loading="lazy" className="w-full h-[280px] sm:h-[420px] object-cover" />
+                <img src={c.img} alt={c.label} width={1024} height={1024} loading="lazy" className="w-full h-[280px] sm:h-[420px] object-cover" />
                 <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold text-white" style={{ background: i === 0 ? "rgba(11,18,32,0.7)" : GRAD }}>{c.tag}</div>
                 <div className="absolute bottom-3 left-3 right-3 text-xs font-semibold text-white drop-shadow">{c.label}</div>
               </motion.div>
