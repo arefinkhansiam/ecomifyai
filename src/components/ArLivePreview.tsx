@@ -1,4 +1,4 @@
-import { Sparkles, X, Camera } from "lucide-react";
+import { Sparkles, X, Camera, ThumbsUp, ThumbsDown } from "lucide-react";
 
 type Props = {
   productImage: string | null;
@@ -16,17 +16,25 @@ type Props = {
   showBranding: boolean;
   showProductName: boolean;
   mode: "fashion" | "furniture" | "full_3d" | "makeup";
+  // New optional customization
+  fontFamily?: string;
+  headerTitle?: string;
+  headerSubtitle?: string;
+  buttonShadow?: boolean;
+  device?: "mobile" | "desktop";
 };
 
 /**
- * A miniature WYSIWYG mock of the public AR viewer page. Mirrors the layout
- * of `/ar/view/$productId` so customizing on the upload/edit page is
- * what-you-see-is-what-you-get.
+ * Miniature WYSIWYG mock of the public Try-On viewer page.
  */
 export function ArLivePreview(p: Props) {
-  const badge = p.mode === "fashion" ? "TRY-ON" : p.mode === "full_3d" ? "3D AR" : p.mode === "makeup" ? "MAKEUP" : "PLACE IT";
+  const badge = p.mode === "fashion" ? "TRY-ON" : p.mode === "makeup" ? "MAKEUP" : "PLACE IT";
+  const fontStack = p.fontFamily ? `'${p.fontFamily}', system-ui, sans-serif` : undefined;
+  const shadow = p.buttonShadow === false ? "none" : "0 10px 28px -8px rgba(2,132,199,0.5)";
+  const isDesktop = p.device === "desktop";
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" style={{ fontFamily: fontStack }}>
+
       {/* Store button preview */}
       <div className="rounded-2xl p-8 bg-soft grid place-items-center min-h-[260px]">
         <div className="text-[10px] uppercase tracking-wider text-muted mb-3">Store button</div>
