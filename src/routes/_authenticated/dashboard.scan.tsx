@@ -450,8 +450,17 @@ function ScanPage() {
                  style={{ background: "linear-gradient(135deg,#0B1220,#1E293B)" }}>
               <div className="text-sm font-semibold">{hint}</div>
               <div className="mt-1 text-xs opacity-70">
-                {autoDetect ? "Auto-capturing every 2 seconds while product is detected" : "Auto-detect off — capturing every 2 seconds"}
+                {autoDetect ? "Auto-capturing every 1.5 seconds while product is detected" : "Auto-detect off — capturing every 1.5 seconds"}
               </div>
+              <div className="mt-3 text-[11px] opacity-80">
+                Confidence {Math.round(detectConfidence * 100)}% · Frames {count}/{TOTAL_FRAMES}{captureLatency ? ` · Last ${captureLatency}ms` : ""}
+              </div>
+            </div>
+          )}
+          {(phase === "scanning" || phase === "generating") && (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <ProgressTimeline steps={timeline} dark />
+              <DiagnosticsPanel items={diagnostics} dark />
             </div>
           )}
         </div>
@@ -494,6 +503,9 @@ function ScanPage() {
           <button onClick={start} className="btn-primary mt-6 w-full justify-center">
             <Camera size={16} /> Start camera scan
           </button>
+          <div className="mt-4">
+            <ProgressTimeline steps={timeline} />
+          </div>
           <ul className="mt-6 text-xs space-y-2" style={{ color: "var(--ink-soft)" }}>
             <li>• Use good, even lighting</li>
             <li>• Rotate slowly — we auto-capture every 2 seconds</li>
@@ -528,6 +540,10 @@ function ScanPage() {
             </button>
             <button className="btn-ghost" onClick={reset}>Scan another</button>
             <button className="btn-ghost" onClick={() => navigate({ to: "/dashboard/products" })}>My products</button>
+          </div>
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+            <ProgressTimeline steps={timeline} />
+            <DiagnosticsPanel items={diagnostics} />
           </div>
         </div>
       )}
