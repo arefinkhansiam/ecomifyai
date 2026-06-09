@@ -22,6 +22,7 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as ArViewProductIdRouteImport } from './routes/ar.view.$productId'
 import { Route as ApiPublicTryonRelatedRouteImport } from './routes/api/public/tryon-related'
 import { Route as ApiPublicTryonFeedbackRouteImport } from './routes/api/public/tryon-feedback'
+import { Route as ApiPublicTryonEventRouteImport } from './routes/api/public/tryon-event'
 import { Route as ApiPublicTryonDemoRouteImport } from './routes/api/public/tryon-demo'
 import { Route as ApiPublicTrackArSessionRouteImport } from './routes/api/public/track-ar-session'
 import { Route as ApiPublicArComposeRouteImport } from './routes/api/public/ar-compose'
@@ -97,6 +98,11 @@ const ApiPublicTryonRelatedRoute = ApiPublicTryonRelatedRouteImport.update({
 const ApiPublicTryonFeedbackRoute = ApiPublicTryonFeedbackRouteImport.update({
   id: '/api/public/tryon-feedback',
   path: '/api/public/tryon-feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTryonEventRoute = ApiPublicTryonEventRouteImport.update({
+  id: '/api/public/tryon-event',
+  path: '/api/public/tryon-event',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicTryonDemoRoute = ApiPublicTryonDemoRouteImport.update({
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
   '/api/public/tryon-demo': typeof ApiPublicTryonDemoRoute
+  '/api/public/tryon-event': typeof ApiPublicTryonEventRoute
   '/api/public/tryon-feedback': typeof ApiPublicTryonFeedbackRoute
   '/api/public/tryon-related': typeof ApiPublicTryonRelatedRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByTo {
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
   '/api/public/tryon-demo': typeof ApiPublicTryonDemoRoute
+  '/api/public/tryon-event': typeof ApiPublicTryonEventRoute
   '/api/public/tryon-feedback': typeof ApiPublicTryonFeedbackRoute
   '/api/public/tryon-related': typeof ApiPublicTryonRelatedRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
@@ -234,6 +242,7 @@ export interface FileRoutesById {
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
   '/api/public/tryon-demo': typeof ApiPublicTryonDemoRoute
+  '/api/public/tryon-event': typeof ApiPublicTryonEventRoute
   '/api/public/tryon-feedback': typeof ApiPublicTryonFeedbackRoute
   '/api/public/tryon-related': typeof ApiPublicTryonRelatedRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
@@ -261,6 +270,7 @@ export interface FileRouteTypes {
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
     | '/api/public/tryon-demo'
+    | '/api/public/tryon-event'
     | '/api/public/tryon-feedback'
     | '/api/public/tryon-related'
     | '/ar/view/$productId'
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
     | '/api/public/tryon-demo'
+    | '/api/public/tryon-event'
     | '/api/public/tryon-feedback'
     | '/api/public/tryon-related'
     | '/ar/view/$productId'
@@ -312,6 +323,7 @@ export interface FileRouteTypes {
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
     | '/api/public/tryon-demo'
+    | '/api/public/tryon-event'
     | '/api/public/tryon-feedback'
     | '/api/public/tryon-related'
     | '/ar/view/$productId'
@@ -332,6 +344,7 @@ export interface RootRouteChildren {
   ApiPublicArComposeRoute: typeof ApiPublicArComposeRoute
   ApiPublicTrackArSessionRoute: typeof ApiPublicTrackArSessionRoute
   ApiPublicTryonDemoRoute: typeof ApiPublicTryonDemoRoute
+  ApiPublicTryonEventRoute: typeof ApiPublicTryonEventRoute
   ApiPublicTryonFeedbackRoute: typeof ApiPublicTryonFeedbackRoute
   ApiPublicTryonRelatedRoute: typeof ApiPublicTryonRelatedRoute
   ArViewProductIdRoute: typeof ArViewProductIdRoute
@@ -428,6 +441,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/tryon-feedback'
       fullPath: '/api/public/tryon-feedback'
       preLoaderRoute: typeof ApiPublicTryonFeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tryon-event': {
+      id: '/api/public/tryon-event'
+      path: '/api/public/tryon-event'
+      fullPath: '/api/public/tryon-event'
+      preLoaderRoute: typeof ApiPublicTryonEventRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/tryon-demo': {
@@ -564,6 +584,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicArComposeRoute: ApiPublicArComposeRoute,
   ApiPublicTrackArSessionRoute: ApiPublicTrackArSessionRoute,
   ApiPublicTryonDemoRoute: ApiPublicTryonDemoRoute,
+  ApiPublicTryonEventRoute: ApiPublicTryonEventRoute,
   ApiPublicTryonFeedbackRoute: ApiPublicTryonFeedbackRoute,
   ApiPublicTryonRelatedRoute: ApiPublicTryonRelatedRoute,
   ArViewProductIdRoute: ArViewProductIdRoute,
@@ -571,13 +592,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

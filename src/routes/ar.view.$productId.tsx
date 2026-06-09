@@ -1,23 +1,21 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture, ImagePlus, Download } from "lucide-react";
+import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture, ImagePlus, Download, ThumbsUp, ThumbsDown, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
-
 
 export const Route = createFileRoute("/ar/view/$productId")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "AR Viewer — Ecomify" },
+      { title: "Try-On Viewer — Ecomify" },
       { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" },
-      { name: "description", content: "View this product in your space with Ecomify AR." },
+      { name: "description", content: "Try this product on virtually with Ecomify." },
     ],
   }),
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("ar_products")
-      .select("id, product_name, original_image_url, processed_image_url, glb_url, usdz_url, button_label, button_bg_color, button_text_color, status, is_public, dominant_color, product_colors, show_branding, ar_customization, ar_mode, ar_subtype")
+      .select("id, user_id, product_name, original_image_url, processed_image_url, button_label, button_bg_color, button_text_color, status, is_public, dominant_color, product_colors, show_branding, ar_customization, ar_mode, ar_subtype")
       .eq("id", params.productId)
       .maybeSingle();
     if (error || !data || data.status !== "ready" || !data.is_public) throw notFound();
@@ -27,17 +25,10 @@ export const Route = createFileRoute("/ar/view/$productId")({
       const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(imagePath, 3600);
       imageUrl = signed?.signedUrl ?? imagePath;
     }
-    let glbUrl: string | null = null;
-    if (data.glb_url) {
-      const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(data.glb_url, 3600);
-      glbUrl = signed?.signedUrl ?? null;
-    }
-    let usdzUrl: string | null = null;
-    if (data.usdz_url) {
-      const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(data.usdz_url, 3600);
-      usdzUrl = signed?.signedUrl ?? null;
-    }
-    return { product: data as any, imageUrl, glbUrl, usdzUrl };
+    // Fetch vendor branding (watermark + page customization)
+    const { data: branding } = await supabase
+      .from("tryon_branding").select("*").eq("user_id", (data as any).user_id).maybeSingle();
+    return { product: data as any, imageUrl, branding: (branding as any) ?? null };
   },
   notFoundComponent: () => <NotReady />,
   errorComponent: () => <NotReady />,
@@ -49,7 +40,7 @@ function NotReady() {
     <div className="min-h-screen grid place-items-center bg-soft text-center px-6">
       <div>
         <Sparkles size={48} className="text-primary mx-auto" />
-        <h2 className="mt-4 text-ink">AR experience not available</h2>
+        <h2 className="mt-4 text-ink">Try-on experience not available</h2>
         <p className="mt-2">This product link is invalid or still processing.</p>
         <a href="/" className="btn-primary mt-6">Back to home</a>
       </div>
@@ -67,18 +58,27 @@ type Customization = {
   custom_button_text?: string;
   default_camera?: "front" | "back";
   show_product_name?: boolean;
+  font_family?: string;
 };
 
-function useCustomization(product: any) {
+function useCustomization(product: any, branding: any) {
   const c: Customization = (product.ar_customization || {}) as Customization;
+  const fontFamily = c.font_family || branding?.font_family || branding?.font || "Inter";
   return {
-    pageBg: c.page_bg || "#000000",
+    pageBg: c.page_bg || branding?.viewer_bg || "#000000",
     fontColor: c.font_color || "#FFFFFF",
     overlay: c.overlay_color || "rgba(255,255,255,0.14)",
     accent: c.accent_color || product.dominant_color || "#38BDF8",
     btnRadius: (c.button_radius ?? product.button_border_radius ?? 12) + "px",
     showName: c.show_product_name !== false,
     defaultCam: (c.default_camera || "back") as "front" | "back",
+    fontFamily,
+    headerTitle: branding?.header_title as string | null,
+    headerSubtitle: branding?.header_subtitle as string | null,
+    watermarkPosition: (branding?.watermark_position ?? "bottom-right") as "bottom-right" | "bottom-left" | "center",
+    watermarkOpacity: (branding?.watermark_opacity ?? 70) as number,
+    showPlatformWatermark: !!branding?.show_platform_watermark,
+    watermarkText: branding?.watermark_text || branding?.store_name || null,
   };
 }
 
@@ -116,7 +116,11 @@ function useSessionTracker(product: any, camera: "front" | "back", arMode: strin
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { markInteract: () => { didInteract.current = true; }, sendSession: send };
+  return {
+    markInteract: () => { didInteract.current = true; },
+    sendSession: send,
+    sessionId: sessionId.current,
+  };
 }
 
 function exitView() {
@@ -143,23 +147,19 @@ function TopBar({ name, showName, overlay, fontColor, accent, onClose, badge }: 
 function ARRouter() {
   const { product } = Route.useLoaderData();
   const raw = (product.ar_mode || "furniture") as string;
-  if (raw === "full_3d" || raw === "object_3d") return <Full3DView />;
+  // 3D mode removed — fall back to furniture (scene-based) placement
   const mode: "fashion" | "furniture" | "makeup" =
     raw === "fashion" ? "fashion" : raw === "makeup" ? "makeup" : "furniture";
   return <CameraComposeView mode={mode} />;
 }
 
-
-
 /* ============================================================
-   Fashion + Furniture + Makeup: camera → capture → AI compose
+   Image-based try-on / scene placement
    ============================================================ */
 function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" }) {
-  const { product, imageUrl } = Route.useLoaderData();
+  const { product, imageUrl, branding } = Route.useLoaderData();
   const subtype: "top" | "bottom" | "accessory" | "jewellery" | undefined = (product as any).ar_subtype ?? undefined;
-  const cust = useCustomization(product);
-  // Fashion + Makeup default to selfie (user). Accessories that go on hands/wrists (watch, ring, bracelet)
-  // still use selfie cam because the body part is usually in front of the user. Furniture = back cam.
+  const cust = useCustomization(product, branding);
   const initialFacing: "user" | "environment" =
     (mode === "fashion" || mode === "makeup") ? "user" : (cust.defaultCam === "front" ? "user" : "environment");
   const [facing, setFacing] = useState<"user" | "environment">(initialFacing);
@@ -175,18 +175,25 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<null | "liked" | "disliked">(null);
   const [related, setRelated] = useState<Array<{ id: string; name: string; imageUrl: string | null }>>([]);
-  const sessionIdRef = useRef<string>(
-    typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
-  );
+  const [savedWishlist, setSavedWishlist] = useState(false);
 
-  const startCamera = async (mode: "user" | "environment" = facing) => {
+  const logEvent = (eventType: string, metadata?: any) => {
+    fetch("/api/public/tryon-event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId: product.id, sessionId: tracker.sessionId, eventType, metadata }),
+      keepalive: true,
+    }).catch(() => {});
+  };
+
+  const startCamera = async (m: "user" | "environment" = facing) => {
     setPhase("requesting");
     setErrorMsg(null);
     try {
       streamRef.current?.getTracks().forEach((t) => t.stop());
       if (!navigator.mediaDevices?.getUserMedia) { setPhase("unsupported"); return; }
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: mode }, width: { ideal: 1280 }, height: { ideal: 1280 } },
+        video: { facingMode: { ideal: m }, width: { ideal: 1280 }, height: { ideal: 1280 } },
         audio: false,
       });
       streamRef.current = stream;
@@ -213,6 +220,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const composeWith = async (dataUrl: string) => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     setPhase("processing");
+    logEvent("tryon_started", { mode });
     try {
       const r = await fetch("/api/public/ar-compose", {
         method: "POST",
@@ -220,9 +228,10 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
         body: JSON.stringify({ productId: product.id, captureBase64: dataUrl, mode, subtype }),
       });
       const j = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(j?.error || `AI error (${r.status})`);
+      if (!r.ok) throw new Error(j?.error || `Error (${r.status})`);
       setResultUrl(j.imageUrl);
       setPhase("result");
+      logEvent("tryon_completed");
     } catch (e: any) {
       setErrorMsg(e?.message || "Something went wrong");
       setPhase("ready");
@@ -259,7 +268,6 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     const reader = new FileReader();
     reader.onload = async () => {
       const src = String(reader.result || "");
-      // Downscale to max 1280px to keep payload reasonable
       try {
         const img = new Image();
         img.onload = async () => {
@@ -276,24 +284,21 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
         };
         img.onerror = () => composeWith(src);
         img.src = src;
-      } catch {
-        await composeWith(src);
-      }
+      } catch { await composeWith(src); }
     };
     reader.readAsDataURL(file);
   };
-
-
 
   const retake = () => {
     setResultUrl(null);
     setErrorMsg(null);
     setFeedback(null);
     setRelated([]);
+    setSavedWishlist(false);
     startCamera(facing);
   };
 
-  // Compose result + watermark into a single PNG blob
+  // Compose result + watermark using vendor settings
   const composeWatermarkedBlob = async (): Promise<{ blob: Blob; url: string } | null> => {
     if (!resultUrl) return null;
     try {
@@ -304,30 +309,44 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       c.width = img.naturalWidth; c.height = img.naturalHeight;
       const ctx = c.getContext("2d")!;
       ctx.drawImage(img, 0, 0);
-      const wmText = product.show_branding === false
-        ? `${product.product_name || "Try-on"}`
-        : "Try-on by Ecomify · ecomify.app";
-      const pad = Math.round(Math.min(c.width, c.height) * 0.025);
-      const fontSize = Math.round(Math.min(c.width, c.height) * 0.028);
-      ctx.font = `600 ${fontSize}px ${getComputedStyle(document.body).fontFamily || "sans-serif"}`;
-      const metrics = ctx.measureText(wmText);
-      const boxW = metrics.width + pad * 1.4;
-      const boxH = fontSize * 1.9;
-      const x = c.width - boxW - pad;
-      const y = c.height - boxH - pad;
-      ctx.fillStyle = "rgba(11,18,32,0.55)";
-      const r = boxH / 2;
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + boxW, y, x + boxW, y + boxH, r);
-      ctx.arcTo(x + boxW, y + boxH, x, y + boxH, r);
-      ctx.arcTo(x, y + boxH, x, y, r);
-      ctx.arcTo(x, y, x + boxW, y, r);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = "#ffffff";
-      ctx.textBaseline = "middle";
-      ctx.fillText(wmText, x + pad * 0.7, y + boxH / 2);
+
+      // Build watermark text
+      const lines: string[] = [];
+      if (cust.watermarkText) lines.push(cust.watermarkText);
+      if (cust.showPlatformWatermark) lines.push("Powered by Ecomify");
+
+      if (lines.length > 0) {
+        const pad = Math.round(Math.min(c.width, c.height) * 0.025);
+        const fontSize = Math.round(Math.min(c.width, c.height) * 0.028);
+        ctx.font = `600 ${fontSize}px ${cust.fontFamily}, sans-serif`;
+        const widths = lines.map((l) => ctx.measureText(l).width);
+        const boxW = Math.max(...widths) + pad * 1.4;
+        const boxH = fontSize * (lines.length * 1.4 + 0.5);
+
+        const pos = cust.watermarkPosition;
+        let x = c.width - boxW - pad;
+        let y = c.height - boxH - pad;
+        if (pos === "bottom-left") { x = pad; }
+        if (pos === "center") { x = (c.width - boxW) / 2; y = (c.height - boxH) / 2; }
+
+        const opacity = Math.max(0, Math.min(1, cust.watermarkOpacity / 100));
+        ctx.fillStyle = `rgba(11,18,32,${0.55 * opacity})`;
+        const r = Math.min(boxH / 2, 24);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + boxW, y, x + boxW, y + boxH, r);
+        ctx.arcTo(x + boxW, y + boxH, x, y + boxH, r);
+        ctx.arcTo(x, y + boxH, x, y, r);
+        ctx.arcTo(x, y, x + boxW, y, r);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = `rgba(255,255,255,${opacity})`;
+        ctx.textBaseline = "top";
+        lines.forEach((l, i) => {
+          ctx.fillText(l, x + pad * 0.7, y + pad * 0.5 + i * fontSize * 1.4);
+        });
+      }
       const blob: Blob = await new Promise((res) => c.toBlob((b) => res(b!), "image/png", 0.95));
       return { blob, url: URL.createObjectURL(blob) };
     } catch {
@@ -338,6 +357,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   };
 
   const download = async () => {
+    logEvent("download");
     const wm = await composeWatermarkedBlob();
     if (!wm) return;
     const a = document.createElement("a");
@@ -348,12 +368,13 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   };
 
   const share = async () => {
+    logEvent("share");
     const wm = await composeWatermarkedBlob();
     if (!wm) return;
     const file = new File([wm.blob], `${product.product_name || "ecomify-tryon"}.png`, { type: "image/png" });
     try {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: product.product_name, text: "Check out my virtual try-on!" });
+        await navigator.share({ files: [file], title: product.product_name, text: "Check out my virtual try-on" });
         return;
       }
     } catch {}
@@ -366,11 +387,12 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
   const submitFeedback = async (liked: boolean) => {
     setFeedback(liked ? "liked" : "disliked");
+    logEvent(liked ? "like" : "dislike");
     try {
       await fetch("/api/public/tryon-feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: product.id, sessionId: sessionIdRef.current, liked }),
+        body: JSON.stringify({ productId: product.id, sessionId: tracker.sessionId, liked }),
       });
     } catch {}
     if (!liked) {
@@ -380,6 +402,19 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
         setRelated(j.items ?? []);
       } catch {}
     }
+  };
+
+  const saveToWishlist = () => {
+    try {
+      const key = "ecomify_wishlist";
+      const cur = JSON.parse(localStorage.getItem(key) || "[]");
+      if (!cur.includes(product.id)) {
+        cur.push(product.id);
+        localStorage.setItem(key, JSON.stringify(cur));
+      }
+      setSavedWishlist(true);
+      logEvent("wishlist");
+    } catch {}
   };
 
   const close = () => { tracker.sendSession(true); streamRef.current?.getTracks().forEach((t) => t.stop()); exitView(); };
@@ -400,10 +435,9 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       :                      "Aim at the spot, then capture";
 
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ background: cust.pageBg, color: cust.fontColor, fontFamily: "var(--font-body)" }}>
-      {/* Camera feed or result */}
+    <div className="fixed inset-0 overflow-hidden" style={{ background: cust.pageBg, color: cust.fontColor, fontFamily: `'${cust.fontFamily}', system-ui, sans-serif` }}>
       {phase === "result" && resultUrl ? (
-        <img src={resultUrl} alt="AR result" className="absolute inset-0 w-full h-full object-contain bg-black" />
+        <img src={resultUrl} alt="Try-on result" className="absolute inset-0 w-full h-full object-contain bg-black transition-opacity duration-500" />
       ) : (
         <video ref={videoRef} playsInline muted className="absolute inset-0 w-full h-full object-cover" style={{ transform: facing === "user" ? "scaleX(-1)" : undefined }} />
       )}
@@ -411,21 +445,24 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
       <TopBar name={product.product_name} showName={cust.showName} overlay={cust.overlay} fontColor={cust.fontColor} accent={cust.accent} onClose={close} badge={phase === "result" ? "RESULT" : badge} />
 
-      {/* Garment preview thumbnail (fashion only, while in ready) */}
-      {phase === "ready" && mode === "fashion" && imageUrl && (
-        <div className="absolute z-30 left-4 top-20 w-16 h-20 rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: cust.fontColor }}>
-          <img src={imageUrl} alt="" className="w-full h-full object-cover bg-white/10" />
+      {/* Header title / subtitle */}
+      {(cust.headerTitle || cust.headerSubtitle) && phase === "ready" && (
+        <div className="absolute left-4 right-4 z-30 text-center pointer-events-none" style={{ top: "calc(env(safe-area-inset-top) + 70px)" }}>
+          {cust.headerTitle && <div className="text-lg font-bold" style={{ color: cust.fontColor }}>{cust.headerTitle}</div>}
+          {cust.headerSubtitle && <div className="text-xs opacity-80 mt-0.5" style={{ color: cust.fontColor }}>{cust.headerSubtitle}</div>}
         </div>
       )}
-      {phase === "ready" && mode === "furniture" && imageUrl && (
-        <div className="absolute z-30 left-4 top-20 w-20 h-20 rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: cust.fontColor }}>
+
+      {/* Garment preview thumbnail */}
+      {phase === "ready" && imageUrl && (
+        <div className="absolute z-30 left-4 top-32 w-16 h-20 rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: cust.fontColor }}>
           <img src={imageUrl} alt="" className="w-full h-full object-contain bg-white/10" />
         </div>
       )}
 
       {/* Hint */}
       {phase === "ready" && (
-        <div className="absolute left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full text-xs font-medium" style={{ top: "calc(env(safe-area-inset-top) + 70px)", background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+        <div className="absolute left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full text-xs font-medium" style={{ bottom: "calc(env(safe-area-inset-bottom) + 180px)", background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
           {captureHint}
         </div>
       )}
@@ -437,7 +474,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
             <div className="w-16 h-16 mx-auto rounded-full grid place-items-center" style={{ background: cust.accent + "33", border: `2px solid ${cust.accent}` }}>
               <Loader2 className="animate-spin" size={28} style={{ color: cust.accent }} />
             </div>
-            <h3 className="mt-5" style={{ color: cust.fontColor, fontFamily: "var(--font-display)" }}>
+            <h3 className="mt-5" style={{ color: cust.fontColor }}>
               {mode === "fashion" ? "Trying it on…" : mode === "makeup" ? "Applying makeup…" : "Placing it in your space…"}
             </h3>
             <p className="mt-2 text-sm opacity-70">This usually takes 10–20 seconds.</p>
@@ -445,7 +482,6 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
         </div>
       )}
 
-      {/* Error toast */}
       {errorMsg && phase === "ready" && (
         <div className="absolute left-4 right-4 z-40 mt-2 p-3 rounded-xl text-sm" style={{ background: "rgba(220,38,38,0.95)", color: "#fff", top: "calc(env(safe-area-inset-top) + 110px)" }}>
           {errorMsg}
@@ -477,34 +513,53 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
         </div>
       )}
 
-
       {phase === "result" && (
-        <div className="absolute left-0 right-0 z-30 flex flex-col items-center gap-3 px-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 14px)" }}>
-          {feedback === null ? (
-            <div className="px-4 py-2.5 rounded-2xl flex items-center gap-3 text-xs font-semibold" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
-              <span>Did you like it?</span>
-              <button onClick={() => submitFeedback(true)} className="px-3 py-1.5 rounded-full" style={{ background: "rgba(16,185,129,0.85)", color: "#fff" }}>👍 Yes</button>
-              <button onClick={() => submitFeedback(false)} className="px-3 py-1.5 rounded-full" style={{ background: "rgba(239,68,68,0.85)", color: "#fff" }}>👎 No</button>
+        <div className="absolute left-0 right-0 z-30 flex flex-col items-center gap-3 px-3 transition-all duration-500" style={{ bottom: "calc(env(safe-area-inset-bottom) + 14px)" }}>
+          {feedback === null && (
+            <div className="px-4 py-2.5 rounded-2xl flex items-center gap-3 text-xs font-semibold animate-in fade-in slide-in-from-bottom-2" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              <span>How does it look?</span>
+              <button onClick={() => submitFeedback(true)} className="px-3 py-1.5 rounded-full inline-flex items-center gap-1" style={{ background: cust.accent, color: "#fff" }}>
+                <ThumbsUp size={12} /> Like
+              </button>
+              <button onClick={() => submitFeedback(false)} className="px-3 py-1.5 rounded-full inline-flex items-center gap-1" style={{ background: "rgba(255,255,255,0.18)", color: cust.fontColor }}>
+                <ThumbsDown size={12} /> Not for me
+              </button>
             </div>
-          ) : feedback === "disliked" && related.length > 0 ? (
-            <div className="w-full max-w-md p-3 rounded-2xl" style={{ background: cust.overlay, backdropFilter: "blur(10px)" }}>
+          )}
+
+          {feedback === "disliked" && related.length > 0 && (
+            <div className="w-full max-w-md p-3 rounded-2xl animate-in fade-in slide-in-from-bottom-2" style={{ background: cust.overlay, backdropFilter: "blur(10px)" }}>
               <div className="text-xs font-semibold mb-2" style={{ color: cust.fontColor }}>Try these instead</div>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {related.map((r) => (
-                  <a key={r.id} href={`/ar/view/${r.id}`} className="shrink-0 w-20 text-center">
-                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-white/10 border" style={{ borderColor: cust.fontColor + "33" }}>
+                  <a key={r.id} href={`/ar/view/${r.id}`}
+                    onClick={() => logEvent("alternative_selected", { altId: r.id })}
+                    className="shrink-0 w-24 text-center">
+                    <div className="w-24 h-24 rounded-xl overflow-hidden bg-white/10 border" style={{ borderColor: cust.fontColor + "33" }}>
                       {r.imageUrl && <img src={r.imageUrl} alt={r.name} className="w-full h-full object-cover" />}
                     </div>
                     <div className="text-[10px] mt-1 truncate" style={{ color: cust.fontColor }}>{r.name}</div>
+                    <div className="text-[9px] mt-0.5 px-1.5 py-0.5 rounded-full inline-block" style={{ background: cust.accent, color: "#fff" }}>Try on</div>
                   </a>
                 ))}
               </div>
             </div>
-          ) : (
-            <div className="px-3 py-1.5 rounded-full text-xs font-medium" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
-              Thanks for the feedback! 💙
+          )}
+
+          {feedback === "liked" && (
+            <div className="px-4 py-2.5 rounded-2xl flex items-center gap-3 text-xs font-semibold animate-in fade-in slide-in-from-bottom-2" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              <span>Glad you like it</span>
+              <button onClick={saveToWishlist} disabled={savedWishlist}
+                className="px-3 py-1.5 rounded-full inline-flex items-center gap-1"
+                style={{ background: savedWishlist ? "rgba(255,255,255,0.2)" : cust.accent, color: "#fff" }}>
+                <Heart size={12} /> {savedWishlist ? "Saved" : "Save to wishlist"}
+              </button>
+              <button onClick={share} className="px-3 py-1.5 rounded-full inline-flex items-center gap-1" style={{ background: "rgba(255,255,255,0.18)", color: cust.fontColor }}>
+                <Share2 size={12} /> Share
+              </button>
             </div>
           )}
+
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <button onClick={retake} className="px-4 py-2.5 rounded-full font-semibold text-sm" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
               <RefreshCw size={14} className="inline mr-1.5" /> Retake
@@ -512,9 +567,11 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
             <button onClick={download} className="px-4 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
               <Download size={15} /> Download
             </button>
-            <button onClick={share} className="px-5 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius, boxShadow: `0 12px 28px -8px ${cust.accent}88` }}>
-              <Share2 size={15} /> Share
-            </button>
+            {feedback !== "liked" && (
+              <button onClick={share} className="px-5 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius, boxShadow: `0 12px 28px -8px ${cust.accent}88` }}>
+                <Share2 size={15} /> Share
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -525,7 +582,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
             <Camera size={44} className="mx-auto" style={{ color: cust.accent }} />
             <h3 className="mt-4 text-white">{phase === "denied" ? "Camera access needed" : "Camera not supported"}</h3>
             <p className="mt-2 text-white/70 text-sm">
-              {phase === "denied" ? "Allow camera permission to continue." : "Open on a mobile browser to use AR."}
+              {phase === "denied" ? "Allow camera permission to continue." : "Open on a mobile browser to use Try-On."}
             </p>
             <div className="mt-6 flex flex-col items-center gap-2">
               {phase === "denied" && (
@@ -537,90 +594,10 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
                 <input type="file" accept="image/*" hidden onChange={(e) => onPickPhoto(e.target.files?.[0] ?? null)} />
               </label>
             </div>
-
           </div>
         </div>
       )}
 
-      {product.show_branding !== false && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70" style={{ background: cust.overlay, color: cust.fontColor }}>
-          Powered by <span className="font-bold" style={{ color: cust.accent }}>Ecomify</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ============================================================
-   Full 3D: model-viewer with WebXR / Quick Look / Scene Viewer
-   ============================================================ */
-function Full3DView() {
-  const { product, glbUrl, usdzUrl } = Route.useLoaderData();
-  const cust = useCustomization(product);
-  const tracker = useSessionTracker(product, "back", "model-viewer");
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    if (document.querySelector('script[data-model-viewer]')) { setLoaded(true); return; }
-    const s = document.createElement("script");
-    s.type = "module";
-    s.src = "https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js";
-    s.setAttribute("data-model-viewer", "true");
-    s.onload = () => setLoaded(true);
-    document.head.appendChild(s);
-  }, []);
-
-  const close = () => { tracker.sendSession(true); exitView(); };
-
-  if (!glbUrl) {
-    return (
-      <div className="fixed inset-0 grid place-items-center bg-black text-white text-center p-6">
-        <div>
-          <Sparkles size={44} className="mx-auto text-sky-400" />
-          <h3 className="mt-4">No 3D model uploaded</h3>
-          <p className="mt-2 text-white/70 text-sm">Ask the seller to upload a GLB file for full 3D AR.</p>
-          <button onClick={close} className="mt-6 px-5 py-2 rounded-full bg-white/15">Close</button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="fixed inset-0 overflow-hidden" style={{ background: cust.pageBg, color: cust.fontColor, fontFamily: "var(--font-body)" }}>
-      <TopBar name={product.product_name} showName={cust.showName} overlay={cust.overlay} fontColor={cust.fontColor} accent={cust.accent} onClose={close} badge="3D AR" />
-      {loaded ? (
-        // @ts-ignore — web component
-        <model-viewer
-          src={glbUrl}
-          ios-src={usdzUrl || undefined}
-          ar
-          ar-modes="webxr scene-viewer quick-look"
-          camera-controls
-          touch-action="pan-y"
-          shadow-intensity="1"
-          exposure="1"
-          auto-rotate
-          interaction-prompt="auto"
-          style={{ width: "100%", height: "100%", background: cust.pageBg }}
-          onLoad={() => tracker.markInteract()}
-        >
-          <button
-            slot="ar-button"
-            style={{
-              position: "absolute", bottom: "calc(env(safe-area-inset-bottom) + 28px)", left: "50%", transform: "translateX(-50%)",
-              background: cust.accent, color: "#fff", border: "none", padding: "14px 28px",
-              borderRadius: cust.btnRadius, fontWeight: 700, boxShadow: `0 18px 40px -10px ${cust.accent}cc`,
-              fontFamily: "var(--font-display)", letterSpacing: ".3px",
-            }}
-          >
-            View in your space
-          </button>
-        </model-viewer>
-      ) : (
-        <div className="absolute inset-0 grid place-items-center">
-          <Loader2 className="animate-spin" size={32} style={{ color: cust.accent }} />
-        </div>
-      )}
       {product.show_branding !== false && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70" style={{ background: cust.overlay, color: cust.fontColor }}>
           Powered by <span className="font-bold" style={{ color: cust.accent }}>Ecomify</span>

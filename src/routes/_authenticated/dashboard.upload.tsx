@@ -9,13 +9,12 @@ import { generateAiHeroFromImage } from "@/lib/scan-ai.functions";
 import { ArLivePreview } from "@/components/ArLivePreview";
 import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown, Shirt, Sofa, Box, Sparkle } from "lucide-react";
 
-type ArMode = "fashion" | "furniture" | "makeup" | "full_3d";
+type ArMode = "fashion" | "furniture" | "makeup";
 type ClothingSub = "top" | "bottom" | "accessory" | "jewellery";
 const MODE_INFO: Record<ArMode, { label: string; desc: string; Icon: any; accept: string; hint: string }> = {
   fashion:   { label: "Fashion try-on",   desc: "Shirts, pants, accessories, jewellery", Icon: Shirt,   accept: "image/jpeg,image/png,image/webp", hint: "Upload garment / accessory photo (JPG / PNG / WebP)" },
   furniture: { label: "Furniture / Decor", desc: "Place in customer's room",             Icon: Sofa,    accept: "image/jpeg,image/png,image/webp", hint: "Upload product photo (JPG / PNG / WebP)" },
   makeup:    { label: "Makeup try-on",    desc: "Lipstick, eyeshadow, blush",            Icon: Sparkle, accept: "image/jpeg,image/png,image/webp", hint: "Upload product / swatch photo (JPG / PNG / WebP)" },
-  full_3d:   { label: "Full 3D AR",       desc: "Real-time 3D in their space",           Icon: Box,     accept: ".glb,.gltf,model/gltf-binary",    hint: "Upload GLB or GLTF 3D model" },
 };
 
 type UploadSearch = { mode?: ArMode; subtype?: ClothingSub };
@@ -24,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/upload")({
   validateSearch: (s: Record<string, unknown>): UploadSearch => {
     const m = s.mode as ArMode | undefined;
     const sub = s.subtype as ClothingSub | undefined;
-    const okMode = m && ["fashion", "furniture", "makeup", "full_3d"].includes(m) ? m : undefined;
+    const okMode = m && ["fashion", "furniture", "makeup"].includes(m) ? m : undefined;
     const okSub = sub && ["top", "bottom", "accessory", "jewellery"].includes(sub) ? sub : undefined;
     return { mode: okMode, subtype: okSub };
   },
@@ -118,7 +117,7 @@ function UploadPage() {
 
   const onFile = (f: File | null) => {
     if (!f) return;
-    const isModel = arMode === "full_3d";
+    const isModel = false;
     const okType = isModel
       ? /\.(glb|gltf)$/i.test(f.name) || f.type === "model/gltf-binary" || f.type === "model/gltf+json"
       : ["image/jpeg", "image/png", "image/webp"].includes(f.type);
@@ -163,14 +162,14 @@ function UploadPage() {
     setTimeline(initialTimeline());
     setLogs([]);
     try {
-      const isModel = arMode === "full_3d";
-      setStep(isModel ? "Uploading 3D model..." : "Uploading image...");
+      const isModel = false;
+      setStep("Uploading image...");
       markStep("Upload", "active");
       log("Upload", `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)}MB`);
       const ext = file.name.split(".").pop();
       const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, {
-        contentType: file.type || (isModel ? "model/gltf-binary" : undefined),
+        contentType: file.type || (undefined),
       });
       if (upErr) throw upErr;
       markStep("Upload", "done");
@@ -284,7 +283,7 @@ function UploadPage() {
     <DashboardShell title="New Try-On Product">
       <div className="mb-6 rounded-2xl p-4 text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", boxShadow: "0 18px 40px -18px rgba(2,132,199,0.55)" }}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl grid place-items-center" style={{ background: "rgba(255,255,255,0.15)" }}>📸</div>
+          <div className="w-10 h-10 rounded-xl grid place-items-center" style={{ background: "rgba(255,255,255,0.15)" }}><Sparkles size={18} /></div>
           <div className="flex-1">
             <div className="text-sm font-bold">Tip — upload multiple angles for best results</div>
             <div className="text-xs opacity-80">Front, back, side and detail photos help our AI generate accurate try-ons.</div>
@@ -333,7 +332,7 @@ function UploadPage() {
             </>
           )}
 
-          <h4 className="text-ink mt-6">2. {arMode === "full_3d" ? "3D model file" : "Product image"}</h4>
+          <h4 className="text-ink mt-6">2. Product image</h4>
           <label className="block mt-3">
             <div
               className="border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-colors hover:border-primary bg-soft"
@@ -342,24 +341,18 @@ function UploadPage() {
             >
               {preview ? (
                 <img src={preview} alt="preview" className="max-h-60 mx-auto object-contain" />
-              ) : file && arMode === "full_3d" ? (
-                <div className="flex flex-col items-center gap-2">
-                  <Box size={48} className="text-primary" />
-                  <div className="font-display text-lg text-ink">{file.name}</div>
-                  <p className="text-xs">{(file.size / 1024 / 1024).toFixed(1)} MB · ready to upload</p>
-                </div>
               ) : (
                 <>
                   <UploadCloud size={48} className="mx-auto text-primary" />
-                  <div className="mt-4 font-display text-lg text-ink">Drop a {arMode === "full_3d" ? "GLB/GLTF file" : "photo"} here</div>
-                  <p className="text-sm mt-1">{MODE_INFO[arMode].hint}. Max {arMode === "full_3d" ? "50MB" : "10MB"}.</p>
+                  <div className="mt-4 font-display text-lg text-ink">Drop a photo here</div>
+                  <p className="text-sm mt-1">{MODE_INFO[arMode].hint}. Max 10MB.</p>
                 </>
               )}
               <input type="file" accept={MODE_INFO[arMode].accept} hidden onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
             </div>
           </label>
 
-          {arMode !== "full_3d" && (
+          {true && (
             <div className="mt-5 p-4 rounded-2xl" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.05), rgba(56,189,248,0.05))", border: "1px solid rgba(124,58,237,0.18)" }}>
               <div className="text-sm font-semibold text-ink">Extra angles (optional · max 4)</div>
               <p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>
@@ -555,7 +548,7 @@ function UploadPage() {
 
           <button onClick={upload} disabled={!file || busy || !!createdId} className="btn-primary w-full mt-6">
             {busy ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
-            {busy ? step || "Working..." : createdId ? "Created ✓" : "Create Try-On Product"}
+            {busy ? step || "Working..." : createdId ? "Created" : "Create Try-On Product"}
           </button>
 
           {(busy || createdId || logs.length > 0) && (
