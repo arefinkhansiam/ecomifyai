@@ -59,6 +59,9 @@ export function LiveAROverlay(p: Props) {
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const [tracking, setTracking] = useState<boolean>(false);
   const [modelReady, setModelReady] = useState<boolean>(false);
+  const [modelStatus, setModelStatus] = useState<string>(p.mode === "furniture" ? "Placement ready" : "Loading tracking model…");
+  const [trackingConfidence, setTrackingConfidence] = useState(0);
+  const [detectLatency, setDetectLatency] = useState<number | null>(null);
   const [hint, setHint] = useState<string>("");
 
   const furnRef = useRef({ x: 0.5, y: 0.7, scale: 0.4, rot: 0 });
@@ -110,28 +113,31 @@ export function LiveAROverlay(p: Props) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      if (p.mode === "furniture") { setModelReady(true); return; }
+      if (p.mode === "furniture") { setModelReady(true); setModelStatus("Furniture placement ready"); return; }
       try {
+        setModelStatus("Loading MediaPipe vision files…");
         const vision = await import(/* @vite-ignore */ MP_VISION_URL);
         const fileset = await vision.FilesetResolver.forVisionTasks(WASM_BASE);
         if (cancelled) return;
         if (p.mode === "makeup") {
+          setModelStatus("Loading face landmarks…");
           landmarkerRef.current = await vision.FaceLandmarker.createFromOptions(fileset, {
             baseOptions: { modelAssetPath: FACE_MODEL, delegate: "GPU" },
             runningMode: "VIDEO",
             numFaces: 1,
           });
         } else {
+          setModelStatus("Loading body pose landmarks…");
           landmarkerRef.current = await vision.PoseLandmarker.createFromOptions(fileset, {
             baseOptions: { modelAssetPath: POSE_MODEL, delegate: "GPU" },
             runningMode: "VIDEO",
             numPoses: 1,
           });
         }
-        if (!cancelled) setModelReady(true);
+        if (!cancelled) { setModelReady(true); setModelStatus(p.mode === "makeup" ? "Face tracking ready" : "Body tracking ready"); }
       } catch (e) {
         console.warn("MediaPipe failed, using centered fallback overlay", e);
-        if (!cancelled) setModelReady(true); // unblock UI; fallback overlay will render
+        if (!cancelled) { setModelReady(true); setModelStatus("Tracking fallback active"); } // unblock UI; fallback overlay will render
       }
     })();
     return () => { cancelled = true; try { landmarkerRef.current?.close?.(); } catch {} };
@@ -164,6 +170,7 @@ export function LiveAROverlay(p: Props) {
 
       const flipped = facing === "user";
       let detected = false;
+      let confidence = 0;
       let result: any = lastResultRef.current;
 
       if (landmarkerRef.current && (p.mode === "fashion" || p.mode === "makeup")) {
@@ -171,7 +178,9 @@ export function LiveAROverlay(p: Props) {
         if (ts - lastTsRef.current > 33) {
           lastTsRef.current = ts;
           try {
+            const start = performance.now();
             const r = landmarkerRef.current.detectForVideo(v, ts);
+            setDetectLatency(Math.round(performance.now() - start));
             if (p.mode === "fashion" ? r?.landmarks?.[0] : r?.faceLandmarks?.[0]) {
               lastResultRef.current = r;
               lastDetectAtRef.current = ts;
@@ -186,12 +195,15 @@ export function LiveAROverlay(p: Props) {
 
       if (p.mode === "fashion" && result?.landmarks?.[0] && fresh) {
         const smoothed = smoothLandmarks(result.landmarks[0], smoothRef.current, c, flipped);
+        confidence = poseConfidence(smoothed, p.subtype);
         if (drawFashion(ctx, c, smoothed, p.subtype, productImgRef.current)) detected = true;
       } else if (p.mode === "makeup" && result?.faceLandmarks?.[0] && fresh) {
         drawMakeup(ctx, c, result.faceLandmarks[0], flipped, p.dominantColor || p.accent);
+        confidence = 1;
         detected = true;
       } else if (p.mode === "furniture" && productImgRef.current) {
         drawFurniture(ctx, c, productImgRef.current, furnRef.current);
+        confidence = 1;
         detected = true;
       }
 
@@ -203,6 +215,7 @@ export function LiveAROverlay(p: Props) {
       }
 
       setTracking(detected && p.mode !== "furniture");
+      setTrackingConfidence(confidence);
     };
 
     render();
@@ -325,6 +338,13 @@ export function LiveAROverlay(p: Props) {
         </div>
       )}
 
+      {!snapshot && phase === "ready" && (
+        <div className="absolute left-3 z-30 px-3 py-2 rounded-2xl text-[10px] leading-relaxed" style={{ top: "calc(env(safe-area-inset-top) + 112px)", background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
+          <div>{modelStatus}</div>
+          <div>Tracking {Math.round(trackingConfidence * 100)}%{detectLatency !== null ? ` · ${detectLatency}ms` : ""}</div>
+        </div>
+      )}
+
       {phase === "loading" && (
         <div className="absolute inset-0 z-40 grid place-items-center bg-black/70 backdrop-blur-sm text-center px-6">
           <div>
@@ -407,6 +427,15 @@ function smoothLandmarks(lm: any, store: Record<number, Smoothed>, c: HTMLCanvas
     out[i] = { x: sx, y: sy, v };
   }
   return out;
+}
+
+function poseConfidence(pts: Record<number, { x: number; y: number; v: number }>, subtype: Subtype) {
+  const required = subtype === "bottom"
+    ? [P.L_HIP, P.R_HIP, P.L_ANKLE, P.R_ANKLE]
+    : [P.L_SHOULDER, P.R_SHOULDER, P.L_HIP, P.R_HIP];
+  const values = required.map((i) => pts[i]?.v ?? 0).filter((v) => Number.isFinite(v));
+  if (!values.length) return 0;
+  return Math.max(0, Math.min(1, values.reduce((sum, v) => sum + v, 0) / values.length));
 }
 
 function drawFashion(

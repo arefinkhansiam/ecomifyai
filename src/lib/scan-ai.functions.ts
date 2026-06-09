@@ -22,24 +22,32 @@ function promptForCategory(mode?: string | null, subtype?: string | null): strin
   return DEFAULT_PROMPT;
 }
 
-async function callGeminiHero(dataUrl: string, prompt: string = DEFAULT_PROMPT): Promise<{ mime: string; bytes: Buffer }> {
+async function callGeminiHero(dataUrl: string | string[], prompt: string = DEFAULT_PROMPT): Promise<{ mime: string; bytes: Buffer }> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("Missing LOVABLE_API_KEY");
+  const imageUrls = Array.isArray(dataUrl) ? dataUrl : [dataUrl];
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 45000);
   const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    signal: controller.signal,
+    headers: {
+      "Lovable-API-Key": apiKey,
+      "X-Lovable-AIG-SDK": "vercel-ai-sdk",
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       model: "google/gemini-2.5-flash-image",
       messages: [{
         role: "user",
         content: [
           { type: "text", text: prompt },
-          { type: "image_url", image_url: { url: dataUrl } },
+          ...imageUrls.map((url) => ({ type: "image_url", image_url: { url } })),
         ],
       }],
       modalities: ["image", "text"],
     }),
-  });
+  }).finally(() => clearTimeout(timeout));
   if (!ai.ok) {
     const t = await ai.text();
     throw new Error(`AI error ${ai.status}: ${t.slice(0, 200)}`);
@@ -51,6 +59,22 @@ async function callGeminiHero(dataUrl: string, prompt: string = DEFAULT_PROMPT):
   const m = img.match(/^data:(image\/[a-z]+);base64,(.+)$/);
   if (!m) throw new Error("AI image not a data URL");
   return { mime: m[1], bytes: Buffer.from(m[2], "base64") };
+}
+
+function pickAngleFrames(frames: Array<{ frame_url: string; frame_number: number }>) {
+  if (frames.length <= 4) return frames;
+  const indexes = [0, Math.floor((frames.length - 1) / 3), Math.floor(((frames.length - 1) * 2) / 3), frames.length - 1];
+  return Array.from(new Set(indexes)).map((i) => frames[i]);
+}
+
+async function storagePathToDataUrl(supabase: any, path: string, fallbackMime = "image/jpeg") {
+  const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(path, 600);
+  if (!signed?.signedUrl) throw new Error("Could not read source image");
+  const imgRes = await fetch(signed.signedUrl);
+  if (!imgRes.ok) throw new Error(`Could not fetch image (${imgRes.status})`);
+  const imgBuf = await imgRes.arrayBuffer();
+  const mime = imgRes.headers.get("content-type") || fallbackMime;
+  return `data:${mime};base64,${Buffer.from(imgBuf).toString("base64")}`;
 }
 
 /**
@@ -83,26 +107,18 @@ export const generate3dPreview = createServerFn({ method: "POST" })
       : (await supabase.from("models_3d").insert({ product_id: productId, processing_status: "generating" }).select().single()).data;
 
     await supabase.from("ar_products").update({
-      status: "processing", processing_step: "ai_preview", processing_progress: 60,
+      status: "processing", processing_step: "mockup_generation", processing_progress: 72, error_message: null,
     }).eq("id", productId);
 
     try {
-      // Pick frame ~middle
       const { data: frames } = await supabase
         .from("scan_frames").select("frame_url, frame_number")
         .eq("product_id", productId).order("frame_number", { ascending: true });
       if (!frames || frames.length === 0) throw new Error("No scan frames");
-      const primary = frames[Math.floor(frames.length / 2)];
+      const chosenFrames = pickAngleFrames(frames);
+      const dataUrls = await Promise.all(chosenFrames.map((frame) => storagePathToDataUrl(supabase, frame.frame_url)));
 
-      // Sign the frame so we can fetch its bytes
-      const { data: signed } = await supabase.storage
-        .from("product-images").createSignedUrl(primary.frame_url, 600);
-      if (!signed?.signedUrl) throw new Error("Could not read scan frame");
-      const imgRes = await fetch(signed.signedUrl);
-      const imgBuf = await imgRes.arrayBuffer();
-      const dataUrl = `data:image/jpeg;base64,${Buffer.from(imgBuf).toString("base64")}`;
-
-      const { mime, bytes } = await callGeminiHero(dataUrl, promptForCategory((product as any).ar_mode, (product as any).ar_subtype));
+      const { mime, bytes } = await callGeminiHero(dataUrls, `${promptForCategory((product as any).ar_mode, (product as any).ar_subtype)} Use all supplied scan angles as reference views for one accurate front-facing AR-ready mockup.`);
       const ext = mime === "image/jpeg" ? "jpg" : "png";
 
       const path = `${userId}/${productId}/preview.${ext}`;
@@ -119,16 +135,29 @@ export const generate3dPreview = createServerFn({ method: "POST" })
         status: "ready",
         processing_step: "complete",
         processing_progress: 100,
+        error_message: null,
       }).eq("id", productId);
 
       return { ok: true, previewPath: path };
     } catch (e: any) {
+      const { data: fallbackFrames } = await supabase
+        .from("scan_frames").select("frame_url, frame_number")
+        .eq("product_id", productId).order("frame_number", { ascending: true }).limit(1);
+      const fallbackPath = fallbackFrames?.[0]?.frame_url;
       await supabase.from("models_3d").update({
         processing_status: "failed", error_message: String(e?.message ?? e),
       }).eq("id", modelRow!.id);
-      await supabase.from("ar_products").update({
-        status: "failed", error_message: String(e?.message ?? e),
-      }).eq("id", productId);
+      if (fallbackPath) {
+        await supabase.from("ar_products").update({
+          processed_image_url: fallbackPath,
+          status: "ready",
+          processing_step: "complete_with_fallback",
+          processing_progress: 100,
+          error_message: String(e?.message ?? e),
+        }).eq("id", productId);
+        return { ok: false as const, previewPath: fallbackPath, reason: String(e?.message ?? e) };
+      }
+      await supabase.from("ar_products").update({ status: "failed", error_message: String(e?.message ?? e) }).eq("id", productId);
       throw e;
     }
   });
@@ -152,14 +181,18 @@ export const generateAiHeroFromImage = createServerFn({ method: "POST" })
     if (!product || product.user_id !== userId) throw new Error("Not found");
     if (!product.original_image_url) return { ok: false, reason: "no_image" as const };
 
+    const { data: existing } = await supabase
+      .from("models_3d").select("id").eq("product_id", productId).maybeSingle();
+    const modelRow = existing?.id
+      ? (await supabase.from("models_3d").update({ processing_status: "generating", error_message: null }).eq("id", existing.id).select().single()).data
+      : (await supabase.from("models_3d").insert({ product_id: productId, processing_status: "generating" }).select().single()).data;
+
+    await supabase.from("ar_products").update({
+      status: "processing", processing_step: "mockup_generation", processing_progress: 70, error_message: null,
+    }).eq("id", productId);
+
     try {
-      const { data: signed } = await supabase.storage
-        .from("product-images").createSignedUrl(product.original_image_url, 600);
-      if (!signed?.signedUrl) throw new Error("Could not read source image");
-      const res = await fetch(signed.signedUrl);
-      const buf = await res.arrayBuffer();
-      const sourceMime = res.headers.get("content-type") || "image/jpeg";
-      const dataUrl = `data:${sourceMime};base64,${Buffer.from(buf).toString("base64")}`;
+      const dataUrl = await storagePathToDataUrl(supabase, product.original_image_url);
 
       const { mime, bytes } = await callGeminiHero(dataUrl, promptForCategory((product as any).ar_mode, (product as any).ar_subtype));
       const ext = mime === "image/jpeg" ? "jpg" : "png";
@@ -168,18 +201,25 @@ export const generateAiHeroFromImage = createServerFn({ method: "POST" })
         .upload(path, bytes, { contentType: mime, upsert: true });
       if (upErr) throw upErr;
 
-      const { data: existing } = await supabase
-        .from("models_3d").select("id").eq("product_id", productId).maybeSingle();
-      if (existing?.id) {
-        await supabase.from("models_3d").update({ preview_url: path, processing_status: "done" }).eq("id", existing.id);
-      } else {
-        await supabase.from("models_3d").insert({ product_id: productId, preview_url: path, processing_status: "done" });
-      }
+      await supabase.from("models_3d").update({ preview_url: path, processing_status: "done", error_message: null }).eq("id", modelRow!.id);
 
-      await supabase.from("ar_products").update({ processed_image_url: path }).eq("id", productId);
+      await supabase.from("ar_products").update({
+        processed_image_url: path,
+        status: "ready",
+        processing_step: "complete",
+        processing_progress: 100,
+        error_message: null,
+      }).eq("id", productId);
       return { ok: true as const, previewPath: path };
     } catch (e: any) {
-      // Don't fail the product — caller already created it as "ready" with the raw image.
+      await supabase.from("models_3d").update({ processing_status: "failed", error_message: String(e?.message ?? e) }).eq("id", modelRow!.id);
+      await supabase.from("ar_products").update({
+        processed_image_url: product.original_image_url,
+        status: "ready",
+        processing_step: "complete_with_fallback",
+        processing_progress: 100,
+        error_message: String(e?.message ?? e),
+      }).eq("id", productId);
       return { ok: false as const, reason: String(e?.message ?? e) };
     }
   });

@@ -21,10 +21,11 @@ export const Route = createFileRoute("/ar/view/$productId")({
       .eq("id", params.productId)
       .maybeSingle();
     if (error || !data || data.status !== "ready" || !data.is_public) throw notFound();
-    let imageUrl: string | null = data.processed_image_url ?? null;
-    if (!imageUrl && data.original_image_url) {
-      const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(data.original_image_url, 3600);
-      imageUrl = signed?.signedUrl ?? null;
+    let imageUrl: string | null = null;
+    const imagePath = data.processed_image_url || data.original_image_url;
+    if (imagePath) {
+      const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(imagePath, 3600);
+      imageUrl = signed?.signedUrl ?? imagePath;
     }
     let glbUrl: string | null = null;
     if (data.glb_url) {

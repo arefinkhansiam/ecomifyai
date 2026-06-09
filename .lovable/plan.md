@@ -1,59 +1,35 @@
-## Goal
-Make the AR flow actually work end-to-end:
+## Plan
 
-```text
-Category → Upload photo or live scan → AI AR-ready product mockup → Live camera AR
-```
+1. Add scan diagnostics and progress timeline
+   - Show model loading status, camera readiness, detection confidence, frame count, capture angle, capture/upload latency, and errors on the scan screen.
+   - Add a timeline for upload → scanning → angle capture → mockup generation → AR render, each with timestamps.
+   - Persist key processing status in the existing product fields so the product page can show what failed instead of looking stuck.
 
-This will not be marketed as a real downloadable GLB/USDZ generator unless a real 3D API is connected. For now, uploaded/scanned photos will become an AI-cleaned transparent/product mockup used by the live AR overlay, while real `.glb/.gltf` uploads remain the real 3D/WebXR path.
+2. Make scanning capture reliable with automatic multi-angle steps
+   - Replace the current 12 generic frame count with required angle stages: front, left/side, back, detail/top.
+   - Auto-capture frames per angle on a timer, even if object detection is weak, with detection confidence shown as diagnostic data.
+   - Keep a manual capture button as fallback and advance only after each required angle has enough frames.
+   - Fix the displayed guidance/progress so it matches the actual required frame counts.
 
-## What I will fix
+3. Complete upload-to-AR-ready asset flow
+   - When a user uploads an image, create the product as processing, then run AI cleanup/mockup generation before marking it ready.
+   - Always store a usable AR asset: AI-processed preview when successful, raw uploaded image fallback when AI fails.
+   - Create/update the model record and keep status/error messages clear.
+   - Add visible upload progress states and timestamps on the upload page.
 
-1. **Upload photo pipeline**
-   - Change image uploads from “instant ready” to visible processing.
-   - Show clear progress: upload → AI preparing product → ready.
-   - Ensure uploaded image products always have a usable AR image: AI-processed image first, raw image fallback if AI fails.
-   - After success, show direct “Preview AR” link using the live camera viewer.
+4. Improve server-side AI mockup generation robustness
+   - Update the AI gateway call to the correct Lovable AI header pattern and improve error handling.
+   - For scan products, choose the best available captured frames by angle instead of only the middle frame.
+   - Generate category-specific AR-ready product renders for fashion, makeup, and furniture; for true GLB/USDZ, keep uploaded 3D models supported and treat image-based generation as an AR-ready mockup asset.
 
-2. **Camera scan pipeline**
-   - Make scanning capture reliably even when object detection fails.
-   - Add an immediate first capture and a manual capture button so users are not stuck waiting.
-   - Keep the guided angle steps: front/left/back/detail for clothing/furniture/makeup.
-   - Show progress/count clearly while frames are being collected.
-   - Lower the scan requirement from a fragile long 40-frame flow to a faster practical multi-angle flow, while still collecting different angles.
+5. Fix AR viewer live placement behavior
+   - Ensure processed image URLs are signed before passing to the live AR overlay so uploaded/scanned assets actually render.
+   - Add AR diagnostics overlay for model loaded/tracking confidence when trying on.
+   - Tune t-shirt placement using shoulders plus hips/torso proportions, with fallback ghost visible until body landmarks lock.
+   - Keep furniture mode direct-camera with drag, rotate, wheel/pinch resize, no capture step.
+   - Keep makeup mode face-landmark lipstick/filter placement and snapshot/share.
 
-3. **AI mockup generation**
-   - Update the server AI prompt to create a clean AR-ready product cutout/mockup from scan/photo.
-   - Use category/subtype-specific prompts:
-     - shirt/top: clean front wearable garment mockup
-     - pants/bottom: full lower garment mockup
-     - accessories/jewellery: isolated object with transparent/clean background intent
-     - makeup: shade/swatch-ready visual reference
-     - furniture: clean cutout/object mockup for room placement
-   - Save the processed mockup path back to the product so the AR viewer can use it.
-
-4. **Live AR viewer**
-   - Keep the no-capture live try-on behavior.
-   - Improve body placement math for tops/pants/accessories so overlays stay anchored while the person moves.
-   - Keep makeup face-landmark filter and furniture drag/rotate/pinch mode.
-   - Make snapshot/share a one-tap action after live try-on/placement.
-
-5. **Remove confusing old capture-composite path from the viewer UI**
-   - The public AR viewer should open camera and show live overlay directly.
-   - Snapshot is only for saving/sharing the final live try-on photo, not for generating AR.
-
-## Technical notes
-- Main files to update:
-  - `src/routes/_authenticated/dashboard.upload.tsx`
-  - `src/routes/_authenticated/dashboard.scan.tsx`
-  - `src/lib/scan-ai.functions.ts`
-  - `src/components/LiveAROverlay.tsx`
-  - possibly clean unused legacy code in `src/routes/ar.view.$productId.tsx`
-- I will keep the existing backend/storage tables and avoid adding paid external 3D services.
-- If AI generation fails, users still get a working live AR preview using the uploaded/scanned image instead of a broken product.
-
-## Expected result
-- Uploading a product photo shows progress and creates a live AR-ready product.
-- Scanning captures frames with visible progress and finishes into an AR-ready product.
-- Opening the AR link starts the camera and overlays the selected product directly on body/face/room.
-- Users can save/share a snapshot after trying it live.
+6. Validate
+   - Verify the route loads without console errors.
+   - Check scan/upload UI shows progress instead of appearing stuck.
+   - Check AR viewer opens camera and uses the product image/mockup for fashion, makeup, and furniture modes.

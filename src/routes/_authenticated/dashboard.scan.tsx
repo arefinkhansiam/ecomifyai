@@ -26,11 +26,24 @@ export const Route = createFileRoute("/_authenticated/dashboard/scan")({
 });
 
 const TOTAL_FRAMES = 12;
+const FRAMES_PER_ANGLE = 3;
 const CAPTURE_INTERVAL_MS = 1500;
 const DETECT_INTERVAL_MS = 500;
 
 type Phase = "intro" | "scanning" | "generating" | "done" | "error";
 type GenStep = "capturing" | "cleaning" | "composing";
+type Diagnostic = { label: string; value: string; at: string };
+type TimelineStep = { label: string; status: "pending" | "active" | "done" | "error"; at?: string; error?: string };
+
+const stamp = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+const initialTimeline = (): TimelineStep[] => [
+  { label: "Upload", status: "pending" },
+  { label: "Scanning", status: "pending" },
+  { label: "Angle capture", status: "pending" },
+  { label: "Mockup generation", status: "pending" },
+  { label: "AR render", status: "pending" },
+];
 
 function ScanPage() {
   const { user } = useAuth();
@@ -52,6 +65,10 @@ function ScanPage() {
   const [previewThumb, setPreviewThumb] = useState<string | null>(null);
   const [embedToken, setEmbedToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [diagnostics, setDiagnostics] = useState<Diagnostic[]>([]);
+  const [timeline, setTimeline] = useState<TimelineStep[]>(initialTimeline);
+  const [detectConfidence, setDetectConfidence] = useState(0);
+  const [captureLatency, setCaptureLatency] = useState<number | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -62,6 +79,8 @@ function ScanPage() {
   const countRef = useRef(0);
   const productIdRef = useRef<string | null>(null);
   const objectVisibleRef = useRef(false);
+  const confidenceRef = useRef(0);
+  const captureBusyRef = useRef(false);
 
   useEffect(() => () => stopAll(), []);
 
@@ -74,6 +93,16 @@ function ScanPage() {
     streamRef.current = null;
   };
 
+  const addDiagnostic = (label: string, value: string) => {
+    setDiagnostics((items) => [{ label, value, at: stamp() }, ...items].slice(0, 8));
+  };
+
+  const markStep = (label: string, status: TimelineStep["status"], errorMsg?: string) => {
+    setTimeline((items) => items.map((item) =>
+      item.label === label ? { ...item, status, at: stamp(), error: errorMsg } : item,
+    ));
+  };
+
   const waitForVideoReady = (v: HTMLVideoElement) =>
     new Promise<void>((resolve) => {
       if (v.readyState >= 2 && v.videoWidth > 0) return resolve();
@@ -84,6 +113,9 @@ function ScanPage() {
   const start = async () => {
     if (!user) return;
     setError(null);
+    setDiagnostics([]);
+    setTimeline(initialTimeline());
+    addDiagnostic("Scan", "Starting product scan");
     if (!productName.trim()) { toast.error("Add a product name first"); return; }
 
     // Camera supported?
@@ -99,11 +131,13 @@ function ScanPage() {
       ar_mode: arMode,
       ar_subtype: subtype ?? null,
       status: "processing",
-      processing_step: "scanning",
-      processing_progress: 0,
+      processing_step: "scanning_camera",
+      processing_progress: 5,
       is_public: true,
     } as any).select("id").single();
     if (insErr || !created) { toast.error(insErr?.message ?? "Could not start scan"); return; }
+    markStep("Upload", "done");
+    markStep("Scanning", "active");
     setProductId(created.id);
     productIdRef.current = created.id;
 
@@ -123,6 +157,7 @@ function ScanPage() {
       v.srcObject = stream;
       await v.play().catch(() => {});
       await waitForVideoReady(v);
+      addDiagnostic("Camera", `${v.videoWidth}×${v.videoHeight} ready`);
       console.log("[scan] camera ready", v.videoWidth, "x", v.videoHeight);
     } catch (e: any) {
       const name = e?.name ?? "";
@@ -132,6 +167,8 @@ function ScanPage() {
         : name === "NotReadableError" ? "Camera is already in use by another app."
         : `Couldn't start camera: ${e?.message ?? name ?? "unknown"}`;
       setError(msg);
+      addDiagnostic("Camera error", msg);
+      markStep("Scanning", "error", msg);
       setPhase("error");
       stopAll();
       return;
@@ -152,6 +189,7 @@ function ScanPage() {
         runningMode: "VIDEO",
       });
       setAutoDetect(true);
+      addDiagnostic("Model", "Object detector loaded");
       console.log("[scan] detector ready");
     } catch (e) {
       console.warn("[scan] detector unavailable, fallback to always-capture", e);
@@ -159,6 +197,9 @@ function ScanPage() {
       setAutoDetect(false);
       objectVisibleRef.current = true;
       setObjectVisible(true);
+      setDetectConfidence(1);
+      confidenceRef.current = 1;
+      addDiagnostic("Model", "Detector fallback active");
     }
 
     // Detection loop
@@ -170,8 +211,11 @@ function ScanPage() {
       }
       try {
         const r = detectorRef.current.detectForVideo(v, performance.now());
-        const visible = (r?.detections?.length ?? 0) > 0;
+        const topScore = Math.max(0, ...(r?.detections ?? []).map((d: any) => d?.categories?.[0]?.score ?? 0));
+        const visible = topScore > 0.18 || (r?.detections?.length ?? 0) > 0;
         objectVisibleRef.current = visible;
+        confidenceRef.current = topScore;
+        setDetectConfidence(topScore);
         setObjectVisible(visible);
       } catch {/* ignore */}
     }, DETECT_INTERVAL_MS);
@@ -184,35 +228,49 @@ function ScanPage() {
   const manualCapture = () => { void tickCapture(true); };
 
   const tickCapture = async (force = false) => {
-    if (!force && !objectVisibleRef.current) return;
+    if (captureBusyRef.current) return;
+    if (!force && !objectVisibleRef.current) {
+      addDiagnostic("Detection", `Waiting for product · confidence ${Math.round(confidenceRef.current * 100)}%`);
+    }
     if (countRef.current >= TOTAL_FRAMES) return;
     const v = videoRef.current, c = canvasRef.current, pid = productIdRef.current, uid = user?.id;
     if (!v || !c || !pid || !uid) return;
     if (!v.videoWidth || !v.videoHeight) return;
+    captureBusyRef.current = true;
+    const started = performance.now();
+    markStep("Angle capture", "active");
     c.width = v.videoWidth; c.height = v.videoHeight;
     const ctx = c.getContext("2d"); if (!ctx) return;
     ctx.drawImage(v, 0, 0, c.width, c.height);
     const blob: Blob | null = await new Promise((res) => c.toBlob((b) => res(b), "image/jpeg", 0.85));
-    if (!blob) return;
+    if (!blob) { captureBusyRef.current = false; return; }
 
     const n = countRef.current + 1;
     const path = `scans/${uid}/${pid}/frame_${String(n).padStart(3, "0")}.jpg`;
     const { error: upErr } = await supabase.storage.from("product-images")
       .upload(path, blob, { contentType: "image/jpeg", upsert: true });
-    if (upErr) { console.warn("[scan] upload err", upErr); return; }
+    if (upErr) { console.warn("[scan] upload err", upErr); addDiagnostic("Upload error", upErr.message); captureBusyRef.current = false; return; }
     await supabase.from("scan_frames").insert({ product_id: pid, frame_url: path, frame_number: n });
+    const ms = Math.round(performance.now() - started);
+    setCaptureLatency(ms);
     countRef.current = n;
     setCount(n);
+    addDiagnostic("Captured", `${angleForCount(n - 1)} frame ${n}/${TOTAL_FRAMES} · ${ms}ms · confidence ${Math.round(confidenceRef.current * 100)}%`);
     await supabase.from("ar_products").update({
-      processing_progress: Math.round((n / TOTAL_FRAMES) * 50),
+      processing_step: `angle_${angleForCount(n - 1).toLowerCase().replace(/\W+/g, "_")}`,
+      processing_progress: Math.max(10, Math.round((n / TOTAL_FRAMES) * 60)),
     }).eq("id", pid);
-    if (n >= TOTAL_FRAMES) await finishScan();
+    captureBusyRef.current = false;
+    if (n >= TOTAL_FRAMES) { markStep("Angle capture", "done"); await finishScan(); }
   };
 
   const finishScan = async () => {
     stopAll();
     setPhase("generating");
     setGenStep("cleaning");
+    markStep("Scanning", "done");
+    markStep("Mockup generation", "active");
+    addDiagnostic("Mockup", "AI generation started");
     // 3-step animation timing
     setTimeout(() => setGenStep("composing"), 1500);
     try {
@@ -227,10 +285,16 @@ function ScanPage() {
           .createSignedUrl(data.processed_image_url, 3600);
         if (signed?.signedUrl) setPreviewThumb(signed.signedUrl);
       }
+      markStep("Mockup generation", "done");
+      markStep("AR render", "done");
+      addDiagnostic("AR", "Live AR viewer ready");
       setPhase("done");
       toast.success("AR Ready!");
     } catch (e: any) {
-      setError(String(e?.message ?? e));
+      const message = String(e?.message ?? e);
+      setError(message);
+      addDiagnostic("Mockup error", message);
+      markStep("Mockup generation", "error", message);
       setPhase("error");
     }
   };
@@ -240,6 +304,7 @@ function ScanPage() {
     setPhase("intro"); setCount(0); countRef.current = 0; setProductName("");
     setProductId(null); productIdRef.current = null;
     setPreviewThumb(null); setEmbedToken(null); setError(null);
+    setDiagnostics([]); setTimeline(initialTimeline()); setDetectConfidence(0); confidenceRef.current = 0; setCaptureLatency(null);
   };
 
   const cancel = () => { stopAll(); setPhase("intro"); setCount(0); countRef.current = 0; };
@@ -248,36 +313,40 @@ function ScanPage() {
   const guidance = (() => {
     if (arMode === "fashion" && subtype === "jewellery") {
       return [
-        { until: 10, hint: "Lay it flat on a clean surface, top view",  label: "Top" },
-        { until: 20, hint: "Tilt 45° — show the clasp/details",          label: "Side" },
-        { until: 30, hint: "Flip to back — show the closure",            label: "Back" },
-        { until: 40, hint: "Close-up of any stones or engravings",       label: "Detail" },
+        { until: 3, hint: "Lay it flat on a clean surface, top view",  label: "Top" },
+        { until: 6, hint: "Tilt 45° — show the clasp/details",          label: "Side" },
+        { until: 9, hint: "Flip to back — show the closure",            label: "Back" },
+        { until: 12, hint: "Close-up of any stones or engravings",       label: "Detail" },
       ];
     }
     if (arMode === "fashion") {
       return [
-        { until: 10, hint: "Lay the item flat — full front view",       label: "Front" },
-        { until: 20, hint: "Smooth out wrinkles, rotate slowly left",   label: "Left" },
-        { until: 30, hint: "Flip to back side, full view",              label: "Back" },
-        { until: 40, hint: "Close-ups of tag, fabric, stitching",       label: "Detail" },
+        { until: 3, hint: "Lay the item flat — full front view",       label: "Front" },
+        { until: 6, hint: "Smooth out wrinkles, rotate slowly left",   label: "Left" },
+        { until: 9, hint: "Flip to back side, full view",              label: "Back" },
+        { until: 12, hint: "Close-ups of tag, fabric, stitching",       label: "Detail" },
       ];
     }
     if (arMode === "makeup") {
       return [
-        { until: 10, hint: "Front of the product, label visible",        label: "Front" },
-        { until: 20, hint: "Open it — show the actual color / swatch",   label: "Swatch" },
-        { until: 30, hint: "Rotate slowly, capture every side",          label: "Side" },
-        { until: 40, hint: "Close-up of the shade / finish",             label: "Detail" },
+        { until: 3, hint: "Front of the product, label visible",        label: "Front" },
+        { until: 6, hint: "Open it — show the actual color / swatch",   label: "Swatch" },
+        { until: 9, hint: "Rotate slowly, capture every side",          label: "Side" },
+        { until: 12, hint: "Close-up of the shade / finish",             label: "Detail" },
       ];
     }
     // furniture / generic object
     return [
-      { until: 10, hint: "Front view — keep whole product in frame",   label: "Front" },
-      { until: 20, hint: "Rotate to the left side",                    label: "Left" },
-      { until: 30, hint: "Now show the back",                          label: "Back" },
-      { until: 40, hint: "Top-down and any unique details",            label: "Top" },
+      { until: 3, hint: "Front view — keep whole product in frame",   label: "Front" },
+      { until: 6, hint: "Rotate to the left side",                    label: "Left" },
+      { until: 9, hint: "Now show the back",                          label: "Back" },
+      { until: 12, hint: "Top-down and any unique details",            label: "Top" },
     ];
   })();
+  function angleForCount(frameIndex: number) {
+    const index = Math.min(guidance.length - 1, Math.floor(frameIndex / FRAMES_PER_ANGLE));
+    return guidance[index]?.label ?? "Angle";
+  }
   const step = guidance.find((g) => count < g.until) ?? guidance[guidance.length - 1];
   const hint = step.hint;
   const angleLabel = step.label;
@@ -384,8 +453,17 @@ function ScanPage() {
                  style={{ background: "linear-gradient(135deg,#0B1220,#1E293B)" }}>
               <div className="text-sm font-semibold">{hint}</div>
               <div className="mt-1 text-xs opacity-70">
-                {autoDetect ? "Auto-capturing every 2 seconds while product is detected" : "Auto-detect off — capturing every 2 seconds"}
+                {autoDetect ? "Auto-capturing every 1.5 seconds while product is detected" : "Auto-detect off — capturing every 1.5 seconds"}
               </div>
+              <div className="mt-3 text-[11px] opacity-80">
+                Confidence {Math.round(detectConfidence * 100)}% · Frames {count}/{TOTAL_FRAMES}{captureLatency ? ` · Last ${captureLatency}ms` : ""}
+              </div>
+            </div>
+          )}
+          {(phase === "scanning" || phase === "generating") && (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <ProgressTimeline steps={timeline} dark />
+              <DiagnosticsPanel items={diagnostics} dark />
             </div>
           )}
         </div>
@@ -428,6 +506,9 @@ function ScanPage() {
           <button onClick={start} className="btn-primary mt-6 w-full justify-center">
             <Camera size={16} /> Start camera scan
           </button>
+          <div className="mt-4">
+            <ProgressTimeline steps={timeline} />
+          </div>
           <ul className="mt-6 text-xs space-y-2" style={{ color: "var(--ink-soft)" }}>
             <li>• Use good, even lighting</li>
             <li>• Rotate slowly — we auto-capture every 2 seconds</li>
@@ -463,6 +544,10 @@ function ScanPage() {
             <button className="btn-ghost" onClick={reset}>Scan another</button>
             <button className="btn-ghost" onClick={() => navigate({ to: "/dashboard/products" })}>My products</button>
           </div>
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+            <ProgressTimeline steps={timeline} />
+            <DiagnosticsPanel items={diagnostics} />
+          </div>
         </div>
       )}
 
@@ -493,6 +578,38 @@ function StepDot({ label, done, active }: { label: string; done?: boolean; activ
         style={{ background: done ? "#10B981" : active ? "#38BDF8" : "rgba(255,255,255,0.4)" }} />
       {label}
     </span>
+  );
+}
+
+function ProgressTimeline({ steps, dark = false }: { steps: TimelineStep[]; dark?: boolean }) {
+  return (
+    <div className="rounded-2xl p-4" style={{ background: dark ? "rgba(255,255,255,0.08)" : "var(--soft)", border: `1px solid ${dark ? "rgba(255,255,255,0.14)" : "var(--border)"}` }}>
+      <div className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: dark ? "rgba(255,255,255,0.65)" : "var(--muted)" }}>AR / Scan progress</div>
+      <div className="mt-3 space-y-2">
+        {steps.map((step) => (
+          <div key={step.label} className="flex items-start gap-2 text-xs" style={{ color: dark ? "#fff" : "var(--ink)" }}>
+            <span className="mt-0.5 w-2.5 h-2.5 rounded-full shrink-0" style={{ background: step.status === "done" ? "#10B981" : step.status === "active" ? "#38BDF8" : step.status === "error" ? "#EF4444" : dark ? "rgba(255,255,255,0.28)" : "#CBD5E1" }} />
+            <span className="flex-1"><span className="font-semibold">{step.label}</span>{step.at ? ` · ${step.at}` : ""}{step.error ? <span className="block text-red-400 mt-0.5">{step.error}</span> : null}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DiagnosticsPanel({ items, dark = false }: { items: Diagnostic[]; dark?: boolean }) {
+  return (
+    <div className="rounded-2xl p-4" style={{ background: dark ? "rgba(255,255,255,0.08)" : "var(--soft)", border: `1px solid ${dark ? "rgba(255,255,255,0.14)" : "var(--border)"}` }}>
+      <div className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: dark ? "rgba(255,255,255,0.65)" : "var(--muted)" }}>Diagnostics</div>
+      <div className="mt-3 space-y-2 text-xs" style={{ color: dark ? "rgba(255,255,255,0.88)" : "var(--ink-soft)" }}>
+        {items.length ? items.map((item, i) => (
+          <div key={`${item.at}-${item.label}-${i}`} className="flex justify-between gap-3">
+            <span><span className="font-semibold" style={{ color: dark ? "#fff" : "var(--ink)" }}>{item.label}</span> · {item.value}</span>
+            <span className="shrink-0 opacity-70">{item.at}</span>
+          </div>
+        )) : <div>No scan diagnostics yet.</div>}
+      </div>
+    </div>
   );
 }
 

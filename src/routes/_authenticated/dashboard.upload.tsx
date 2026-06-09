@@ -32,6 +32,17 @@ export const Route = createFileRoute("/_authenticated/dashboard/upload")({
 });
 
 type Size = "small" | "medium" | "large";
+type TimelineStep = { label: string; status: "pending" | "active" | "done" | "error"; at?: string; error?: string };
+type UploadLog = { label: string; value: string; at: string };
+
+const stamp = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+const initialTimeline = (): TimelineStep[] => [
+  { label: "Upload", status: "pending" },
+  { label: "Scanning", status: "pending" },
+  { label: "Angle capture", status: "pending" },
+  { label: "Mockup generation", status: "pending" },
+  { label: "AR render", status: "pending" },
+];
 
 const PRESET_COLORS = ["#0B1220", "#0EA5E9", "#38BDF8", "#7C3AED", "#10B981", "#F59E0B", "#EF4444", "#FFFFFF"];
 const GRADIENT_PRESETS = [
@@ -56,6 +67,8 @@ function UploadPage() {
   const [step, setStep] = useState("");
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [timeline, setTimeline] = useState<TimelineStep[]>(initialTimeline);
+  const [logs, setLogs] = useState<UploadLog[]>([]);
   const [arMode, setArMode] = useState<ArMode>(search.mode ?? "furniture");
   const [subtype] = useState<ClothingSub | undefined>(search.subtype);
   // If user came from /dashboard/create, lock the mode picker to that choice.
@@ -85,6 +98,11 @@ function UploadPage() {
   const [showProductName, setShowProductName] = useState(true);
 
   const isPaid = plan !== "free";
+
+  const log = (label: string, value: string) => setLogs((items) => [{ label, value, at: stamp() }, ...items].slice(0, 8));
+  const markStep = (label: string, status: TimelineStep["status"], error?: string) => {
+    setTimeline((items) => items.map((item) => item.label === label ? { ...item, status, at: stamp(), error } : item));
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -117,27 +135,34 @@ function UploadPage() {
   const upload = async () => {
     if (!file || !user) return;
     setBusy(true);
+    setTimeline(initialTimeline());
+    setLogs([]);
     try {
       const isModel = arMode === "full_3d";
       setStep(isModel ? "Uploading 3D model..." : "Uploading image...");
+      markStep("Upload", "active");
+      log("Upload", `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)}MB`);
       const ext = file.name.split(".").pop();
       const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, {
         contentType: file.type || (isModel ? "model/gltf-binary" : undefined),
       });
       if (upErr) throw upErr;
+      markStep("Upload", "done");
 
       setStep("Saving product...");
+      markStep("Scanning", isModel ? "done" : "active");
       const { data: created, error: insErr } = await supabase.from("ar_products").insert({
         user_id: user.id,
         product_name: name || "Untitled Product",
         original_image_url: isModel ? null : path,
+        processed_image_url: isModel ? null : path,
         glb_url: isModel ? path : null,
         ar_mode: arMode,
         ar_subtype: subtype ?? null,
-        status: "ready",
-        processing_step: "complete",
-        processing_progress: 100,
+        status: isModel ? "ready" : "processing",
+        processing_step: isModel ? "complete" : "image_uploaded",
+        processing_progress: isModel ? 100 : 25,
         file_size_bytes: file.size,
         dominant_color: bg,
         button_label: label,
@@ -164,22 +189,35 @@ function UploadPage() {
         } : {},
       } as any).select().single();
       if (insErr) throw insErr;
+      log("Product", `Created ${created.id}`);
 
       // For image uploads, run the same AI hero pass so plain uploads become
       // AR-ready (clean studio render) just like camera scans.
       if (!isModel) {
+        markStep("Scanning", "done");
+        markStep("Angle capture", "done");
+        markStep("Mockup generation", "active");
         setStep("AI is preparing your AR preview...");
+        log("AI", "Generating AR-ready mockup");
         try {
-          await generateHero({ data: { productId: created.id } });
+          const result = await generateHero({ data: { productId: created.id } });
+          markStep("Mockup generation", "done");
+          log("Mockup", result.ok ? "AI mockup ready" : `Raw image fallback · ${result.reason}`);
         } catch (e) {
           console.warn("[upload] AI hero failed, keeping raw image", e);
+          markStep("Mockup generation", "error", e instanceof Error ? e.message : String(e));
           toast.warning("AR preview kept the original image (AI cleanup unavailable).");
         }
       }
 
+      markStep("AR render", "done");
+
       toast.success("AR product created!");
       setCreatedId(created.id);
     } catch (e: any) {
+      const msg = e.message ?? "Upload failed";
+      markStep("Upload", "error", msg);
+      log("Error", msg);
       toast.error(e.message ?? "Upload failed");
     } finally { setBusy(false); setStep(""); }
   };
@@ -482,6 +520,13 @@ function UploadPage() {
             {busy ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
             {busy ? step || "Working..." : createdId ? "Created ✓" : "Create AR Product"}
           </button>
+
+          {(busy || createdId || logs.length > 0) && (
+            <div className="mt-5 grid grid-cols-1 gap-3">
+              <UploadTimeline steps={timeline} />
+              <UploadDiagnostics items={logs} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -514,6 +559,38 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
       <div className="mt-1 flex items-center gap-2 border rounded-xl px-2 py-1.5" style={{ borderColor: "var(--border)", background: "#fff" }}>
         <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-9 h-9 rounded cursor-pointer bg-transparent border-0" />
         <input value={value} onChange={(e) => onChange(e.target.value)} className="flex-1 outline-none text-sm font-mono bg-transparent text-ink" />
+      </div>
+    </div>
+  );
+}
+
+function UploadTimeline({ steps }: { steps: TimelineStep[] }) {
+  return (
+    <div className="rounded-2xl p-4 bg-soft" style={{ border: "1px solid var(--border)" }}>
+      <div className="text-[11px] uppercase tracking-wider font-semibold text-muted">AR / Scan progress</div>
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {steps.map((step) => (
+          <div key={step.label} className="flex items-start gap-2 text-xs" style={{ color: "var(--ink-soft)" }}>
+            <span className="mt-0.5 w-2.5 h-2.5 rounded-full shrink-0" style={{ background: step.status === "done" ? "#10B981" : step.status === "active" ? "#38BDF8" : step.status === "error" ? "#EF4444" : "#CBD5E1" }} />
+            <span><span className="font-semibold text-ink">{step.label}</span>{step.at ? ` · ${step.at}` : ""}{step.error ? <span className="block text-red-600 mt-0.5">{step.error}</span> : null}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function UploadDiagnostics({ items }: { items: UploadLog[] }) {
+  return (
+    <div className="rounded-2xl p-4 bg-soft" style={{ border: "1px solid var(--border)" }}>
+      <div className="text-[11px] uppercase tracking-wider font-semibold text-muted">Diagnostics</div>
+      <div className="mt-3 space-y-2 text-xs" style={{ color: "var(--ink-soft)" }}>
+        {items.length ? items.map((item, i) => (
+          <div key={`${item.at}-${item.label}-${i}`} className="flex justify-between gap-3">
+            <span><span className="font-semibold text-ink">{item.label}</span> · {item.value}</span>
+            <span className="shrink-0 opacity-70">{item.at}</span>
+          </div>
+        )) : <div>No diagnostics yet.</div>}
       </div>
     </div>
   );
