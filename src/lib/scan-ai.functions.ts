@@ -26,8 +26,11 @@ async function callGeminiHero(dataUrl: string | string[], prompt: string = DEFAU
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("Missing LOVABLE_API_KEY");
   const imageUrls = Array.isArray(dataUrl) ? dataUrl : [dataUrl];
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 45000);
   const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
+    signal: controller.signal,
     headers: {
       "Lovable-API-Key": apiKey,
       "X-Lovable-AIG-SDK": "vercel-ai-sdk",
@@ -44,7 +47,7 @@ async function callGeminiHero(dataUrl: string | string[], prompt: string = DEFAU
       }],
       modalities: ["image", "text"],
     }),
-  });
+  }).finally(() => clearTimeout(timeout));
   if (!ai.ok) {
     const t = await ai.text();
     throw new Error(`AI error ${ai.status}: ${t.slice(0, 200)}`);
@@ -132,6 +135,7 @@ export const generate3dPreview = createServerFn({ method: "POST" })
         status: "ready",
         processing_step: "complete",
         processing_progress: 100,
+        error_message: null,
       }).eq("id", productId);
 
       return { ok: true, previewPath: path };
