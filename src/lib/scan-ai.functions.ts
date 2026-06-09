@@ -71,7 +71,7 @@ export const generate3dPreview = createServerFn({ method: "POST" })
 
     // verify ownership
     const { data: product } = await supabase
-      .from("ar_products").select("id, user_id, product_name")
+      .from("ar_products").select("id, user_id, product_name, ar_mode, ar_subtype")
       .eq("id", productId).maybeSingle();
     if (!product || product.user_id !== userId) throw new Error("Not found");
 
