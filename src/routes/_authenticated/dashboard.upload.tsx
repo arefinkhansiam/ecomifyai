@@ -61,8 +61,10 @@ function UploadPage() {
   const generateHero = useServerFn(generateAiHeroFromImage);
   const [plan, setPlan] = useState<"free" | "starter" | "growth">("free");
   const [file, setFile] = useState<File | null>(null);
+  const [extraFiles, setExtraFiles] = useState<File[]>([]);
   const [name, setName] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
+  const [extraPreviews, setExtraPreviews] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState("");
   const [createdId, setCreatedId] = useState<string | null>(null);
@@ -71,6 +73,7 @@ function UploadPage() {
   const [logs, setLogs] = useState<UploadLog[]>([]);
   const [arMode, setArMode] = useState<ArMode>(search.mode ?? "furniture");
   const [subtype] = useState<ClothingSub | undefined>(search.subtype);
+
   // If user came from /dashboard/create, lock the mode picker to that choice.
   const modeLocked = !!search.mode;
 
