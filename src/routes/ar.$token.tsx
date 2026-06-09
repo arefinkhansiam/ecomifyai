@@ -1,8 +1,9 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { useEffect } from "react";
+import { useRef } from "react";
 import { z } from "zod";
 import { Sparkles } from "lucide-react";
+import { LiveAROverlay } from "@/components/LiveAROverlay";
 
 const Input = z.object({ token: z.string().min(8).max(64) });
 
@@ -12,7 +13,7 @@ const loadProductByToken = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: product } = await supabaseAdmin
       .from("ar_products")
-      .select("id, product_name, processed_image_url, original_image_url, glb_url, usdz_url, dominant_color, status, is_public, ar_mode, ar_customization, embed_token")
+        .select("id, product_name, processed_image_url, original_image_url, glb_url, usdz_url, dominant_color, status, is_public, ar_mode, ar_subtype, ar_customization, show_branding, embed_token")
       .eq("embed_token", data.token)
       .maybeSingle();
     if (!product || !product.is_public || product.status !== "ready") return null;
@@ -37,6 +38,8 @@ const loadProductByToken = createServerFn({ method: "POST" })
       name: product.product_name,
       mode: product.ar_mode as string,
       dominant: product.dominant_color as string | null,
+      subtype: product.ar_subtype as string | null,
+      showBranding: product.show_branding !== false,
       imageUrl: imageUrl ?? originalUrl,
       glbUrl,
       usdzUrl,
