@@ -119,9 +119,7 @@ function CustomizePage() {
       setLabel(p.button_label ?? DEFAULTS.label);
       setUseGradient(!!p.use_gradient);
       setBg(p.button_bg_color ?? DEFAULTS.bg);
-      const storedGrad = (c as any).gradient_data;
-      if (storedGrad) setGradient(parseGradient(storedGrad));
-      else if (p.gradient_from || p.gradient_to) {
+      if (p.gradient_from || p.gradient_to) {
         setGradient({ stops: [{ color: p.gradient_from || DEFAULTS.bg, position: 0 }, { color: p.gradient_to || "#38BDF8", position: 100 }], direction: "diagonal", angle: 135 });
       }
       setFg(p.button_text_color ?? DEFAULTS.fg);
