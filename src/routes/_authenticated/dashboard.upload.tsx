@@ -520,6 +520,13 @@ function UploadPage() {
             {busy ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
             {busy ? step || "Working..." : createdId ? "Created ✓" : "Create AR Product"}
           </button>
+
+          {(busy || createdId || logs.length > 0) && (
+            <div className="mt-5 grid grid-cols-1 gap-3">
+              <UploadTimeline steps={timeline} />
+              <UploadDiagnostics items={logs} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -552,6 +559,38 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
       <div className="mt-1 flex items-center gap-2 border rounded-xl px-2 py-1.5" style={{ borderColor: "var(--border)", background: "#fff" }}>
         <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-9 h-9 rounded cursor-pointer bg-transparent border-0" />
         <input value={value} onChange={(e) => onChange(e.target.value)} className="flex-1 outline-none text-sm font-mono bg-transparent text-ink" />
+      </div>
+    </div>
+  );
+}
+
+function UploadTimeline({ steps }: { steps: TimelineStep[] }) {
+  return (
+    <div className="rounded-2xl p-4 bg-soft" style={{ border: "1px solid var(--border)" }}>
+      <div className="text-[11px] uppercase tracking-wider font-semibold text-muted">AR / Scan progress</div>
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {steps.map((step) => (
+          <div key={step.label} className="flex items-start gap-2 text-xs text-ink-soft">
+            <span className="mt-0.5 w-2.5 h-2.5 rounded-full shrink-0" style={{ background: step.status === "done" ? "#10B981" : step.status === "active" ? "#38BDF8" : step.status === "error" ? "#EF4444" : "#CBD5E1" }} />
+            <span><span className="font-semibold text-ink">{step.label}</span>{step.at ? ` · ${step.at}` : ""}{step.error ? <span className="block text-red-600 mt-0.5">{step.error}</span> : null}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function UploadDiagnostics({ items }: { items: UploadLog[] }) {
+  return (
+    <div className="rounded-2xl p-4 bg-soft" style={{ border: "1px solid var(--border)" }}>
+      <div className="text-[11px] uppercase tracking-wider font-semibold text-muted">Diagnostics</div>
+      <div className="mt-3 space-y-2 text-xs text-ink-soft">
+        {items.length ? items.map((item, i) => (
+          <div key={`${item.at}-${item.label}-${i}`} className="flex justify-between gap-3">
+            <span><span className="font-semibold text-ink">{item.label}</span> · {item.value}</span>
+            <span className="shrink-0 opacity-70">{item.at}</span>
+          </div>
+        )) : <div>No diagnostics yet.</div>}
       </div>
     </div>
   );
