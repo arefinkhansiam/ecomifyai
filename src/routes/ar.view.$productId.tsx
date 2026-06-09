@@ -288,23 +288,98 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const retake = () => {
     setResultUrl(null);
     setErrorMsg(null);
+    setFeedback(null);
+    setRelated([]);
     startCamera(facing);
   };
 
-  const share = async () => {
-    if (!resultUrl) return;
+  // Compose result + watermark into a single PNG blob
+  const composeWatermarkedBlob = async (): Promise<{ blob: Blob; url: string } | null> => {
+    if (!resultUrl) return null;
     try {
-      const blob = await (await fetch(resultUrl)).blob();
-      const file = new File([blob], `${product.product_name || "easibie-ar"}.png`, { type: blob.type });
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      await new Promise<void>((res, rej) => { img.onload = () => res(); img.onerror = () => rej(); img.src = resultUrl; });
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const ctx = c.getContext("2d")!;
+      ctx.drawImage(img, 0, 0);
+      const wmText = product.show_branding === false
+        ? `${product.product_name || "Try-on"}`
+        : "Try-on by Easibie · easibie.app";
+      const pad = Math.round(Math.min(c.width, c.height) * 0.025);
+      const fontSize = Math.round(Math.min(c.width, c.height) * 0.028);
+      ctx.font = `600 ${fontSize}px ${getComputedStyle(document.body).fontFamily || "sans-serif"}`;
+      const metrics = ctx.measureText(wmText);
+      const boxW = metrics.width + pad * 1.4;
+      const boxH = fontSize * 1.9;
+      const x = c.width - boxW - pad;
+      const y = c.height - boxH - pad;
+      ctx.fillStyle = "rgba(11,18,32,0.55)";
+      const r = boxH / 2;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + boxW, y, x + boxW, y + boxH, r);
+      ctx.arcTo(x + boxW, y + boxH, x, y + boxH, r);
+      ctx.arcTo(x, y + boxH, x, y, r);
+      ctx.arcTo(x, y, x + boxW, y, r);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.textBaseline = "middle";
+      ctx.fillText(wmText, x + pad * 0.7, y + boxH / 2);
+      const blob: Blob = await new Promise((res) => c.toBlob((b) => res(b!), "image/png", 0.95));
+      return { blob, url: URL.createObjectURL(blob) };
+    } catch {
+      const r = await fetch(resultUrl);
+      const blob = await r.blob();
+      return { blob, url: URL.createObjectURL(blob) };
+    }
+  };
+
+  const download = async () => {
+    const wm = await composeWatermarkedBlob();
+    if (!wm) return;
+    const a = document.createElement("a");
+    a.href = wm.url;
+    a.download = `${product.product_name || "easibie-tryon"}.png`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(wm.url), 5000);
+  };
+
+  const share = async () => {
+    const wm = await composeWatermarkedBlob();
+    if (!wm) return;
+    const file = new File([wm.blob], `${product.product_name || "easibie-tryon"}.png`, { type: "image/png" });
+    try {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: product.product_name });
+        await navigator.share({ files: [file], title: product.product_name, text: "Check out my virtual try-on!" });
         return;
       }
-      const a = document.createElement("a");
-      a.href = resultUrl;
-      a.download = file.name;
-      a.click();
     } catch {}
+    const a = document.createElement("a");
+    a.href = wm.url;
+    a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(wm.url), 5000);
+  };
+
+  const submitFeedback = async (liked: boolean) => {
+    setFeedback(liked ? "liked" : "disliked");
+    try {
+      await fetch("/api/public/tryon-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id, sessionId: sessionIdRef.current, liked }),
+      });
+    } catch {}
+    if (!liked) {
+      try {
+        const r = await fetch(`/api/public/tryon-related?productId=${product.id}`);
+        const j = await r.json();
+        setRelated(j.items ?? []);
+      } catch {}
+    }
   };
 
   const close = () => { tracker.sendSession(true); streamRef.current?.getTracks().forEach((t) => t.stop()); exitView(); };
