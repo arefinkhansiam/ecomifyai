@@ -52,8 +52,8 @@ function Landing() {
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6 }}
             className="mt-10 flex flex-wrap justify-center gap-4"
           >
-            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Start for Free</Link>
-            <Link to="/try-ar" className="btn-ghost"><Play size={16} /> See a Try-On</Link>
+            <Link to="/auth" search={{ mode: "signup" }} className="btn-cyan">Start for Free</Link>
+            <Link to="/try-ar" className="btn-outline-cyan"><Play size={16} /> See a Try-On</Link>
           </motion.div>
           <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
             <div className="flex -space-x-3">
