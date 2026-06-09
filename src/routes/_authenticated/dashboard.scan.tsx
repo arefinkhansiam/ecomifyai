@@ -183,8 +183,8 @@ function ScanPage() {
 
   const manualCapture = () => { void tickCapture(true); };
 
-  const tickCapture = async () => {
-    if (!objectVisibleRef.current) return;
+  const tickCapture = async (force = false) => {
+    if (!force && !objectVisibleRef.current) return;
     if (countRef.current >= TOTAL_FRAMES) return;
     const v = videoRef.current, c = canvasRef.current, pid = productIdRef.current, uid = user?.id;
     if (!v || !c || !pid || !uid) return;
