@@ -555,7 +555,7 @@ function UploadPage() {
 
           <button onClick={upload} disabled={!file || busy || !!createdId} className="btn-primary w-full mt-6">
             {busy ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
-            {busy ? step || "Working..." : createdId ? "Created ✓" : "Create Try-On Product"}
+            {busy ? step || "Working..." : createdId ? "Created" : "Create Try-On Product"}
           </button>
 
           {(busy || createdId || logs.length > 0) && (
