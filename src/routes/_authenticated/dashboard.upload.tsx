@@ -130,6 +130,28 @@ function UploadPage() {
     if (!name) setName(f.name.replace(/\.[^.]+$/, ""));
   };
 
+  const onExtraFiles = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const okType = (f: File) => ["image/jpeg", "image/png", "image/webp"].includes(f.type);
+    const next: File[] = [];
+    Array.from(files).forEach((f) => {
+      if (!okType(f)) { toast.error("Extra angles must be JPG / PNG / WebP"); return; }
+      if (f.size > 10 * 1024 * 1024) { toast.error(`${f.name} too large (max 10MB)`); return; }
+      next.push(f);
+    });
+    const combined = [...extraFiles, ...next].slice(0, 4);
+    setExtraFiles(combined);
+    setExtraPreviews(combined.map((f) => URL.createObjectURL(f)));
+  };
+
+  const removeExtra = (idx: number) => {
+    const next = extraFiles.filter((_, i) => i !== idx);
+    setExtraFiles(next);
+    setExtraPreviews(next.map((f) => URL.createObjectURL(f)));
+  };
+
+
+
   const addColor = () => {
     if (colors.includes(newColor)) return;
     setColors([...colors, newColor]);
