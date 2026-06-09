@@ -46,7 +46,7 @@ export const PLANS: Plan[] = [
       "Product categories & cross-sell",
       "Full Try-On button branding",
       "Custom Try-On viewer skin",
-      "Customer feedback (👍/👎)",
+      "Customer feedback signals",
       "Same-category recommendations",
       "Your store watermark on downloads",
     ],
