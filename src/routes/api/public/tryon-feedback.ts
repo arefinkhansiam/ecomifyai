@@ -23,8 +23,15 @@ export const Route = createFileRoute("/api/public/tryon-feedback")({
           const body = await request.json();
           const data = FeedbackInput.parse(body);
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: prod } = await supabaseAdmin
+            .from("ar_products")
+            .select("user_id")
+            .eq("id", data.productId)
+            .maybeSingle();
+          if (!prod) return Response.json({ error: "Product not found" }, { status: 404, headers: CORS });
           const { error } = await supabaseAdmin.from("tryon_feedback").insert({
             product_id: data.productId,
+            vendor_id: (prod as any).user_id,
             session_id: data.sessionId,
             liked: data.liked,
             comment: data.comment ?? null,
