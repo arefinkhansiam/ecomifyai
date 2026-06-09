@@ -77,7 +77,7 @@ function About() {
           <h2 className="text-white">Join 10,000+ stores using Easibie.</h2>
           <div className="mt-7 flex flex-col sm:flex-row justify-center items-center gap-3">
             <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)", minWidth: 220 }}>
-              <Sparkles size={16} /> Start Free
+              Start Free
             </Link>
             <Link to="/pricing" className="text-sm font-semibold text-white/90 hover:text-white underline-offset-4 hover:underline px-4 py-2">See pricing →</Link>
           </div>
