@@ -140,13 +140,45 @@ function TopBar({ name, showName, overlay, fontColor, accent, onClose, badge }: 
 }
 
 function ARRouter() {
-  const { product } = Route.useLoaderData();
+  const { product, imageUrl } = Route.useLoaderData();
   const raw = (product.ar_mode || "furniture") as string;
   if (raw === "full_3d" || raw === "object_3d") return <Full3DView />;
   const mode: "fashion" | "furniture" | "makeup" =
     raw === "fashion" ? "fashion" : raw === "makeup" ? "makeup" : "furniture";
-  return <CameraComposeView mode={mode} />;
+  const subtype = (product as any).ar_subtype ?? undefined;
+  const cust = useCustomization(product);
+  const camLabel: "front" | "back" = (mode === "fashion" || mode === "makeup") ? "front" : "back";
+  const tracker = useSessionTracker(product, camLabel, mode);
+
+  const customBadge = (product.ar_customization as any)?.ar_badge_text as string | undefined;
+  const defaultBadge =
+    mode === "fashion"
+      ? (subtype === "bottom" ? "PANTS TRY-ON" : subtype === "accessory" ? "ACCESSORY" : subtype === "jewellery" ? "JEWELLERY" : "TRY-ON")
+      : mode === "makeup" ? "MAKEUP" : "PLACE IT";
+  const badge = customBadge?.trim() ? customBadge.trim().toUpperCase() : defaultBadge;
+
+  return (
+    <LiveAROverlay
+      productId={product.id}
+      productName={product.product_name}
+      productImageUrl={imageUrl}
+      dominantColor={product.dominant_color}
+      mode={mode}
+      subtype={subtype}
+      accent={cust.accent}
+      fontColor={cust.fontColor}
+      overlay={cust.overlay}
+      pageBg={cust.pageBg}
+      badge={badge}
+      showName={cust.showName}
+      showBranding={product.show_branding !== false}
+      btnRadius={cust.btnRadius}
+      onClose={() => { tracker.sendSession(true); exitView(); }}
+      onInteract={() => tracker.markInteract()}
+    />
+  );
 }
+
 
 /* ============================================================
    Fashion + Furniture + Makeup: camera → capture → AI compose
