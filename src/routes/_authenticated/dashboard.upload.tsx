@@ -284,7 +284,7 @@ function UploadPage() {
     <DashboardShell title="New Try-On Product">
       <div className="mb-6 rounded-2xl p-4 text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", boxShadow: "0 18px 40px -18px rgba(2,132,199,0.55)" }}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl grid place-items-center" style={{ background: "rgba(255,255,255,0.15)" }}>📸</div>
+          <div className="w-10 h-10 rounded-xl grid place-items-center" style={{ background: "rgba(255,255,255,0.15)" }}><Sparkles size={18} /></div>
           <div className="flex-1">
             <div className="text-sm font-bold">Tip — upload multiple angles for best results</div>
             <div className="text-xs opacity-80">Front, back, side and detail photos help our AI generate accurate try-ons.</div>
