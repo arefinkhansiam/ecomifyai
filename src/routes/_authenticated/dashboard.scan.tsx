@@ -65,6 +65,10 @@ function ScanPage() {
   const [previewThumb, setPreviewThumb] = useState<string | null>(null);
   const [embedToken, setEmbedToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [diagnostics, setDiagnostics] = useState<Diagnostic[]>([]);
+  const [timeline, setTimeline] = useState<TimelineStep[]>(initialTimeline);
+  const [detectConfidence, setDetectConfidence] = useState(0);
+  const [captureLatency, setCaptureLatency] = useState<number | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -75,6 +79,7 @@ function ScanPage() {
   const countRef = useRef(0);
   const productIdRef = useRef<string | null>(null);
   const objectVisibleRef = useRef(false);
+  const confidenceRef = useRef(0);
 
   useEffect(() => () => stopAll(), []);
 
