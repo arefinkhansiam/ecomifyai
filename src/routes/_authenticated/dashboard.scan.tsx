@@ -330,6 +330,10 @@ function ScanPage() {
       { until: 40, hint: "Top-down and any unique details",            label: "Top" },
     ];
   })();
+  function angleForCount(frameIndex: number) {
+    const index = Math.min(guidance.length - 1, Math.floor(frameIndex / FRAMES_PER_ANGLE));
+    return guidance[index]?.label ?? "Angle";
+  }
   const step = guidance.find((g) => count < g.until) ?? guidance[guidance.length - 1];
   const hint = step.hint;
   const angleLabel = step.label;
