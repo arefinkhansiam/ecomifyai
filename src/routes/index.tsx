@@ -85,7 +85,7 @@ function Landing() {
             <div className="float w-[280px] h-[560px] rounded-[44px] bg-card p-3 relative" style={{ boxShadow: "0 40px 120px rgba(2,132,199,0.4)" }}>
               <div className="w-full h-full rounded-[34px] bg-bg overflow-hidden relative">
                 <div className="absolute top-4 left-4 right-4 flex justify-between text-xs text-muted z-10">
-                  <span>9:41</span><span>•••</span>
+                  <span>{clock}</span><span>•••</span>
                 </div>
                 <model-viewer
                   src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
