@@ -439,12 +439,38 @@ function poseConfidence(pts: Record<number, { x: number; y: number; v: number }>
   return Math.max(0, Math.min(1, values.reduce((sum, v) => sum + v, 0) / values.length));
 }
 
+function makeTransparentCutout(img: HTMLImageElement): HTMLCanvasElement | HTMLImageElement {
+  const w = img.naturalWidth || img.width;
+  const h = img.naturalHeight || img.height;
+  if (!w || !h) return img;
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const ctx = c.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return img;
+  ctx.drawImage(img, 0, 0, w, h);
+  const data = ctx.getImageData(0, 0, w, h);
+  const px = data.data;
+  const sample = [[2, 2], [w - 3, 2], [2, h - 3], [w - 3, h - 3]];
+  const bg = sample.reduce((acc, [x, y]) => {
+    const i = (Math.max(0, Math.min(h - 1, y)) * w + Math.max(0, Math.min(w - 1, x))) * 4;
+    acc[0] += px[i]; acc[1] += px[i + 1]; acc[2] += px[i + 2];
+    return acc;
+  }, [0, 0, 0]).map((v) => v / sample.length);
+  for (let i = 0; i < px.length; i += 4) {
+    const d = Math.hypot(px[i] - bg[0], px[i + 1] - bg[1], px[i + 2] - bg[2]);
+    if (d < 34) px[i + 3] = 0;
+    else if (d < 58) px[i + 3] = Math.round(px[i + 3] * ((d - 34) / 24));
+  }
+  ctx.putImageData(data, 0, 0);
+  return c;
+}
+
 function drawFashion(
   ctx: CanvasRenderingContext2D,
   c: HTMLCanvasElement,
   pts: Record<number, { x: number; y: number; v: number }>,
   subtype: Subtype,
-  img: HTMLImageElement | null,
+  img: ProductImage | null,
 ): boolean {
   if (!img) return false;
   const ls = pts[P.L_SHOULDER], rs = pts[P.R_SHOULDER];
