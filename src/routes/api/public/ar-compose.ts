@@ -5,6 +5,7 @@ const Input = z.object({
   productId: z.string().uuid(),
   captureBase64: z.string().min(100).max(15_000_000),
   mode: z.enum(["fashion", "furniture", "makeup"]),
+  subtype: z.enum(["top", "bottom", "accessory", "jewellery"]).optional(),
 });
 
 async function fetchAsDataUrl(url: string): Promise<string> {
