@@ -86,6 +86,8 @@
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
+  ::selection { background: #0369A1; color: #ffffff; text-shadow: none; }
+  ::-moz-selection { background: #0369A1; color: #ffffff; text-shadow: none; }
 }
 
 @layer utilities {
