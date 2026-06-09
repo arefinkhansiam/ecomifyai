@@ -92,6 +92,16 @@ function ScanPage() {
     streamRef.current = null;
   };
 
+  const addDiagnostic = (label: string, value: string) => {
+    setDiagnostics((items) => [{ label, value, at: stamp() }, ...items].slice(0, 8));
+  };
+
+  const markStep = (label: string, status: TimelineStep["status"], errorMsg?: string) => {
+    setTimeline((items) => items.map((item) =>
+      item.label === label ? { ...item, status, at: stamp(), error: errorMsg } : item,
+    ));
+  };
+
   const waitForVideoReady = (v: HTMLVideoElement) =>
     new Promise<void>((resolve) => {
       if (v.readyState >= 2 && v.videoWidth > 0) return resolve();
