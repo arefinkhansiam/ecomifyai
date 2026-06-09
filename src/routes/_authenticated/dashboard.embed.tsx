@@ -8,11 +8,15 @@ import { useAuth } from "@/lib/use-auth";
 import { Copy, Download, QrCode } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/embed")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    product: typeof s.product === "string" ? s.product : undefined,
+  }),
   component: EmbedPage,
 });
 
 function EmbedPage() {
   const { user } = useAuth();
+  const search = Route.useSearch();
   const [products, setProducts] = useState<{ id: string; product_name: string }[]>([]);
   const [selected, setSelected] = useState<string>("");
   const [qrData, setQrData] = useState<string | null>(null);
@@ -21,10 +25,12 @@ function EmbedPage() {
   useEffect(() => {
     if (!user) return;
     supabase.from("ar_products").select("id, product_name").eq("user_id", user.id).eq("status", "ready").then(({ data }) => {
-      setProducts(data ?? []);
-      if (data?.[0]) setSelected(data[0].id);
+      const rows = data ?? [];
+      setProducts(rows);
+      const requested = search.product && rows.some((p) => p.id === search.product) ? search.product : rows[0]?.id;
+      if (requested) setSelected(requested);
     });
-  }, [user]);
+  }, [user, search.product]);
 
   useEffect(() => {
     if (!selected) return;

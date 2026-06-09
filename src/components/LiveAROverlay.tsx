@@ -39,13 +39,14 @@ const P = {
 const LIP_OUTER = [61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185];
 
 type Smoothed = { x: number; y: number; v: number } | null;
+type ProductImage = HTMLCanvasElement | HTMLImageElement;
 
 export function LiveAROverlay(p: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
-  const productImgRef = useRef<HTMLImageElement | null>(null);
+  const productImgRef = useRef<HTMLCanvasElement | HTMLImageElement | null>(null);
   const landmarkerRef = useRef<any>(null);
   const lastTsRef = useRef<number>(0);
   const lastResultRef = useRef<any>(null);
@@ -64,14 +65,15 @@ export function LiveAROverlay(p: Props) {
   const [detectLatency, setDetectLatency] = useState<number | null>(null);
   const [hint, setHint] = useState<string>("");
 
-  const furnRef = useRef({ x: 0.5, y: 0.7, scale: 0.4, rot: 0 });
+  const furnRef = useRef({ x: 0.5, y: 0.78, scale: 0.32, rot: 0 });
   const dragRef = useRef<{ active: boolean } | null>(null);
 
   useEffect(() => {
+    productImgRef.current = null;
     if (!p.productImageUrl) return;
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => { productImgRef.current = img; };
+    img.onload = () => { productImgRef.current = makeTransparentCutout(img); };
     img.onerror = () => { console.warn("product image failed to load"); };
     img.src = p.productImageUrl;
   }, [p.productImageUrl]);
@@ -196,7 +198,7 @@ export function LiveAROverlay(p: Props) {
       if (p.mode === "fashion" && result?.landmarks?.[0] && fresh) {
         const smoothed = smoothLandmarks(result.landmarks[0], smoothRef.current, c, flipped);
         confidence = poseConfidence(smoothed, p.subtype);
-        if (drawFashion(ctx, c, smoothed, p.subtype, productImgRef.current)) detected = true;
+        if (confidence >= 0.58 && drawFashion(ctx, c, smoothed, p.subtype, productImgRef.current)) detected = true;
       } else if (p.mode === "makeup" && result?.faceLandmarks?.[0] && fresh) {
         drawMakeup(ctx, c, result.faceLandmarks[0], flipped, p.dominantColor || p.accent);
         confidence = 1;
@@ -438,12 +440,38 @@ function poseConfidence(pts: Record<number, { x: number; y: number; v: number }>
   return Math.max(0, Math.min(1, values.reduce((sum, v) => sum + v, 0) / values.length));
 }
 
+function makeTransparentCutout(img: HTMLImageElement): HTMLCanvasElement | HTMLImageElement {
+  const w = img.naturalWidth || img.width;
+  const h = img.naturalHeight || img.height;
+  if (!w || !h) return img;
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const ctx = c.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return img;
+  ctx.drawImage(img, 0, 0, w, h);
+  const data = ctx.getImageData(0, 0, w, h);
+  const px = data.data;
+  const sample = [[2, 2], [w - 3, 2], [2, h - 3], [w - 3, h - 3]];
+  const bg = sample.reduce((acc, [x, y]) => {
+    const i = (Math.max(0, Math.min(h - 1, y)) * w + Math.max(0, Math.min(w - 1, x))) * 4;
+    acc[0] += px[i]; acc[1] += px[i + 1]; acc[2] += px[i + 2];
+    return acc;
+  }, [0, 0, 0]).map((v) => v / sample.length);
+  for (let i = 0; i < px.length; i += 4) {
+    const d = Math.hypot(px[i] - bg[0], px[i + 1] - bg[1], px[i + 2] - bg[2]);
+    if (d < 34) px[i + 3] = 0;
+    else if (d < 58) px[i + 3] = Math.round(px[i + 3] * ((d - 34) / 24));
+  }
+  ctx.putImageData(data, 0, 0);
+  return c;
+}
+
 function drawFashion(
   ctx: CanvasRenderingContext2D,
   c: HTMLCanvasElement,
   pts: Record<number, { x: number; y: number; v: number }>,
   subtype: Subtype,
-  img: HTMLImageElement | null,
+  img: ProductImage | null,
 ): boolean {
   if (!img) return false;
   const ls = pts[P.L_SHOULDER], rs = pts[P.R_SHOULDER];
@@ -474,13 +502,11 @@ function drawFashion(
   }
 
   // Top (t-shirt / shirt)
-  if (!ls || !rs || Math.min(ls.v, rs.v) < 0.3) return false;
+  if (!ls || !rs || !lh || !rh || Math.min(ls.v, rs.v, lh.v, rh.v) < 0.45) return false;
   const shoulderW = Math.hypot(ls.x - rs.x, ls.y - rs.y);
   const cx = (ls.x + rs.x) / 2;
   const shoulderTop = (ls.y + rs.y) / 2;
-  const hipMidY = (lh && rh && Math.min(lh.v, rh.v) > 0.25)
-    ? (lh.y + rh.y) / 2
-    : shoulderTop + shoulderW * 1.7;
+  const hipMidY = (lh.y + rh.y) / 2;
   // Tilt to match shoulder line
   const angle = Math.atan2(rs.y - ls.y, rs.x - ls.x);
   const w = shoulderW * 1.95;
@@ -497,7 +523,7 @@ function drawFashion(
   return true;
 }
 
-function drawProductImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement, cx: number, cy: number, w: number, h: number) {
+function drawProductImage(ctx: CanvasRenderingContext2D, img: ProductImage, cx: number, cy: number, w: number, h: number) {
   ctx.save();
   ctx.shadowColor = "rgba(0,0,0,0.4)";
   ctx.shadowBlur = 20;
@@ -506,7 +532,7 @@ function drawProductImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
   ctx.restore();
 }
 
-function drawFurniture(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img: HTMLImageElement, s: { x: number; y: number; scale: number; rot: number }) {
+function drawFurniture(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img: ProductImage, s: { x: number; y: number; scale: number; rot: number }) {
   const targetW = c.width * s.scale;
   const targetH = targetW * (img.height / img.width);
   ctx.save();
@@ -519,7 +545,7 @@ function drawFurniture(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img:
   ctx.restore();
 }
 
-function drawGhost(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img: HTMLImageElement, subtype: Subtype) {
+function drawGhost(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img: ProductImage, subtype: Subtype) {
   ctx.save();
   ctx.globalAlpha = 0.35;
   let w, h, cx = c.width / 2, cy = c.height / 2;

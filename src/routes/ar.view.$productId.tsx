@@ -160,6 +160,7 @@ function ARRouter() {
 
   return (
     <LiveAROverlay
+      key={product.id}
       productId={product.id}
       productName={product.product_name}
       productImageUrl={imageUrl}

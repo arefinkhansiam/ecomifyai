@@ -86,7 +86,7 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
   }, [p.processed_image_url, p.original_image_url]);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const viewerUrl = p.embed_token ? `${origin}/ar/${p.embed_token}` : `${origin}/ar/view/${p.id}`;
+  const viewerUrl = `${origin}/ar/view/${p.id}`;
   const embedCode = `<iframe src="${viewerUrl}" width="100%" height="550" frameborder="0" allow="xr-spatial-tracking; camera" allowfullscreen></iframe>`;
 
   const copyEmbed = async () => {
@@ -116,7 +116,7 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
           {p.status === "ready" && (
             <a href={viewerUrl} target="_blank" rel="noreferrer" className="flex-1 btn-ghost text-[10px]"><ExternalLink size={12} /> Preview AR</a>
           )}
-          {p.status === "ready" && p.embed_token && (
+          {p.status === "ready" && (
             <button onClick={copyEmbed} className="btn-ghost text-[10px]">
               {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? "Copied" : "Embed"}
             </button>
@@ -124,7 +124,7 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
           <Link to="/dashboard/products/$id/customize" params={{ id: p.id }} className="btn-ghost text-[10px]" title="Customize">
             <Settings2 size={12} /> Edit
           </Link>
-          <Link to="/dashboard/embed" className="btn-ghost text-[10px]"><QrCode size={12} /></Link>
+          <Link to="/dashboard/embed" search={{ product: p.id }} className="btn-ghost text-[10px]"><QrCode size={12} /></Link>
           <button onClick={onDelete} className="btn-ghost text-[10px]" style={{ borderColor: "var(--error)", color: "var(--error)" }}><Trash2 size={12} /></button>
         </div>
       </div>

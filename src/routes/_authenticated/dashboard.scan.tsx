@@ -353,7 +353,7 @@ function ScanPage() {
   const pct = Math.round((count / TOTAL_FRAMES) * 100);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const viewerUrl = embedToken ? `${origin}/ar/${embedToken}` : `${origin}/ar/view/${productId}`;
+  const viewerUrl = productId ? `${origin}/ar/view/${productId}` : "";
   const embedSnippet = `<iframe src="${viewerUrl}" width="100%" height="550" frameborder="0" allow="xr-spatial-tracking; camera" allowfullscreen></iframe>`;
   const copyEmbed = async () => {
     await navigator.clipboard.writeText(embedSnippet);
