@@ -265,10 +265,11 @@ function Landing() {
         <div className="mx-auto max-w-3xl px-6 text-center relative">
           <h2 className="text-white">Start Selling Try-Ons Today</h2>
           <p className="mt-4 text-white/80">Join 10,000+ stores already using Easibie. Your first try-on product is free forever.</p>
-          <div className="mt-8 flex justify-center gap-4 flex-wrap">
-            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Create Free Account</Link>
-            <Link to="/pricing" className="btn-ghost">See Pricing</Link>
-            <Link to="/try-ar" className="btn-ghost"><Share2 size={16} /> Try a Demo</Link>
+          <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-3">
+            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)", minWidth: 220 }}>
+              <Sparkles size={16} /> Create Free Account
+            </Link>
+            <Link to="/pricing" className="text-sm font-semibold text-white/90 hover:text-white underline-offset-4 hover:underline px-4 py-2">See pricing →</Link>
           </div>
         </div>
       </section>
