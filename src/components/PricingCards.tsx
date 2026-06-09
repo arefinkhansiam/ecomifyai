@@ -1,8 +1,8 @@
 import { Check } from "lucide-react";
-import { Crown, Sparkles, Zap } from "lucide-react";
+import { Crown, Sparkles, Zap, Gem } from "lucide-react";
 
 export type Plan = {
-  id: "free" | "starter" | "growth";
+  id: "free" | "starter" | "pro" | "growth";
   name: string;
   price: string;
   subtitle: string;
@@ -10,7 +10,7 @@ export type Plan = {
   cta: string;
   href: string;
   highlight?: boolean;
-  variant: "ghost" | "primary" | "cyan";
+  variant: "ghost" | "primary" | "cyan" | "pro";
   icon: typeof Sparkles;
 };
 
@@ -18,10 +18,9 @@ export const PLANS: Plan[] = [
   {
     id: "free", name: "Free Forever", price: "$0", subtitle: "Perfect to get started.",
     features: [
-      "1 AR product",
-      "Basic AR viewer",
-      "Shareable AR link & QR code",
-      "Solid-color button only",
+      "1 Try-On product",
+      "Basic Try-On viewer",
+      "Shareable link & QR code",
       "“Powered by Easibie” branding",
       "Email support",
     ],
@@ -30,26 +29,38 @@ export const PLANS: Plan[] = [
   {
     id: "starter", name: "Starter", price: "$10", subtitle: "For growing stores.",
     features: [
-      "10 AR products",
-      "Advanced AR viewer + color variants",
-      "Gradient button customizer",
+      "10 Try-On products",
+      "Basic button colour customizer",
       "Remove “Powered by Easibie” branding",
       "Embed code + Shopify snippet",
       "Analytics dashboard",
       "Priority support",
     ],
-    cta: "Start Starter Plan", href: "/checkout?plan=starter", variant: "primary", highlight: true, icon: Zap,
+    cta: "Start Starter Plan", href: "/checkout?plan=starter", variant: "primary", icon: Zap,
   },
   {
-    id: "growth", name: "Growth", price: "$39", subtitle: "For serious sellers.",
+    id: "pro", name: "Pro", price: "$99", subtitle: "Pro tools for serious brands.",
     features: [
-      "50 AR products",
+      "Unlimited Try-On products",
+      "Up to 3 variants per product",
+      "Product categories & cross-sell",
+      "Full Try-On button branding",
+      "Custom Try-On viewer skin",
+      "Customer feedback (👍/👎)",
+      "Same-category recommendations",
+      "Your store watermark on downloads",
+    ],
+    cta: "Go Pro", href: "/checkout?plan=pro", variant: "pro", highlight: true, icon: Gem,
+  },
+  {
+    id: "growth", name: "Growth", price: "$39", subtitle: "Mid-size sellers.",
+    features: [
+      "50 Try-On products",
       "Everything in Starter",
-      "Custom brand colors & full gradient control",
-      "Hide branding across all products",
+      "Custom brand colors & gradient",
+      "Hide all branding",
       "3 team seats",
       "Advanced analytics & exports",
-      "Dedicated support",
     ],
     cta: "Start Growth Plan", href: "/checkout?plan=growth", variant: "cyan", icon: Crown,
   },
