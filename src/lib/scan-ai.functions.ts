@@ -4,9 +4,25 @@ import { z } from "zod";
 
 const Input = z.object({ productId: z.string().uuid() });
 
-const AI_PROMPT = "Recreate this product as a clean studio 3D-style hero render: centered on a soft neutral background, subtle ground shadow, even product lighting, photoreal materials, no people, no text. Keep the exact product shape and color.";
+const DEFAULT_PROMPT = "Recreate this product as a clean AR-ready hero render: isolate the product, remove the original background and replace it with a soft neutral studio backdrop with a subtle ground shadow, even product lighting, photoreal materials, sharp edges, no people, no text, no watermarks. Keep the exact product shape, proportions, color and details.";
 
-async function callGeminiHero(dataUrl: string): Promise<{ mime: string; bytes: Buffer }> {
+function promptForCategory(mode?: string | null, subtype?: string | null): string {
+  if (mode === "fashion") {
+    if (subtype === "bottom")    return "Isolate the bottom garment (pants / jeans / trousers / skirt / shorts) as a clean front-facing flat-lay style AR-ready cutout on a soft neutral backdrop. Remove the original background, mannequin or person. Keep exact fabric color, pattern, stitching, length and shape. Photoreal, even lighting, subtle ground shadow, no text or watermarks.";
+    if (subtype === "accessory") return "Isolate this fashion accessory (watch / bag / hat / glasses / shoes / belt) as a clean product render on a soft neutral backdrop. Remove the original background. Keep exact color, material, shape and details. Photoreal, even studio lighting, subtle ground shadow, no text or watermarks.";
+    if (subtype === "jewellery") return "Isolate this jewellery piece (necklace / earring / ring / bracelet) as a clean product render on a soft neutral backdrop. Remove the original background. Preserve exact metal finish, gemstone color and sparkle, and proportions. Photoreal, soft studio lighting, sharp details, no text or watermarks.";
+    return "Isolate the top garment (shirt / t-shirt / blouse / jacket / dress) as a clean front-facing flat-lay style AR-ready cutout on a soft neutral backdrop. Remove any mannequin, person or background. Keep exact fabric color, pattern, stitching and shape. Photoreal, even lighting, subtle ground shadow, no text or watermarks.";
+  }
+  if (mode === "makeup") {
+    return "Recreate this makeup product as a clean studio AR-ready hero render on a soft neutral backdrop. Remove the original background. Keep the exact shade, finish (matte / glossy / shimmer), packaging color and label. Photoreal, soft lighting, subtle ground shadow, no people, no extra text.";
+  }
+  if (mode === "furniture") {
+    return "Isolate this furniture / decor item as a clean AR-ready product render on a soft neutral backdrop, ready to be placed in a room. Remove the original background and any people. Keep exact shape, material, color and proportions. Photoreal, even lighting, subtle ground shadow, no text or watermarks.";
+  }
+  return DEFAULT_PROMPT;
+}
+
+async function callGeminiHero(dataUrl: string, prompt: string = DEFAULT_PROMPT): Promise<{ mime: string; bytes: Buffer }> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("Missing LOVABLE_API_KEY");
   const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -17,7 +33,7 @@ async function callGeminiHero(dataUrl: string): Promise<{ mime: string; bytes: B
       messages: [{
         role: "user",
         content: [
-          { type: "text", text: AI_PROMPT },
+          { type: "text", text: prompt },
           { type: "image_url", image_url: { url: dataUrl } },
         ],
       }],
@@ -55,7 +71,7 @@ export const generate3dPreview = createServerFn({ method: "POST" })
 
     // verify ownership
     const { data: product } = await supabase
-      .from("ar_products").select("id, user_id, product_name")
+      .from("ar_products").select("id, user_id, product_name, ar_mode, ar_subtype")
       .eq("id", productId).maybeSingle();
     if (!product || product.user_id !== userId) throw new Error("Not found");
 
@@ -86,7 +102,7 @@ export const generate3dPreview = createServerFn({ method: "POST" })
       const imgBuf = await imgRes.arrayBuffer();
       const dataUrl = `data:image/jpeg;base64,${Buffer.from(imgBuf).toString("base64")}`;
 
-      const { mime, bytes } = await callGeminiHero(dataUrl);
+      const { mime, bytes } = await callGeminiHero(dataUrl, promptForCategory((product as any).ar_mode, (product as any).ar_subtype));
       const ext = mime === "image/jpeg" ? "jpg" : "png";
 
       const path = `${userId}/${productId}/preview.${ext}`;
@@ -131,7 +147,7 @@ export const generateAiHeroFromImage = createServerFn({ method: "POST" })
     const { productId } = data;
 
     const { data: product } = await supabase
-      .from("ar_products").select("id, user_id, original_image_url")
+      .from("ar_products").select("id, user_id, original_image_url, ar_mode, ar_subtype")
       .eq("id", productId).maybeSingle();
     if (!product || product.user_id !== userId) throw new Error("Not found");
     if (!product.original_image_url) return { ok: false, reason: "no_image" as const };
@@ -145,7 +161,7 @@ export const generateAiHeroFromImage = createServerFn({ method: "POST" })
       const sourceMime = res.headers.get("content-type") || "image/jpeg";
       const dataUrl = `data:${sourceMime};base64,${Buffer.from(buf).toString("base64")}`;
 
-      const { mime, bytes } = await callGeminiHero(dataUrl);
+      const { mime, bytes } = await callGeminiHero(dataUrl, promptForCategory((product as any).ar_mode, (product as any).ar_subtype));
       const ext = mime === "image/jpeg" ? "jpg" : "png";
       const path = `${userId}/${productId}/preview.${ext}`;
       const { error: upErr } = await supabase.storage.from("product-images")

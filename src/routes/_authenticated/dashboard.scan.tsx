@@ -25,8 +25,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/scan")({
   component: ScanPage,
 });
 
-const TOTAL_FRAMES = 40;
-const CAPTURE_INTERVAL_MS = 2000;
+const TOTAL_FRAMES = 12;
+const CAPTURE_INTERVAL_MS = 1500;
 const DETECT_INTERVAL_MS = 500;
 
 type Phase = "intro" | "scanning" | "generating" | "done" | "error";
@@ -177,10 +177,14 @@ function ScanPage() {
     }, DETECT_INTERVAL_MS);
 
     captureTimerRef.current = setInterval(() => { void tickCapture(); }, CAPTURE_INTERVAL_MS);
+    // Immediate first capture so the user sees progress right away
+    setTimeout(() => { void tickCapture(true); }, 600);
   };
 
-  const tickCapture = async () => {
-    if (!objectVisibleRef.current) return;
+  const manualCapture = () => { void tickCapture(true); };
+
+  const tickCapture = async (force = false) => {
+    if (!force && !objectVisibleRef.current) return;
     if (countRef.current >= TOTAL_FRAMES) return;
     const v = videoRef.current, c = canvasRef.current, pid = productIdRef.current, uid = user?.id;
     if (!v || !c || !pid || !uid) return;
@@ -348,11 +352,12 @@ function ScanPage() {
               </button>
             </div>
 
-            {/* Shutter ring */}
-            <div className="absolute left-1/2 -translate-x-1/2"
-                 style={{ bottom: "calc(env(safe-area-inset-bottom) + 28px)" }}>
+            {/* Shutter ring — tap to manually capture an extra angle */}
+            <button onClick={manualCapture} aria-label="Capture angle"
+              className="absolute left-1/2 -translate-x-1/2 active:scale-95 transition-transform"
+              style={{ bottom: "calc(env(safe-area-inset-bottom) + 28px)" }}>
               <ShutterRing pct={pct} count={count} total={TOTAL_FRAMES} angle={angleLabel} />
-            </div>
+            </button>
 
             {/* Generating overlay */}
             {phase === "generating" && (
