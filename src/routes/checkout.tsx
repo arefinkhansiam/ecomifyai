@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { PLANS } from "@/components/PricingCards";
 
-const searchSchema = z.object({ plan: z.enum(["starter","growth"]).optional() });
+const searchSchema = z.object({ plan: z.enum(["starter","pro","growth"]).optional() });
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: searchSchema,
