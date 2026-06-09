@@ -135,27 +135,34 @@ function UploadPage() {
   const upload = async () => {
     if (!file || !user) return;
     setBusy(true);
+    setTimeline(initialTimeline());
+    setLogs([]);
     try {
       const isModel = arMode === "full_3d";
       setStep(isModel ? "Uploading 3D model..." : "Uploading image...");
+      markStep("Upload", "active");
+      log("Upload", `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)}MB`);
       const ext = file.name.split(".").pop();
       const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, {
         contentType: file.type || (isModel ? "model/gltf-binary" : undefined),
       });
       if (upErr) throw upErr;
+      markStep("Upload", "done");
 
       setStep("Saving product...");
+      markStep("Scanning", isModel ? "done" : "active");
       const { data: created, error: insErr } = await supabase.from("ar_products").insert({
         user_id: user.id,
         product_name: name || "Untitled Product",
         original_image_url: isModel ? null : path,
+        processed_image_url: isModel ? null : path,
         glb_url: isModel ? path : null,
         ar_mode: arMode,
         ar_subtype: subtype ?? null,
-        status: "ready",
-        processing_step: "complete",
-        processing_progress: 100,
+        status: isModel ? "ready" : "processing",
+        processing_step: isModel ? "complete" : "image_uploaded",
+        processing_progress: isModel ? 100 : 25,
         file_size_bytes: file.size,
         dominant_color: bg,
         button_label: label,
@@ -182,22 +189,35 @@ function UploadPage() {
         } : {},
       } as any).select().single();
       if (insErr) throw insErr;
+      log("Product", `Created ${created.id}`);
 
       // For image uploads, run the same AI hero pass so plain uploads become
       // AR-ready (clean studio render) just like camera scans.
       if (!isModel) {
+        markStep("Scanning", "done");
+        markStep("Angle capture", "done");
+        markStep("Mockup generation", "active");
         setStep("AI is preparing your AR preview...");
+        log("AI", "Generating AR-ready mockup");
         try {
-          await generateHero({ data: { productId: created.id } });
+          const result = await generateHero({ data: { productId: created.id } });
+          markStep("Mockup generation", "done");
+          log("Mockup", result.ok ? "AI mockup ready" : `Raw image fallback · ${result.reason}`);
         } catch (e) {
           console.warn("[upload] AI hero failed, keeping raw image", e);
+          markStep("Mockup generation", "error", e instanceof Error ? e.message : String(e));
           toast.warning("AR preview kept the original image (AI cleanup unavailable).");
         }
       }
 
+      markStep("AR render", "done");
+
       toast.success("AR product created!");
       setCreatedId(created.id);
     } catch (e: any) {
+      const msg = e.message ?? "Upload failed";
+      markStep("Upload", "error", msg);
+      log("Error", msg);
       toast.error(e.message ?? "Upload failed");
     } finally { setBusy(false); setStep(""); }
   };
