@@ -126,6 +126,7 @@ function CustomizePage() {
       setRadius(p.button_border_radius ?? DEFAULTS.radius);
 
       const c = (p.ar_customization ?? {}) as any;
+      if (c.gradient_data) setGradient(parseGradient(c.gradient_data));
       setPageBg(c.page_bg ?? DEFAULTS.pageBg);
       setFontColor(c.font_color ?? DEFAULTS.fontColor);
       setAccent(c.accent_color ?? DEFAULTS.accent);
