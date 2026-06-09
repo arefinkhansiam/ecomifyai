@@ -12,7 +12,7 @@ const searchSchema = z.object({ plan: z.enum(["starter","pro","growth"]).optiona
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Checkout — Easibie" }] }),
+  head: () => ({ meta: [{ title: "Checkout — Ecomify" }] }),
   component: Checkout,
 });
 

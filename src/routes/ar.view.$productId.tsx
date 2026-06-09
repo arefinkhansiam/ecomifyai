@@ -9,9 +9,9 @@ export const Route = createFileRoute("/ar/view/$productId")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "AR Viewer — Easibie" },
+      { title: "AR Viewer — Ecomify" },
       { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" },
-      { name: "description", content: "View this product in your space with Easibie AR." },
+      { name: "description", content: "View this product in your space with Ecomify AR." },
     ],
   }),
   loader: async ({ params }) => {
@@ -306,7 +306,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       ctx.drawImage(img, 0, 0);
       const wmText = product.show_branding === false
         ? `${product.product_name || "Try-on"}`
-        : "Try-on by Easibie · easibie.app";
+        : "Try-on by Ecomify · ecomify.app";
       const pad = Math.round(Math.min(c.width, c.height) * 0.025);
       const fontSize = Math.round(Math.min(c.width, c.height) * 0.028);
       ctx.font = `600 ${fontSize}px ${getComputedStyle(document.body).fontFamily || "sans-serif"}`;
@@ -342,7 +342,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     if (!wm) return;
     const a = document.createElement("a");
     a.href = wm.url;
-    a.download = `${product.product_name || "easibie-tryon"}.png`;
+    a.download = `${product.product_name || "ecomify-tryon"}.png`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(wm.url), 5000);
   };
@@ -350,7 +350,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const share = async () => {
     const wm = await composeWatermarkedBlob();
     if (!wm) return;
-    const file = new File([wm.blob], `${product.product_name || "easibie-tryon"}.png`, { type: "image/png" });
+    const file = new File([wm.blob], `${product.product_name || "ecomify-tryon"}.png`, { type: "image/png" });
     try {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: product.product_name, text: "Check out my virtual try-on!" });
@@ -544,7 +544,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
       {product.show_branding !== false && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70" style={{ background: cust.overlay, color: cust.fontColor }}>
-          Powered by <span className="font-bold" style={{ color: cust.accent }}>Easibie</span>
+          Powered by <span className="font-bold" style={{ color: cust.accent }}>Ecomify</span>
         </div>
       )}
     </div>
@@ -623,7 +623,7 @@ function Full3DView() {
       )}
       {product.show_branding !== false && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70" style={{ background: cust.overlay, color: cust.fontColor }}>
-          Powered by <span className="font-bold" style={{ color: cust.accent }}>Easibie</span>
+          Powered by <span className="font-bold" style={{ color: cust.accent }}>Ecomify</span>
         </div>
       )}
     </div>

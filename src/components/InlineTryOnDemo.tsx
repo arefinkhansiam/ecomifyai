@@ -74,7 +74,7 @@ export function InlineTryOnDemo({ compact = false }: { compact?: boolean }) {
     const blob = await (await fetch(result)).blob();
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `easibie-tryon-${demo}.png`;
+    a.download = `ecomify-tryon-${demo}.png`;
     a.click();
   };
 
@@ -82,9 +82,9 @@ export function InlineTryOnDemo({ compact = false }: { compact?: boolean }) {
     if (!result) return;
     try {
       const blob = await (await fetch(result)).blob();
-      const file = new File([blob], `easibie-tryon-${demo}.png`, { type: blob.type });
+      const file = new File([blob], `ecomify-tryon-${demo}.png`, { type: blob.type });
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: "My Easibie try-on", text: "Made with Easibie AI try-on" });
+        await navigator.share({ files: [file], title: "My Ecomify try-on", text: "Made with Ecomify AI try-on" });
         return;
       }
       await navigator.clipboard.writeText(window.location.origin);

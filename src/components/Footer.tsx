@@ -59,7 +59,7 @@ export function Footer() {
         ))}
       </div>
       <div className="mx-auto max-w-7xl px-6 mt-14 pt-6 border-t border-[var(--border)] flex flex-col md:flex-row justify-between gap-3 text-[13px] text-muted">
-        <div>2025 Easibie. All rights reserved.</div>
+        <div>2025 Ecomify. All rights reserved.</div>
         <div className="flex gap-6">
           <a href="#" className="hover:text-white">Privacy Policy</a>
           <a href="#" className="hover:text-white">Terms of Service</a>

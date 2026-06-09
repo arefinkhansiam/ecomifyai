@@ -260,7 +260,7 @@ export function LiveAROverlay(p: Props) {
     if (!snapshot) return;
     try {
       const blob = await (await fetch(snapshot)).blob();
-      const file = new File([blob], `${p.productName || "easibie-ar"}.jpg`, { type: "image/jpeg" });
+      const file = new File([blob], `${p.productName || "ecomify-ar"}.jpg`, { type: "image/jpeg" });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: p.productName });
         return;
@@ -404,7 +404,7 @@ export function LiveAROverlay(p: Props) {
 
       {p.showBranding !== false && !snapshot && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70" style={{ background: p.overlay, color: p.fontColor }}>
-          Powered by <span className="font-bold" style={{ color: p.accent }}>Easibie</span>
+          Powered by <span className="font-bold" style={{ color: p.accent }}>Ecomify</span>
         </div>
       )}
     </div>

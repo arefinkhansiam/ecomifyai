@@ -5,7 +5,7 @@ import { Sparkles, Heart, Zap, Globe } from "lucide-react";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Easibie — AI Photo Try-On, for Every Store" },
+      { title: "About Ecomify — AI Photo Try-On, for Every Store" },
       { name: "description", content: "We're building the AI try-on layer of e-commerce so every store — big or small — can let shoppers see themselves wearing or using the product before they buy." },
     ],
   }),
@@ -25,10 +25,10 @@ function About() {
       <section className="relative">
         <div className="absolute inset-0 -z-10 opacity-70" style={{ background: "radial-gradient(ellipse 900px 500px at 50% 0%, rgba(14,165,233,0.22), transparent 70%)" }} />
         <div className="mx-auto max-w-3xl px-6 pt-20 pb-12 text-center">
-          <span className="pill"><Sparkles size={14} /> About Easibie</span>
+          <span className="pill"><Sparkles size={14} /> About Ecomify</span>
           <h1 className="mt-5 text-gradient-ocean">AI try-on, for every store.</h1>
           <p className="mt-6 text-lg" style={{ color: "var(--ink-soft)" }}>
-            Easibie was founded with a simple belief: every online shopper deserves to see themselves with the product before they buy. We made that possible from a single photo — no AR headsets, no 3D modelling, no developer team.
+            Ecomify was founded with a simple belief: every online shopper deserves to see themselves with the product before they buy. We made that possible from a single photo — no AR headsets, no 3D modelling, no developer team.
           </p>
         </div>
       </section>
@@ -74,7 +74,7 @@ function About() {
 
       <section className="py-20 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #02060c 0%, #0a1929 30%, #0369A1 70%, #38BDF8 100%)" }}>
         <div className="mx-auto max-w-3xl px-6 text-center relative">
-          <h2 className="text-white">Join 10,000+ stores using Easibie.</h2>
+          <h2 className="text-white">Join 10,000+ stores using Ecomify.</h2>
           <div className="mt-7 flex flex-col sm:flex-row justify-center items-center gap-3">
             <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)", minWidth: 220 }}>
               Start Free
