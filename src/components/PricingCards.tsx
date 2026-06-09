@@ -88,7 +88,7 @@ export function PricingCards() {
         >
           {p.highlight && (
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-wider px-3 py-1 rounded-full font-bold text-ink" style={{ background: "#fff" }}>
-              ★ Most Popular
+              Most Popular
             </div>
           )}
           <div className="text-sm font-semibold uppercase tracking-wider opacity-80">{p.name}</div>
