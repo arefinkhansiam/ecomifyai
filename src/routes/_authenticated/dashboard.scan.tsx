@@ -26,11 +26,24 @@ export const Route = createFileRoute("/_authenticated/dashboard/scan")({
 });
 
 const TOTAL_FRAMES = 12;
+const FRAMES_PER_ANGLE = 3;
 const CAPTURE_INTERVAL_MS = 1500;
 const DETECT_INTERVAL_MS = 500;
 
 type Phase = "intro" | "scanning" | "generating" | "done" | "error";
 type GenStep = "capturing" | "cleaning" | "composing";
+type Diagnostic = { label: string; value: string; at: string };
+type TimelineStep = { label: string; status: "pending" | "active" | "done" | "error"; at?: string; error?: string };
+
+const stamp = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+const initialTimeline = (): TimelineStep[] => [
+  { label: "Upload", status: "pending" },
+  { label: "Scanning", status: "pending" },
+  { label: "Angle capture", status: "pending" },
+  { label: "Mockup generation", status: "pending" },
+  { label: "AR render", status: "pending" },
+];
 
 function ScanPage() {
   const { user } = useAuth();
