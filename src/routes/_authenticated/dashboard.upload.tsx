@@ -391,33 +391,7 @@ function UploadPage() {
             <input className="input-base mt-1" value={name} onChange={(e) => setName(e.target.value)} placeholder="Modern Lounge Chair" />
           </div>
 
-          {/* Color variants */}
-          <div className="mt-5">
-            <label className="text-xs text-muted uppercase tracking-wide">Available colors (optional)</label>
-            <p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>Customers can pick from these when viewing in AR.</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {colors.map((c) => (
-                <div key={c} className="relative group">
-                  <div className="w-9 h-9 rounded-full border-2 border-white shadow" style={{ background: c }} />
-                  <button onClick={() => setColors(colors.filter((x) => x !== c))}
-                    className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-black text-white grid place-items-center opacity-0 group-hover:opacity-100">
-                    <X size={10} />
-                  </button>
-                </div>
-              ))}
-              <div className="flex items-center gap-2 border rounded-full px-2 py-1" style={{ borderColor: "var(--border)" }}>
-                <input type="color" value={newColor} onChange={(e) => setNewColor(e.target.value)} className="w-7 h-7 rounded-full cursor-pointer bg-transparent border-0" />
-                <button onClick={addColor} className="text-xs font-semibold text-primary inline-flex items-center gap-1"><Plus size={12} /> Add</button>
-              </div>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {PRESET_COLORS.map((c) => (
-                <button key={c} onClick={() => !colors.includes(c) && setColors([...colors, c])}
-                  className="w-6 h-6 rounded-full border" style={{ background: c, borderColor: "var(--border)" }} title={c} />
-              ))}
-            </div>
-          </div>
-        </div>
+          {/* Available colors removed per product spec — variants live on the product page */}
 
         {/* Right: button customization + live preview */}
         <div className="bg-card rounded-2xl p-6 glow-card">
