@@ -341,17 +341,11 @@ function UploadPage() {
             >
               {preview ? (
                 <img src={preview} alt="preview" className="max-h-60 mx-auto object-contain" />
-              ) : file && false ? (
-                <div className="flex flex-col items-center gap-2">
-                  <Box size={48} className="text-primary" />
-                  <div className="font-display text-lg text-ink">{file.name}</div>
-                  <p className="text-xs">{(file.size / 1024 / 1024).toFixed(1)} MB · ready to upload</p>
-                </div>
               ) : (
                 <>
                   <UploadCloud size={48} className="mx-auto text-primary" />
-                  <div className="mt-4 font-display text-lg text-ink">Drop a {false ? "GLB/GLTF file" : "photo"} here</div>
-                  <p className="text-sm mt-1">{MODE_INFO[arMode].hint}. Max {false ? "50MB" : "10MB"}.</p>
+                  <div className="mt-4 font-display text-lg text-ink">Drop a photo here</div>
+                  <p className="text-sm mt-1">{MODE_INFO[arMode].hint}. Max 10MB.</p>
                 </>
               )}
               <input type="file" accept={MODE_INFO[arMode].accept} hidden onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
