@@ -27,6 +27,7 @@ import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardScanRouteImport } from './routes/_authenticated/dashboard.scan'
 import { Route as AuthenticatedDashboardProductsRouteImport } from './routes/_authenticated/dashboard.products'
 import { Route as AuthenticatedDashboardEmbedRouteImport } from './routes/_authenticated/dashboard.embed'
+import { Route as AuthenticatedDashboardCreateRouteImport } from './routes/_authenticated/dashboard.create'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardBehaviourRouteImport } from './routes/_authenticated/dashboard.behaviour'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
@@ -127,6 +128,12 @@ const AuthenticatedDashboardEmbedRoute =
     path: '/dashboard/embed',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardCreateRoute =
+  AuthenticatedDashboardCreateRouteImport.update({
+    id: '/dashboard/create',
+    path: '/dashboard/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardBillingRoute =
   AuthenticatedDashboardBillingRouteImport.update({
     id: '/dashboard/billing',
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/dashboard/create': typeof AuthenticatedDashboardCreateRoute
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRouteWithChildren
   '/dashboard/scan': typeof AuthenticatedDashboardScanRoute
@@ -187,6 +195,7 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/dashboard/create': typeof AuthenticatedDashboardCreateRoute
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRouteWithChildren
   '/dashboard/scan': typeof AuthenticatedDashboardScanRoute
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
+  '/_authenticated/dashboard/create': typeof AuthenticatedDashboardCreateRoute
   '/_authenticated/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/_authenticated/dashboard/products': typeof AuthenticatedDashboardProductsRouteWithChildren
   '/_authenticated/dashboard/scan': typeof AuthenticatedDashboardScanRoute
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/behaviour'
     | '/dashboard/billing'
+    | '/dashboard/create'
     | '/dashboard/embed'
     | '/dashboard/products'
     | '/dashboard/scan'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/behaviour'
     | '/dashboard/billing'
+    | '/dashboard/create'
     | '/dashboard/embed'
     | '/dashboard/products'
     | '/dashboard/scan'
@@ -284,6 +296,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/behaviour'
     | '/_authenticated/dashboard/billing'
+    | '/_authenticated/dashboard/create'
     | '/_authenticated/dashboard/embed'
     | '/_authenticated/dashboard/products'
     | '/_authenticated/dashboard/scan'
@@ -439,6 +452,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardEmbedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/create': {
+      id: '/_authenticated/dashboard/create'
+      path: '/dashboard/create'
+      fullPath: '/dashboard/create'
+      preLoaderRoute: typeof AuthenticatedDashboardCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/billing': {
       id: '/_authenticated/dashboard/billing'
       path: '/dashboard/billing'
@@ -489,6 +509,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardBehaviourRoute: typeof AuthenticatedDashboardBehaviourRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
+  AuthenticatedDashboardCreateRoute: typeof AuthenticatedDashboardCreateRoute
   AuthenticatedDashboardEmbedRoute: typeof AuthenticatedDashboardEmbedRoute
   AuthenticatedDashboardProductsRoute: typeof AuthenticatedDashboardProductsRouteWithChildren
   AuthenticatedDashboardScanRoute: typeof AuthenticatedDashboardScanRoute
@@ -501,6 +522,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
   AuthenticatedDashboardBehaviourRoute: AuthenticatedDashboardBehaviourRoute,
   AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
+  AuthenticatedDashboardCreateRoute: AuthenticatedDashboardCreateRoute,
   AuthenticatedDashboardEmbedRoute: AuthenticatedDashboardEmbedRoute,
   AuthenticatedDashboardProductsRoute:
     AuthenticatedDashboardProductsRouteWithChildren,

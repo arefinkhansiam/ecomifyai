@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           ar_customization: Json
           ar_mode: string
+          ar_subtype: string | null
           ar_viewer_url: string | null
           button_bg_color: string
           button_border_radius: number
@@ -57,6 +58,7 @@ export type Database = {
         Insert: {
           ar_customization?: Json
           ar_mode?: string
+          ar_subtype?: string | null
           ar_viewer_url?: string | null
           button_bg_color?: string
           button_border_radius?: number
@@ -96,6 +98,7 @@ export type Database = {
         Update: {
           ar_customization?: Json
           ar_mode?: string
+          ar_subtype?: string | null
           ar_viewer_url?: string | null
           button_bg_color?: string
           button_border_radius?: number

@@ -15,7 +15,7 @@ export const Route = createFileRoute("/ar/view/$productId")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("ar_products")
-      .select("id, product_name, original_image_url, processed_image_url, glb_url, usdz_url, button_label, button_bg_color, button_text_color, status, is_public, dominant_color, product_colors, show_branding, ar_customization, ar_mode")
+      .select("id, product_name, original_image_url, processed_image_url, glb_url, usdz_url, button_label, button_bg_color, button_text_color, status, is_public, dominant_color, product_colors, show_branding, ar_customization, ar_mode, ar_subtype")
       .eq("id", params.productId)
       .maybeSingle();
     if (error || !data || data.status !== "ready" || !data.is_public) throw notFound();
@@ -151,8 +151,12 @@ function ARRouter() {
    ============================================================ */
 function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" }) {
   const { product, imageUrl } = Route.useLoaderData();
+  const subtype: "top" | "bottom" | "accessory" | "jewellery" | undefined = (product as any).ar_subtype ?? undefined;
   const cust = useCustomization(product);
-  const initialFacing: "user" | "environment" = (mode === "fashion" || mode === "makeup") ? "user" : (cust.defaultCam === "front" ? "user" : "environment");
+  // Fashion + Makeup default to selfie (user). Accessories that go on hands/wrists (watch, ring, bracelet)
+  // still use selfie cam because the body part is usually in front of the user. Furniture = back cam.
+  const initialFacing: "user" | "environment" =
+    (mode === "fashion" || mode === "makeup") ? "user" : (cust.defaultCam === "front" ? "user" : "environment");
   const [facing, setFacing] = useState<"user" | "environment">(initialFacing);
   const camLabel: "front" | "back" = facing === "user" ? "front" : "back";
   const tracker = useSessionTracker(product, camLabel, mode);
@@ -223,7 +227,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       const r = await fetch("/api/public/ar-compose", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: product.id, captureBase64: dataUrl, mode }),
+        body: JSON.stringify({ productId: product.id, captureBase64: dataUrl, mode, subtype }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.error || `AI error (${r.status})`);
@@ -261,12 +265,19 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const close = () => { tracker.sendSession(true); streamRef.current?.getTracks().forEach((t) => t.stop()); exitView(); };
 
   const customBadge = (product.ar_customization as any)?.ar_badge_text as string | undefined;
-  const defaultBadge = mode === "fashion" ? "TRY-ON" : mode === "makeup" ? "MAKEUP" : "PLACE IT";
+  const defaultBadge =
+    mode === "fashion"
+      ? (subtype === "bottom" ? "PANTS TRY-ON" : subtype === "accessory" ? "ACCESSORY" : subtype === "jewellery" ? "JEWELLERY" : "TRY-ON")
+      : mode === "makeup" ? "MAKEUP" : "PLACE IT";
   const badge = customBadge?.trim() ? customBadge.trim().toUpperCase() : defaultBadge;
   const captureHint =
-    mode === "fashion" ? "Stand in frame, then capture" :
-    mode === "makeup"  ? "Center your face, then capture" :
-                         "Aim at the spot, then capture";
+    mode === "fashion"
+      ? (subtype === "bottom" ? "Stand so legs are in frame, then capture"
+        : subtype === "accessory" ? "Show the body part (wrist / face / feet) and capture"
+        : subtype === "jewellery" ? "Show neck / hand / ear close to camera, then capture"
+        : "Stand in frame, then capture")
+      : mode === "makeup"  ? "Center your face, then capture"
+      :                      "Aim at the spot, then capture";
 
   return (
     <div className="fixed inset-0 overflow-hidden" style={{ background: cust.pageBg, color: cust.fontColor, fontFamily: "var(--font-body)" }}>

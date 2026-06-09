@@ -1,15 +1,27 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Camera, Sparkles, ScanLine, X, Check, Copy, ExternalLink } from "lucide-react";
+import { Camera, Sparkles, ScanLine, X, Check, Copy, ExternalLink, ArrowLeft } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { generate3dPreview } from "@/lib/scan-ai.functions";
 
+type ArMode = "fashion" | "furniture" | "makeup" | "full_3d";
+type ClothingSub = "top" | "bottom" | "accessory" | "jewellery";
+type ScanSearch = { mode?: ArMode; subtype?: ClothingSub };
+
 export const Route = createFileRoute("/_authenticated/dashboard/scan")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>): ScanSearch => {
+    const m = s.mode as ArMode | undefined;
+    const sub = s.subtype as ClothingSub | undefined;
+    return {
+      mode: m && ["fashion", "furniture", "makeup", "full_3d"].includes(m) ? m : undefined,
+      subtype: sub && ["top", "bottom", "accessory", "jewellery"].includes(sub) ? sub : undefined,
+    };
+  },
   component: ScanPage,
 });
 
@@ -23,7 +35,11 @@ type GenStep = "capturing" | "cleaning" | "composing";
 function ScanPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const generate = useServerFn(generate3dPreview);
+  // Category passed from /dashboard/create. Falls back to legacy "scan_ai" flow.
+  const arMode: ArMode = search.mode ?? "furniture";
+  const subtype = search.subtype;
 
   const [phase, setPhase] = useState<Phase>("intro");
   const [productName, setProductName] = useState("");
@@ -80,7 +96,8 @@ function ScanPage() {
     const { data: created, error: insErr } = await supabase.from("ar_products").insert({
       user_id: user.id,
       product_name: productName.trim(),
-      ar_mode: "scan_ai",
+      ar_mode: arMode,
+      ar_subtype: subtype ?? null,
       status: "processing",
       processing_step: "scanning",
       processing_progress: 0,
@@ -223,13 +240,43 @@ function ScanPage() {
 
   const cancel = () => { stopAll(); setPhase("intro"); setCount(0); countRef.current = 0; };
 
-  const hint = (() => {
-    if (count < 10) return "Slowly rotate the product to the left";
-    if (count < 20) return "Now tilt up slightly";
-    if (count < 30) return "Show the back of the product";
-    return "Almost done — show the bottom";
+  // Per-category scan guidance. Different products need different angles.
+  const guidance = (() => {
+    if (arMode === "fashion" && subtype === "jewellery") {
+      return [
+        { until: 10, hint: "Lay it flat on a clean surface, top view",  label: "Top" },
+        { until: 20, hint: "Tilt 45° — show the clasp/details",          label: "Side" },
+        { until: 30, hint: "Flip to back — show the closure",            label: "Back" },
+        { until: 40, hint: "Close-up of any stones or engravings",       label: "Detail" },
+      ];
+    }
+    if (arMode === "fashion") {
+      return [
+        { until: 10, hint: "Lay the item flat — full front view",       label: "Front" },
+        { until: 20, hint: "Smooth out wrinkles, rotate slowly left",   label: "Left" },
+        { until: 30, hint: "Flip to back side, full view",              label: "Back" },
+        { until: 40, hint: "Close-ups of tag, fabric, stitching",       label: "Detail" },
+      ];
+    }
+    if (arMode === "makeup") {
+      return [
+        { until: 10, hint: "Front of the product, label visible",        label: "Front" },
+        { until: 20, hint: "Open it — show the actual color / swatch",   label: "Swatch" },
+        { until: 30, hint: "Rotate slowly, capture every side",          label: "Side" },
+        { until: 40, hint: "Close-up of the shade / finish",             label: "Detail" },
+      ];
+    }
+    // furniture / generic object
+    return [
+      { until: 10, hint: "Front view — keep whole product in frame",   label: "Front" },
+      { until: 20, hint: "Rotate to the left side",                    label: "Left" },
+      { until: 30, hint: "Now show the back",                          label: "Back" },
+      { until: 40, hint: "Top-down and any unique details",            label: "Top" },
+    ];
   })();
-  const angleLabel = count < 10 ? "Left side" : count < 20 ? "Top" : count < 30 ? "Back" : "Bottom";
+  const step = guidance.find((g) => count < g.until) ?? guidance[guidance.length - 1];
+  const hint = step.hint;
+  const angleLabel = step.label;
   const pct = Math.round((count / TOTAL_FRAMES) * 100);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -339,20 +386,34 @@ function ScanPage() {
         </div>
       </div>
 
-      {/* Intro */}
       {phase === "intro" && (
         <div className="max-w-xl mx-auto bg-card rounded-2xl p-6 glow-card">
+          {search.mode && (
+            <Link to="/dashboard/create" className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary mb-3">
+              <ArrowLeft size={12} /> Change category
+            </Link>
+          )}
           <div className="flex items-center gap-3">
             <span className="w-12 h-12 rounded-2xl grid place-items-center text-white"
                   style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}>
               <ScanLine size={22} />
             </span>
             <div>
-              <h3 className="text-ink">Scan a real product</h3>
+              <h3 className="text-ink">
+                Scan a {arMode === "fashion" ? (subtype ?? "fashion item") : arMode === "makeup" ? "makeup product" : arMode === "furniture" ? "furniture piece" : "product"}
+              </h3>
               <p className="text-sm" style={{ color: "var(--ink-soft)" }}>
-                Place your product on a clean surface. We'll capture {TOTAL_FRAMES} angles and turn it into an AR-ready preview.
+                Follow the on-screen direction for each angle. We capture {TOTAL_FRAMES} frames and turn it into an AR-ready preview.
               </p>
             </div>
+          </div>
+          <div className="mt-4 p-3 rounded-xl text-xs" style={{ background: "rgba(2,132,199,0.06)", border: "1px solid rgba(2,132,199,0.18)", color: "var(--ink-soft)" }}>
+            <div className="font-semibold text-ink mb-1">You'll be guided through:</div>
+            <ol className="space-y-0.5 ml-1">
+              {guidance.map((g, i) => (
+                <li key={i}>{i + 1}. <span className="font-medium text-ink">{g.label}</span> — {g.hint}</li>
+              ))}
+            </ol>
           </div>
           <div className="mt-5">
             <label className="text-xs text-muted uppercase tracking-wide">Product name</label>
