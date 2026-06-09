@@ -479,13 +479,43 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
 
       {phase === "result" && (
-        <div className="absolute left-3 right-3 z-30 flex items-center justify-center gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
-          <button onClick={retake} className="px-5 py-3 rounded-full font-semibold text-sm" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
-            <RefreshCw size={14} className="inline mr-1.5" /> Retake
-          </button>
-          <button onClick={share} className="px-6 py-3 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius, boxShadow: `0 12px 28px -8px ${cust.accent}88` }}>
-            <Share2 size={15} /> Share
-          </button>
+        <div className="absolute left-0 right-0 z-30 flex flex-col items-center gap-3 px-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 14px)" }}>
+          {feedback === null ? (
+            <div className="px-4 py-2.5 rounded-2xl flex items-center gap-3 text-xs font-semibold" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              <span>Did you like it?</span>
+              <button onClick={() => submitFeedback(true)} className="px-3 py-1.5 rounded-full" style={{ background: "rgba(16,185,129,0.85)", color: "#fff" }}>👍 Yes</button>
+              <button onClick={() => submitFeedback(false)} className="px-3 py-1.5 rounded-full" style={{ background: "rgba(239,68,68,0.85)", color: "#fff" }}>👎 No</button>
+            </div>
+          ) : feedback === "disliked" && related.length > 0 ? (
+            <div className="w-full max-w-md p-3 rounded-2xl" style={{ background: cust.overlay, backdropFilter: "blur(10px)" }}>
+              <div className="text-xs font-semibold mb-2" style={{ color: cust.fontColor }}>Try these instead</div>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {related.map((r) => (
+                  <a key={r.id} href={`/ar/view/${r.id}`} className="shrink-0 w-20 text-center">
+                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-white/10 border" style={{ borderColor: cust.fontColor + "33" }}>
+                      {r.imageUrl && <img src={r.imageUrl} alt={r.name} className="w-full h-full object-cover" />}
+                    </div>
+                    <div className="text-[10px] mt-1 truncate" style={{ color: cust.fontColor }}>{r.name}</div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="px-3 py-1.5 rounded-full text-xs font-medium" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              Thanks for the feedback! 💙
+            </div>
+          )}
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <button onClick={retake} className="px-4 py-2.5 rounded-full font-semibold text-sm" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              <RefreshCw size={14} className="inline mr-1.5" /> Retake
+            </button>
+            <button onClick={download} className="px-4 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              <Download size={15} /> Download
+            </button>
+            <button onClick={share} className="px-5 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius, boxShadow: `0 12px 28px -8px ${cust.accent}88` }}>
+              <Share2 size={15} /> Share
+            </button>
+          </div>
         </div>
       )}
 
