@@ -147,7 +147,7 @@ export const generateAiHeroFromImage = createServerFn({ method: "POST" })
     const { productId } = data;
 
     const { data: product } = await supabase
-      .from("ar_products").select("id, user_id, original_image_url")
+      .from("ar_products").select("id, user_id, original_image_url, ar_mode, ar_subtype")
       .eq("id", productId).maybeSingle();
     if (!product || product.user_id !== userId) throw new Error("Not found");
     if (!product.original_image_url) return { ok: false, reason: "no_image" as const };
