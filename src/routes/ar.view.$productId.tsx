@@ -139,18 +139,20 @@ function TopBar({ name, showName, overlay, fontColor, accent, onClose, badge }: 
 
 function ARRouter() {
   const { product } = Route.useLoaderData();
-  const mode = (product.ar_mode || "furniture") as "fashion" | "furniture" | "full_3d";
-  if (mode === "full_3d") return <Full3DView />;
+  const raw = (product.ar_mode || "furniture") as string;
+  if (raw === "full_3d" || raw === "object_3d") return <Full3DView />;
+  const mode: "fashion" | "furniture" | "makeup" =
+    raw === "fashion" ? "fashion" : raw === "makeup" ? "makeup" : "furniture";
   return <CameraComposeView mode={mode} />;
 }
 
 /* ============================================================
-   Fashion + Furniture: camera → capture → AI compose
+   Fashion + Furniture + Makeup: camera → capture → AI compose
    ============================================================ */
-function CameraComposeView({ mode }: { mode: "fashion" | "furniture" }) {
+function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" }) {
   const { product, imageUrl } = Route.useLoaderData();
   const cust = useCustomization(product);
-  const initialFacing: "user" | "environment" = mode === "fashion" ? "user" : (cust.defaultCam === "front" ? "user" : "environment");
+  const initialFacing: "user" | "environment" = (mode === "fashion" || mode === "makeup") ? "user" : (cust.defaultCam === "front" ? "user" : "environment");
   const [facing, setFacing] = useState<"user" | "environment">(initialFacing);
   const camLabel: "front" | "back" = facing === "user" ? "front" : "back";
   const tracker = useSessionTracker(product, camLabel, mode);
@@ -259,8 +261,12 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" }) {
   const close = () => { tracker.sendSession(true); streamRef.current?.getTracks().forEach((t) => t.stop()); exitView(); };
 
   const customBadge = (product.ar_customization as any)?.ar_badge_text as string | undefined;
-  const badge = customBadge?.trim() ? customBadge.trim().toUpperCase() : (mode === "fashion" ? "TRY-ON" : "PLACE IT");
-  const captureHint = mode === "fashion" ? "Stand in frame, then capture" : "Aim at the spot, then capture";
+  const defaultBadge = mode === "fashion" ? "TRY-ON" : mode === "makeup" ? "MAKEUP" : "PLACE IT";
+  const badge = customBadge?.trim() ? customBadge.trim().toUpperCase() : defaultBadge;
+  const captureHint =
+    mode === "fashion" ? "Stand in frame, then capture" :
+    mode === "makeup"  ? "Center your face, then capture" :
+                         "Aim at the spot, then capture";
 
   return (
     <div className="fixed inset-0 overflow-hidden" style={{ background: cust.pageBg, color: cust.fontColor, fontFamily: "var(--font-body)" }}>
@@ -301,7 +307,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" }) {
               <Loader2 className="animate-spin" size={28} style={{ color: cust.accent }} />
             </div>
             <h3 className="mt-5" style={{ color: cust.fontColor, fontFamily: "var(--font-display)" }}>
-              {mode === "fashion" ? "Trying it on…" : "Placing it in your space…"}
+              {mode === "fashion" ? "Trying it on…" : mode === "makeup" ? "Applying makeup…" : "Placing it in your space…"}
             </h3>
             <p className="mt-2 text-sm opacity-70">This usually takes 10–20 seconds.</p>
           </div>

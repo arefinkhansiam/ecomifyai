@@ -4,7 +4,7 @@ import { z } from "zod";
 const Input = z.object({
   productId: z.string().uuid(),
   captureBase64: z.string().min(100).max(15_000_000),
-  mode: z.enum(["fashion", "furniture"]),
+  mode: z.enum(["fashion", "furniture", "makeup"]),
 });
 
 async function fetchAsDataUrl(url: string): Promise<string> {
@@ -64,6 +64,8 @@ export const Route = createFileRoute("/api/public/ar-compose")({
           const prompt =
             data.mode === "fashion"
               ? `Virtual try-on. FIRST image: a person. SECOND image: a clothing item (shirt / t-shirt / top). Generate a photorealistic image of the SAME person wearing the clothing item. Preserve the person's face, hair, pose, body shape, skin tone, lighting and background exactly. The clothing must fit naturally with realistic folds, shadows, and shading matching the scene light. Return only the resulting image.`
+              : data.mode === "makeup"
+              ? `Virtual makeup try-on. FIRST image: a selfie of a person's face. SECOND image: a makeup product (lipstick / eyeshadow / foundation / blush / etc.) — use it as the COLOR and FINISH reference. Apply that makeup to the person's face photorealistically. Preserve the person's identity, facial features, pose, hair, skin texture, lighting, and background EXACTLY. Only modify the relevant area (lips for lipstick, eyelids for eyeshadow, cheeks for blush, full face for foundation). Match the product's exact shade, opacity, and finish (matte, glossy, shimmer). No skin smoothing, no face shape changes, no filters. Return only the resulting image.`
               : `Interior visualisation. FIRST image: a real room photo from a phone camera. SECOND image: a product (furniture / decor) on its own (possibly with a background). Place the product naturally inside the room with correct perspective, realistic scale, ground contact shadows, and lighting matching the room. Remove the product's original background. Keep the room background unchanged. Return only the resulting composed image.`;
 
           const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
