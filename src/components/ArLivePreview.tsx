@@ -57,22 +57,46 @@ export function ArLivePreview(p: Props) {
         )}
       </div>
 
-      {/* AR viewer mock — phone frame */}
+      {/* Viewer mock — phone or desktop frame */}
       <div className="grid place-items-center">
-        <div className="text-[10px] uppercase tracking-wider text-muted mb-3">Try-On viewer page</div>
-        <div className="relative w-[220px] h-[420px] rounded-[34px] overflow-hidden shadow-2xl"
-             style={{ background: p.pageBg, color: p.fontColor, border: "8px solid #111" }}>
-          {/* Simulated camera feed */}
+        <div className="text-[10px] uppercase tracking-wider text-muted mb-3">Try-On viewer · {isDesktop ? "desktop" : "mobile"}</div>
+        <div
+          className="relative overflow-hidden shadow-2xl"
+          style={{
+            width: isDesktop ? 320 : 220,
+            height: isDesktop ? 200 : 420,
+            borderRadius: isDesktop ? 14 : 34,
+            background: p.pageBg,
+            color: p.fontColor,
+            border: isDesktop ? "2px solid #111" : "8px solid #111",
+          }}
+        >
           <div className="absolute inset-0"
                style={{ background: "linear-gradient(135deg, #1f2937 0%, #0f172a 50%, #020617 100%)" }} />
           {p.productImage && (
             <img src={p.productImage} alt=""
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[70%] max-h-[55%] object-contain"
-              style={{ filter: "drop-shadow(0 20px 30px rgba(0,0,0,.6))" }} />
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 object-contain"
+              style={{ maxWidth: "70%", maxHeight: "55%", filter: "drop-shadow(0 20px 30px rgba(0,0,0,.6))" }} />
           )}
-          {/* gradient overlays */}
           <div className="absolute inset-0 pointer-events-none"
                style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.35), transparent 30%, transparent 60%, rgba(0,0,0,0.55))" }} />
+
+          {/* Header text */}
+          {(p.headerTitle || p.headerSubtitle) && (
+            <div className="absolute left-2 right-2 z-10 text-center pointer-events-none"
+                 style={{ top: isDesktop ? 28 : 36 }}>
+              {p.headerTitle && (
+                <div className="text-[11px] font-bold truncate" style={{ color: p.fontColor }}>
+                  {p.headerTitle}
+                </div>
+              )}
+              {p.headerSubtitle && (
+                <div className="text-[9px] truncate opacity-80" style={{ color: p.fontColor }}>
+                  {p.headerSubtitle}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* top bar */}
           <div className="absolute top-2 left-2 right-2 flex items-center justify-between gap-1.5">
@@ -94,19 +118,36 @@ export function ArLivePreview(p: Props) {
           </div>
 
           {/* shutter */}
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-6 w-14 h-14 rounded-full grid place-items-center"
-               style={{ background: "#fff", boxShadow: `0 0 0 3px ${p.accent}` }}>
+          <div className="absolute left-1/2 -translate-x-1/2 w-14 h-14 rounded-full grid place-items-center"
+               style={{ bottom: isDesktop ? 18 : 24, background: "#fff", boxShadow: `0 0 0 3px ${p.accent}` }}>
             <div className="w-11 h-11 rounded-full grid place-items-center" style={{ background: p.accent }}>
               <Camera size={16} color="#fff" />
             </div>
           </div>
 
           {/* CTA pill */}
-          <div className="absolute left-2 right-2 bottom-[88px] grid place-items-center">
+          <div className="absolute left-2 right-2 grid place-items-center"
+               style={{ bottom: isDesktop ? 86 : 88 }}>
             <div className="px-3 py-1.5 text-[10px] font-semibold inline-flex items-center gap-1"
-                 style={{ background: p.accent, color: "#fff", borderRadius: p.arButtonRadius }}>
+                 style={{
+                   background: p.accent, color: "#fff", borderRadius: p.arButtonRadius,
+                   boxShadow: shadow,
+                 }}>
               <Sparkles size={11} /> {p.arButtonText}
             </div>
+          </div>
+
+          {/* Like / Not For Me preview */}
+          <div className="absolute left-2 right-2 flex justify-center gap-2 pointer-events-none"
+               style={{ bottom: isDesktop ? 50 : 56 }}>
+            <span className="px-2 py-1 rounded-full text-[8px] font-semibold inline-flex items-center gap-1"
+                  style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(8px)" }}>
+              <ThumbsUp size={9} /> Like
+            </span>
+            <span className="px-2 py-1 rounded-full text-[8px] font-semibold inline-flex items-center gap-1"
+                  style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(8px)" }}>
+              <ThumbsDown size={9} /> Not for me
+            </span>
           </div>
 
           {p.showBranding && (
