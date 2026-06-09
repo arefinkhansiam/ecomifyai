@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { generateAiHeroFromImage } from "@/lib/scan-ai.functions";
 import { ArLivePreview } from "@/components/ArLivePreview";
-import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown, Shirt, Sofa, Box, Sparkle, ArrowLeft } from "lucide-react";
+import { UploadCloud, Loader2, Sparkles, Copy, Check, X, Plus, Lock, Crown, Shirt, Sofa, Box, Sparkle } from "lucide-react";
 
 type ArMode = "fashion" | "furniture" | "makeup" | "full_3d";
 type ClothingSub = "top" | "bottom" | "accessory" | "jewellery";
