@@ -21,12 +21,14 @@ export const Route = createFileRoute("/")({
 });
 
 function useClock() {
-  const [now, setNow] = useState(() => new Date());
+  const [clock, setClock] = useState("--:--");
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
+    const update = () => setClock(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+    update();
+    const id = setInterval(update, 1000);
     return () => clearInterval(id);
   }, []);
-  return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return clock;
 }
 
 function Landing() {
