@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Play, Star, UploadCloud, Box, Smartphone, BarChart2, Link as LinkIcon, ShieldCheck, Camera, Share2 } from "lucide-react";
 import { MarketingShell } from "@/components/MarketingShell";
