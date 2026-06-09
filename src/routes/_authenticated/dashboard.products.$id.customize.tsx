@@ -153,41 +153,41 @@ function CustomizePage() {
             <input className="input-base" value={label} maxLength={40} onChange={(e) => setLabel(e.target.value)} />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <ColorField label="Background" value={bg} onChange={setBg} />
-            <ColorField label="Text" value={fg} onChange={setFg} />
+            <AdvancedColorPicker label="Background" value={bg} onChange={setBg} allowGradient />
+            <AdvancedColorPicker label="Text" value={fg} onChange={setFg} />
           </div>
           <Field label={`Radius · ${radius}px`}>
             <input type="range" min={0} max={30} value={radius} onChange={(e) => setRadius(Number(e.target.value))} className="w-full accent-sky-500" />
           </Field>
           <Toggle label="Use gradient" gated={!isPaid} on={useGradient} onChange={(v) => setUseGradient(v)} />
-          {useGradient && isPaid && <ColorField label="Gradient end" value={bg2} onChange={setBg2} />}
+          {useGradient && isPaid && <AdvancedColorPicker label="Gradient end" value={bg2} onChange={setBg2} />}
 
           <hr style={{ borderColor: "var(--border)" }} />
 
           <div className="flex items-center justify-between">
-            <h4 className="text-ink">AR viewer page</h4>
+            <h4 className="text-ink">Try-On viewer page</h4>
             {!isPaid && <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full text-white" style={{ background: "linear-gradient(135deg,#7C3AED,#38BDF8)" }}><Crown size={9} /> Pro</span>}
           </div>
           {!isPaid ? (
-            <p className="text-xs" style={{ color: "var(--ink-soft)" }}>Upgrade to fully customize the AR viewer (colors, accent, badge text, branding…).</p>
+            <p className="text-xs" style={{ color: "var(--ink-soft)" }}>Upgrade to fully customize the Try-On viewer (colors, accent, badge text, branding…).</p>
           ) : (
             <>
               <div className="grid grid-cols-2 gap-3">
-                <ColorField label="Page bg" value={pageBg} onChange={setPageBg} />
-                <ColorField label="Font color" value={fontColor} onChange={setFontColor} />
-                <ColorField label="Accent" value={accent} onChange={setAccent} />
-                <ColorField label="Overlay" value={overlay} onChange={setOverlay} />
+                <AdvancedColorPicker label="Page bg" value={pageBg} onChange={setPageBg} allowGradient />
+                <AdvancedColorPicker label="Font color" value={fontColor} onChange={setFontColor} />
+                <AdvancedColorPicker label="Accent" value={accent} onChange={setAccent} allowGradient />
+                <AdvancedColorPicker label="Overlay" value={overlay} onChange={setOverlay} allowAlpha />
               </div>
-              <Field label={`AR button radius · ${arRadius}px`}>
+              <Field label={`Try-On button radius · ${arRadius}px`}>
                 <input type="range" min={0} max={32} value={arRadius} onChange={(e) => setArRadius(Number(e.target.value))} className="w-full accent-sky-500" />
               </Field>
-              <Field label="AR button text">
+              <Field label="Try-On button text">
                 <input className="input-base" value={arText} maxLength={40} onChange={(e) => setArText(e.target.value)} />
               </Field>
               <Field label="Badge text (top-left pill)">
-                <input className="input-base" value={arBadge} maxLength={20} placeholder="auto (PLACE IT / TRY-ON / 3D AR)" onChange={(e) => setArBadge(e.target.value)} />
+                <input className="input-base" value={arBadge} maxLength={20} placeholder="auto (PLACE IT / TRY-ON / 3D)" onChange={(e) => setArBadge(e.target.value)} />
               </Field>
-              <Toggle label="Show product name on AR page" on={showProductName} onChange={setShowProductName} />
+              <Toggle label="Show product name on Try-On page" on={showProductName} onChange={setShowProductName} />
               <Toggle label='Show "Powered by Ecomify"' on={showBranding} onChange={setShowBranding} />
             </>
           )}
