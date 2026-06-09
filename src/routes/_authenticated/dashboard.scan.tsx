@@ -1,15 +1,27 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Camera, Sparkles, ScanLine, X, Check, Copy, ExternalLink } from "lucide-react";
+import { Camera, Sparkles, ScanLine, X, Check, Copy, ExternalLink, ArrowLeft } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { generate3dPreview } from "@/lib/scan-ai.functions";
 
+type ArMode = "fashion" | "furniture" | "makeup" | "full_3d";
+type ClothingSub = "top" | "bottom" | "accessory" | "jewellery";
+type ScanSearch = { mode?: ArMode; subtype?: ClothingSub };
+
 export const Route = createFileRoute("/_authenticated/dashboard/scan")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>): ScanSearch => {
+    const m = s.mode as ArMode | undefined;
+    const sub = s.subtype as ClothingSub | undefined;
+    return {
+      mode: m && ["fashion", "furniture", "makeup", "full_3d"].includes(m) ? m : undefined,
+      subtype: sub && ["top", "bottom", "accessory", "jewellery"].includes(sub) ? sub : undefined,
+    };
+  },
   component: ScanPage,
 });
 
