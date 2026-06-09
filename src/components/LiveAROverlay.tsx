@@ -338,6 +338,13 @@ export function LiveAROverlay(p: Props) {
         </div>
       )}
 
+      {!snapshot && phase === "ready" && (
+        <div className="absolute left-3 z-30 px-3 py-2 rounded-2xl text-[10px] leading-relaxed" style={{ top: "calc(env(safe-area-inset-top) + 112px)", background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
+          <div>{modelStatus}</div>
+          <div>Tracking {Math.round(trackingConfidence * 100)}%{detectLatency !== null ? ` · ${detectLatency}ms` : ""}</div>
+        </div>
+      )}
+
       {phase === "loading" && (
         <div className="absolute inset-0 z-40 grid place-items-center bg-black/70 backdrop-blur-sm text-center px-6">
           <div>
