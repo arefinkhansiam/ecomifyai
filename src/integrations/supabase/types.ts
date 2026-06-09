@@ -349,6 +349,48 @@ export type Database = {
         }
         Relationships: []
       }
+      product_alternatives: {
+        Row: {
+          alt_product_id: string
+          created_at: string
+          id: string
+          position: number
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          alt_product_id: string
+          created_at?: string
+          id?: string
+          position?: number
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          alt_product_id?: string
+          created_at?: string
+          id?: string
+          position?: number
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_alternatives_alt_product_id_fkey"
+            columns: ["alt_product_id"]
+            isOneToOne: false
+            referencedRelation: "ar_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_alternatives_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "ar_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_categories: {
         Row: {
           created_at: string
@@ -518,50 +560,121 @@ export type Database = {
       tryon_branding: {
         Row: {
           accent_color: string
+          background_type: string
+          background_value: string
           button_bg: string
           button_label: string
+          button_radius: number
+          button_shadow: boolean
           button_text_color: string
           created_at: string
           font: string
+          font_family: string
+          font_size: number
+          header_subtitle: string | null
+          header_title: string | null
           logo_url: string | null
+          show_platform_watermark: boolean
           store_name: string | null
           updated_at: string
           user_id: string
           viewer_bg: string
+          watermark_opacity: number
+          watermark_position: string
           watermark_text: string | null
           watermark_url: string | null
         }
         Insert: {
           accent_color?: string
+          background_type?: string
+          background_value?: string
           button_bg?: string
           button_label?: string
+          button_radius?: number
+          button_shadow?: boolean
           button_text_color?: string
           created_at?: string
           font?: string
+          font_family?: string
+          font_size?: number
+          header_subtitle?: string | null
+          header_title?: string | null
           logo_url?: string | null
+          show_platform_watermark?: boolean
           store_name?: string | null
           updated_at?: string
           user_id: string
           viewer_bg?: string
+          watermark_opacity?: number
+          watermark_position?: string
           watermark_text?: string | null
           watermark_url?: string | null
         }
         Update: {
           accent_color?: string
+          background_type?: string
+          background_value?: string
           button_bg?: string
           button_label?: string
+          button_radius?: number
+          button_shadow?: boolean
           button_text_color?: string
           created_at?: string
           font?: string
+          font_family?: string
+          font_size?: number
+          header_subtitle?: string | null
+          header_title?: string | null
           logo_url?: string | null
+          show_platform_watermark?: boolean
           store_name?: string | null
           updated_at?: string
           user_id?: string
           viewer_bg?: string
+          watermark_opacity?: number
+          watermark_position?: string
           watermark_text?: string | null
           watermark_url?: string | null
         }
         Relationships: []
+      }
+      tryon_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json
+          product_id: string
+          session_id: string | null
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json
+          product_id: string
+          session_id?: string | null
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          product_id?: string
+          session_id?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tryon_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "ar_products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tryon_feedback: {
         Row: {
@@ -639,6 +752,69 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vendor_gradients: {
+        Row: {
+          angle: number
+          created_at: string
+          css: string
+          direction: string
+          id: string
+          name: string
+          stops: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          angle?: number
+          created_at?: string
+          css: string
+          direction?: string
+          id?: string
+          name: string
+          stops?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          angle?: number
+          created_at?: string
+          css?: string
+          direction?: string
+          id?: string
+          name?: string
+          stops?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vendor_palettes: {
+        Row: {
+          colors: Json
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          colors?: Json
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          colors?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
