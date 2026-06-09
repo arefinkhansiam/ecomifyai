@@ -417,9 +417,17 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
             <p className="mt-2 text-white/70 text-sm">
               {phase === "denied" ? "Allow camera permission to continue." : "Open on a mobile browser to use AR."}
             </p>
-            {phase === "denied" && (
-              <button onClick={() => startCamera()} className="btn-primary mt-6 inline-flex"><RefreshCw size={16} /> Retry</button>
-            )}
+            <div className="mt-6 flex flex-col items-center gap-2">
+              {phase === "denied" && (
+                <button onClick={() => startCamera()} className="btn-primary inline-flex"><RefreshCw size={16} /> Retry camera</button>
+              )}
+              <label className="px-5 py-3 rounded-full font-semibold text-sm inline-flex items-center gap-2 cursor-pointer"
+                style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius }}>
+                <ImagePlus size={15} /> Upload a photo instead
+                <input type="file" accept="image/*" hidden onChange={(e) => onPickPhoto(e.target.files?.[0] ?? null)} />
+              </label>
+            </div>
+
           </div>
         </div>
       )}
