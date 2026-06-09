@@ -51,7 +51,7 @@ export function ArLivePreview(p: Props) {
 
       {/* AR viewer mock — phone frame */}
       <div className="grid place-items-center">
-        <div className="text-[10px] uppercase tracking-wider text-muted mb-3">AR viewer page</div>
+        <div className="text-[10px] uppercase tracking-wider text-muted mb-3">Try-On viewer page</div>
         <div className="relative w-[220px] h-[420px] rounded-[34px] overflow-hidden shadow-2xl"
              style={{ background: p.pageBg, color: p.fontColor, border: "8px solid #111" }}>
           {/* Simulated camera feed */}
