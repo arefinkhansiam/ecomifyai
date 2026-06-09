@@ -24,8 +24,8 @@ function Dashboard() {
 
   const cards = [
     { label: "Total Products", value: stats?.total_products ?? 0, icon: Box, accent: "#0369A1" },
-    { label: "Ready for AR", value: stats?.ready_products ?? 0, icon: Sparkles, accent: "#0369A1" },
-    { label: "Total AR Views", value: stats?.total_views ?? 0, icon: Eye, accent: "#0369A1" },
+    { label: "Ready for try-on", value: stats?.ready_products ?? 0, icon: Sparkles, accent: "#0369A1" },
+    { label: "Try-on views", value: stats?.total_views ?? 0, icon: Eye, accent: "#0369A1" },
     { label: "Sessions this month", value: stats?.sessions_this_month ?? 0, icon: TrendingUp, accent: "#0369A1" },
   ];
 
@@ -45,7 +45,7 @@ function Dashboard() {
           </h1>
           <p className="mt-2 text-base" style={{ color: "var(--ink-soft)" }}>Upload a product, share the link, watch the views roll in.</p>
         </div>
-        <Link to="/dashboard/upload" className="btn-primary"><Upload size={16} /> New AR Product</Link>
+        <Link to="/dashboard/upload" className="btn-primary"><Upload size={16} /> New Try-On Product</Link>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
@@ -64,9 +64,9 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
         {[
-          { to: "/dashboard/upload", icon: Upload, title: "Upload a product", body: "Drag in a photo, get a live AR link in seconds." },
-          { to: "/dashboard/products", icon: Box, title: "Manage products", body: "View, edit and share your AR products." },
-          { to: "/dashboard/behaviour", icon: TrendingUp, title: "Customer behaviour", body: "See how visitors engage with your AR." },
+          { to: "/dashboard/upload", icon: Upload, title: "Upload a product", body: "Add product photos from every angle — shoppers try it on from their own photo." },
+          { to: "/dashboard/products", icon: Box, title: "Manage products", body: "View, edit and share your try-on products." },
+          { to: "/dashboard/behaviour", icon: TrendingUp, title: "Customer behaviour", body: "See how visitors engage with your try-ons." },
         ].map((q) => (
           <Link key={q.to} to={q.to} className="rounded-2xl p-6 transition-transform hover:-translate-y-1 group"
             style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(14px)", border: "1px solid rgba(2,132,199,0.15)", boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)" }}>
@@ -86,10 +86,10 @@ function Dashboard() {
         <div className="flex justify-between items-center flex-wrap gap-4">
           <div>
             <div className="text-xs uppercase tracking-wider opacity-80 flex items-center gap-2">
-              {isPaid && <Crown size={12} />} AR slots · {plan}
+              {isPaid && <Crown size={12} />} Try-on slots · {plan}
             </div>
-            <div className="font-display text-2xl md:text-3xl font-extrabold mt-1" title="Deleting an AR product does not recover your slot. Each plan allows a fixed number of AR creations total.">
-              {slotsUsed} of {slotLimit} AR slots used
+            <div className="font-display text-2xl md:text-3xl font-extrabold mt-1" title="Deleting a product does not recover your slot. Each plan allows a fixed number of try-on creations total.">
+              {slotsUsed} of {slotLimit} try-on slots used
             </div>
             <div className="text-xs mt-1 opacity-80">Slots are permanent — deleting a product does not give a slot back.</div>
           </div>

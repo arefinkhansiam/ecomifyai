@@ -1,35 +1,69 @@
-## Plan
+## Goal
 
-1. Add scan diagnostics and progress timeline
-   - Show model loading status, camera readiness, detection confidence, frame count, capture angle, capture/upload latency, and errors on the scan screen.
-   - Add a timeline for upload → scanning → angle capture → mockup generation → AR render, each with timestamps.
-   - Persist key processing status in the existing product fields so the product page can show what failed instead of looking stuck.
+Align the whole product surface (landing page + dashboard) with the new system: **vendors upload product photos from multiple angles → shoppers upload (or take) their own photo → Gemini composes a photorealistic try-on / room placement / makeup result**. Remove all "live AR camera tracking" framing.
 
-2. Make scanning capture reliable with automatic multi-angle steps
-   - Replace the current 12 generic frame count with required angle stages: front, left/side, back, detail/top.
-   - Auto-capture frames per angle on a timer, even if object detection is weak, with detection confidence shown as diagnostic data.
-   - Keep a manual capture button as fallback and advance only after each required angle has enough frames.
-   - Fix the displayed guidance/progress so it matches the actual required frame counts.
+## 1. Landing page (`src/routes/index.tsx`)
 
-3. Complete upload-to-AR-ready asset flow
-   - When a user uploads an image, create the product as processing, then run AI cleanup/mockup generation before marking it ready.
-   - Always store a usable AR asset: AI-processed preview when successful, raw uploaded image fallback when AI fails.
-   - Create/update the model record and keep status/error messages clear.
-   - Add visible upload progress states and timestamps on the upload page.
+Rewrite copy and visuals to describe AI Photo Try-On, not live AR.
 
-4. Improve server-side AI mockup generation robustness
-   - Update the AI gateway call to the correct Lovable AI header pattern and improve error handling.
-   - For scan products, choose the best available captured frames by angle instead of only the middle frame.
-   - Generate category-specific AR-ready product renders for fashion, makeup, and furniture; for true GLB/USDZ, keep uploaded 3D models supported and treat image-based generation as an AR-ready mockup asset.
+- **Hero**
+  - Headline: "Try it on. From a photo." (or similar) — emphasises upload-a-photo try-on, not camera AR.
+  - Subhead: explain the 2-photo flow (product + shopper photo → AI result).
+  - CTA buttons: "Start free" + "See a try-on" (links to `/try-ar` demo page, which we'll also rebrand).
+  - Replace the fake "Live AR Demo" phone mock with a **before / after** card pair (shopper photo → composed try-on result) using existing demo assets. Drop the clock / "tap & drag" / tracking dot visuals.
 
-5. Fix AR viewer live placement behavior
-   - Ensure processed image URLs are signed before passing to the live AR overlay so uploaded/scanned assets actually render.
-   - Add AR diagnostics overlay for model loaded/tracking confidence when trying on.
-   - Tune t-shirt placement using shoulders plus hips/torso proportions, with fallback ghost visible until body landmarks lock.
-   - Keep furniture mode direct-camera with drag, rotate, wheel/pinch resize, no capture step.
-   - Keep makeup mode face-landmark lipstick/filter placement and snapshot/share.
+- **"How it works" section** — 3 steps:
+  1. Vendor uploads product photos (front / back / side / detail).
+  2. Shopper uploads or snaps a photo of themselves / their room / their face.
+  3. AI generates a photorealistic try-on in seconds.
 
-6. Validate
-   - Verify the route loads without console errors.
-   - Check scan/upload UI shows progress instead of appearing stuck.
-   - Check AR viewer opens camera and uses the product image/mockup for fashion, makeup, and furniture modes.
+- **Features grid** — replace "real-time tracking / pose detection / WebXR" bullets with:
+  - Multi-angle product capture
+  - AI photo try-on for fashion, jewellery, accessories
+  - Room placement for furniture & decor
+  - Virtual makeup shade matching
+  - One shareable link + QR per product
+  - Works on any phone — no AR hardware needed
+
+- **Use cases**: Fashion · Jewellery · Furniture · Makeup (same 4, refreshed copy).
+
+- **FAQ / footer copy**: strip "AR / WebXR / camera tracking" language; talk about "AI try-on", "photo composition", "powered by Gemini".
+
+## 2. Dashboard
+
+Remove dashboard pages and nav entries that belonged to the old live-AR workflow; keep what fits the new flow.
+
+- **Remove from sidebar + delete routes:**
+  - `dashboard.scan.tsx` (3D scanning / multi-frame capture flow — not used anymore)
+  - `dashboard.create.tsx` if it duplicates upload
+  - `dashboard.products.$id.customize.tsx` if its options only configured live-AR placement; otherwise trim to product metadata only
+
+- **Keep / refresh:**
+  - `dashboard.index.tsx` — relabel "Ready for AR" → "Ready for try-on"; "Total AR Views" → "Try-on views"; "AR slots" → "Try-on slots".
+  - `dashboard.upload.tsx` — already supports multi-angle (`extra_images`). Tighten copy: "Upload product photos (front, back, side, detail) — more angles = better try-on". Show angle guidance.
+  - `dashboard.products.tsx` — rename "Preview AR" → "Preview try-on"; "AR link" → "Try-on link". Keep `/ar/view/$productId` route working (just relabel UI).
+  - `dashboard.embed.tsx` — relabel "AR widget" → "Try-on widget"; update preview text.
+  - `dashboard.analytics.tsx` / `dashboard.behaviour.tsx` — relabel AR session metrics → try-on metrics.
+  - `dashboard.billing.tsx`, `dashboard.settings.tsx` — copy pass only.
+
+- **DashboardShell sidebar** (`src/components/DashboardShell.tsx`): drop Scan link, rename labels to "Try-on" terminology.
+
+## 3. Shared marketing / shell components
+
+- `Navbar.tsx`, `Footer.tsx`, `PricingCards.tsx`, `ReviewCarousel.tsx`, `FeatureCard.tsx` — copy pass only: replace "AR" wording with "AI try-on" where it appears in user-facing strings. No structural changes.
+- `try-ar.tsx` page — keep route, rewrite as a public demo of the try-on flow (pick a sample product → upload your photo → see result), pointing at the same `/ar/view/$productId` viewer.
+- `how-it-works.tsx`, `about.tsx`, `pricing.tsx` — copy pass to match new positioning.
+
+## 4. Not touching
+
+- Backend / DB schema, `ar_products` table, `extra_images` column, signed-URL flow, `ar-compose.ts` Gemini pipeline, `/ar/view/$productId` viewer behaviour. These already implement the new system correctly; this change is **frontend copy + dashboard nav** only.
+- Route URLs stay `/ar/...` internally (no URL renames) so existing shared links keep working — only the visible labels change to "Try-on".
+
+## 5. Verification
+
+- Visit `/` on mobile viewport (current 413×769) → confirm new hero + steps + no "Live AR Demo" clock card.
+- Visit `/dashboard` → sidebar shows new labels, Scan removed, stats labelled "Try-on".
+- Visit `/dashboard/upload` → multi-angle copy is clear.
+- Visit `/ar/view/<id>` → viewer still works end-to-end (unchanged).
+
+Ready to switch to build mode and apply the above.

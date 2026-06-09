@@ -40,7 +40,7 @@ function EmbedPage() {
 
   const url = selected ? `${origin}/ar/view/${selected}` : "";
   const embedCode = `<iframe src="${url}" width="100%" height="640" style="border:0;border-radius:16px" allow="xr-spatial-tracking; camera"></iframe>`;
-  const shopify = `{% comment %} Easibie AR {% endcomment %}\n<a href="${url}" target="_blank" rel="noreferrer">View in AR</a>`;
+  const shopify = `{% comment %} Easibie Try-On {% endcomment %}\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
 
   const copy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
