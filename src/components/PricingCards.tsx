@@ -70,7 +70,7 @@ const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
 
 export function PricingCards() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-6xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-12 max-w-7xl mx-auto">
       {PLANS.map((p) => (
         <div
           key={p.id}
