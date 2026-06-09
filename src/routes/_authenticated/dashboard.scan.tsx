@@ -177,7 +177,11 @@ function ScanPage() {
     }, DETECT_INTERVAL_MS);
 
     captureTimerRef.current = setInterval(() => { void tickCapture(); }, CAPTURE_INTERVAL_MS);
+    // Immediate first capture so the user sees progress right away
+    setTimeout(() => { void tickCapture(true); }, 600);
   };
+
+  const manualCapture = () => { void tickCapture(true); };
 
   const tickCapture = async () => {
     if (!objectVisibleRef.current) return;
