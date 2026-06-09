@@ -47,7 +47,7 @@ export function ArLivePreview(p: Props) {
           style={{
             background: p.buttonBg, color: p.buttonFg, padding: "14px 28px", fontSize: 15,
             borderRadius: p.buttonRadius, fontWeight: 600, border: "none",
-            boxShadow: "0 10px 28px -8px rgba(2,132,199,0.5)",
+            boxShadow: shadow,
             display: "inline-flex", alignItems: "center", gap: 8,
           }}>
           <Sparkles size={16} /> {p.buttonLabel}
