@@ -112,10 +112,14 @@ export function PricingCards() {
           </ul>
           <a
             href={p.href}
-            className={`mt-8 w-full ${p.variant === "primary" ? "" : p.variant === "cyan" ? "btn-cyan" : "btn-ghost"}`}
-            style={p.variant === "primary" ? {
+            className={`mt-8 w-full ${p.variant === "cyan" ? "btn-cyan" : p.variant === "ghost" ? "btn-ghost" : ""}`}
+            style={p.variant === "pro" ? {
               background: "#fff", color: "var(--primary)", padding: "14px 30px", borderRadius: 999,
               fontWeight: 700, fontSize: 14, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+            } : p.variant === "primary" ? {
+              background: GRAD, color: "#fff", padding: "14px 30px", borderRadius: 999,
+              fontWeight: 700, fontSize: 14, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+              boxShadow: "0 18px 40px -18px rgba(2,132,199,0.6)",
             } : undefined}
           >
             {p.cta}
