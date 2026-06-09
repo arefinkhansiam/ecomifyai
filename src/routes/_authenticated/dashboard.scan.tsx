@@ -80,6 +80,7 @@ function ScanPage() {
   const productIdRef = useRef<string | null>(null);
   const objectVisibleRef = useRef(false);
   const confidenceRef = useRef(0);
+  const captureBusyRef = useRef(false);
 
   useEffect(() => () => stopAll(), []);
 
@@ -227,6 +228,7 @@ function ScanPage() {
   const manualCapture = () => { void tickCapture(true); };
 
   const tickCapture = async (force = false) => {
+    if (captureBusyRef.current) return;
     if (!force && !objectVisibleRef.current) {
       addDiagnostic("Detection", `Waiting for product · confidence ${Math.round(confidenceRef.current * 100)}%`);
     }
@@ -234,19 +236,20 @@ function ScanPage() {
     const v = videoRef.current, c = canvasRef.current, pid = productIdRef.current, uid = user?.id;
     if (!v || !c || !pid || !uid) return;
     if (!v.videoWidth || !v.videoHeight) return;
+    captureBusyRef.current = true;
     const started = performance.now();
     markStep("Angle capture", "active");
     c.width = v.videoWidth; c.height = v.videoHeight;
     const ctx = c.getContext("2d"); if (!ctx) return;
     ctx.drawImage(v, 0, 0, c.width, c.height);
     const blob: Blob | null = await new Promise((res) => c.toBlob((b) => res(b), "image/jpeg", 0.85));
-    if (!blob) return;
+    if (!blob) { captureBusyRef.current = false; return; }
 
     const n = countRef.current + 1;
     const path = `scans/${uid}/${pid}/frame_${String(n).padStart(3, "0")}.jpg`;
     const { error: upErr } = await supabase.storage.from("product-images")
       .upload(path, blob, { contentType: "image/jpeg", upsert: true });
-    if (upErr) { console.warn("[scan] upload err", upErr); addDiagnostic("Upload error", upErr.message); return; }
+    if (upErr) { console.warn("[scan] upload err", upErr); addDiagnostic("Upload error", upErr.message); captureBusyRef.current = false; return; }
     await supabase.from("scan_frames").insert({ product_id: pid, frame_url: path, frame_number: n });
     const ms = Math.round(performance.now() - started);
     setCaptureLatency(ms);
@@ -257,6 +260,7 @@ function ScanPage() {
       processing_step: `angle_${angleForCount(n - 1).toLowerCase().replace(/\W+/g, "_")}`,
       processing_progress: Math.max(10, Math.round((n / TOTAL_FRAMES) * 60)),
     }).eq("id", pid);
+    captureBusyRef.current = false;
     if (n >= TOTAL_FRAMES) { markStep("Angle capture", "done"); await finishScan(); }
   };
 
