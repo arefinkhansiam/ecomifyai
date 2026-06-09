@@ -104,26 +104,18 @@ export const generate3dPreview = createServerFn({ method: "POST" })
       : (await supabase.from("models_3d").insert({ product_id: productId, processing_status: "generating" }).select().single()).data;
 
     await supabase.from("ar_products").update({
-      status: "processing", processing_step: "ai_preview", processing_progress: 60,
+      status: "processing", processing_step: "mockup_generation", processing_progress: 72, error_message: null,
     }).eq("id", productId);
 
     try {
-      // Pick frame ~middle
       const { data: frames } = await supabase
         .from("scan_frames").select("frame_url, frame_number")
         .eq("product_id", productId).order("frame_number", { ascending: true });
       if (!frames || frames.length === 0) throw new Error("No scan frames");
-      const primary = frames[Math.floor(frames.length / 2)];
+      const chosenFrames = pickAngleFrames(frames);
+      const dataUrls = await Promise.all(chosenFrames.map((frame) => storagePathToDataUrl(supabase, frame.frame_url)));
 
-      // Sign the frame so we can fetch its bytes
-      const { data: signed } = await supabase.storage
-        .from("product-images").createSignedUrl(primary.frame_url, 600);
-      if (!signed?.signedUrl) throw new Error("Could not read scan frame");
-      const imgRes = await fetch(signed.signedUrl);
-      const imgBuf = await imgRes.arrayBuffer();
-      const dataUrl = `data:image/jpeg;base64,${Buffer.from(imgBuf).toString("base64")}`;
-
-      const { mime, bytes } = await callGeminiHero(dataUrl, promptForCategory((product as any).ar_mode, (product as any).ar_subtype));
+      const { mime, bytes } = await callGeminiHero(dataUrls, `${promptForCategory((product as any).ar_mode, (product as any).ar_subtype)} Use all supplied scan angles as reference views for one accurate front-facing AR-ready mockup.`);
       const ext = mime === "image/jpeg" ? "jpg" : "png";
 
       const path = `${userId}/${productId}/preview.${ext}`;
