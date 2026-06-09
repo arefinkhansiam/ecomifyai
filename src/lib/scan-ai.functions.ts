@@ -22,7 +22,7 @@ function promptForCategory(mode?: string | null, subtype?: string | null): strin
   return DEFAULT_PROMPT;
 }
 
-async function callGeminiHero(dataUrl: string): Promise<{ mime: string; bytes: Buffer }> {
+async function callGeminiHero(dataUrl: string, prompt: string = DEFAULT_PROMPT): Promise<{ mime: string; bytes: Buffer }> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("Missing LOVABLE_API_KEY");
   const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
