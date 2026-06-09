@@ -27,7 +27,7 @@ function Checkout() {
     if (!user) { navigate({ to: "/auth", search: { mode: "signup" } }); return; }
     setProcessing(true);
     try {
-      const limit = plan === "starter" ? 10 : 50;
+      const limit = plan === "starter" ? 10 : plan === "pro" ? 9999 : 50;
       const { data: prof } = await supabase.from("profiles").select("is_free_trial_growth").eq("id", user.id).maybeSingle();
       const free = plan === "growth" && (prof as any)?.is_free_trial_growth === true;
       const { error } = await supabase.from("user_plans").update({
