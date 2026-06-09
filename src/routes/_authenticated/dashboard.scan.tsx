@@ -229,7 +229,6 @@ function ScanPage() {
   const tickCapture = async (force = false) => {
     if (!force && !objectVisibleRef.current) {
       addDiagnostic("Detection", `Waiting for product · confidence ${Math.round(confidenceRef.current * 100)}%`);
-      return;
     }
     if (countRef.current >= TOTAL_FRAMES) return;
     const v = videoRef.current, c = canvasRef.current, pid = productIdRef.current, uid = user?.id;
