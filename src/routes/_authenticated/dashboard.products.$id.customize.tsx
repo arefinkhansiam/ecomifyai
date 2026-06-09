@@ -208,7 +208,6 @@ function CustomizePage() {
         use_gradient: isPaid ? useGradient : false,
         gradient_from: gradient.stops[0]?.color,
         gradient_to: gradient.stops[gradient.stops.length - 1]?.color,
-        gradient_data: gradient as any,
         show_branding: isPaid ? showBranding : true,
         ar_customization: isPaid ? {
           page_bg: bgType === "solid" ? bgSolid : bgType === "gradient" ? gradientToCSS(bgGradient) : bgImage,
@@ -217,6 +216,7 @@ function CustomizePage() {
           show_product_name: showProductName, ar_badge_text: arBadge || undefined,
           button_shadow: buttonShadow,
           font_family: fontFamily,
+          gradient_data: gradient,
         } : {},
       } as any).eq("id", id);
       if (error) throw error;
