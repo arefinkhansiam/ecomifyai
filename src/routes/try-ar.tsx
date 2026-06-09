@@ -237,7 +237,7 @@ function TryARPage() {
             </div>
             <div className="grid sm:grid-cols-3 gap-4">
               {[
-                { name: "Easibie Demo (iOS AR)", src: "https://modelviewer.dev/shared-assets/models/glTF-Sample-Models/2.0/SheenChair/glTF-Binary/SheenChair.glb", ios: "/models/demo-ar.usdz" },
+                { name: "Easibie Demo (iOS AR)", src: "https://modelviewer.dev/shared-assets/models/Astronaut.glb", ios: "/models/demo-ar.usdz" },
                 { name: "Astronaut", src: "https://modelviewer.dev/shared-assets/models/Astronaut.glb", ios: "https://modelviewer.dev/shared-assets/models/Astronaut.usdz" },
                 { name: "Damaged Helmet", src: "https://modelviewer.dev/shared-assets/models/glTF-Sample-Models/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb" },
               ].map((m) => (
