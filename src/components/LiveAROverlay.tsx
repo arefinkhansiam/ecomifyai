@@ -170,6 +170,7 @@ export function LiveAROverlay(p: Props) {
 
       const flipped = facing === "user";
       let detected = false;
+      let confidence = 0;
       let result: any = lastResultRef.current;
 
       if (landmarkerRef.current && (p.mode === "fashion" || p.mode === "makeup")) {
@@ -177,7 +178,9 @@ export function LiveAROverlay(p: Props) {
         if (ts - lastTsRef.current > 33) {
           lastTsRef.current = ts;
           try {
+            const start = performance.now();
             const r = landmarkerRef.current.detectForVideo(v, ts);
+            setDetectLatency(Math.round(performance.now() - start));
             if (p.mode === "fashion" ? r?.landmarks?.[0] : r?.faceLandmarks?.[0]) {
               lastResultRef.current = r;
               lastDetectAtRef.current = ts;
@@ -192,12 +195,15 @@ export function LiveAROverlay(p: Props) {
 
       if (p.mode === "fashion" && result?.landmarks?.[0] && fresh) {
         const smoothed = smoothLandmarks(result.landmarks[0], smoothRef.current, c, flipped);
+        confidence = poseConfidence(smoothed, p.subtype);
         if (drawFashion(ctx, c, smoothed, p.subtype, productImgRef.current)) detected = true;
       } else if (p.mode === "makeup" && result?.faceLandmarks?.[0] && fresh) {
         drawMakeup(ctx, c, result.faceLandmarks[0], flipped, p.dominantColor || p.accent);
+        confidence = 1;
         detected = true;
       } else if (p.mode === "furniture" && productImgRef.current) {
         drawFurniture(ctx, c, productImgRef.current, furnRef.current);
+        confidence = 1;
         detected = true;
       }
 
@@ -209,6 +215,7 @@ export function LiveAROverlay(p: Props) {
       }
 
       setTracking(detected && p.mode !== "furniture");
+      setTrackingConfidence(confidence);
     };
 
     render();
