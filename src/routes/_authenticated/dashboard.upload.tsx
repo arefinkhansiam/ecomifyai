@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/upload")({
   validateSearch: (s: Record<string, unknown>): UploadSearch => {
     const m = s.mode as ArMode | undefined;
     const sub = s.subtype as ClothingSub | undefined;
-    const okMode = m && ["fashion", "furniture", "makeup", "full_3d"].includes(m) ? m : undefined;
+    const okMode = m && ["fashion", "furniture", "makeup"].includes(m) ? m : undefined;
     const okSub = sub && ["top", "bottom", "accessory", "jewellery"].includes(sub) ? sub : undefined;
     return { mode: okMode, subtype: okSub };
   },
