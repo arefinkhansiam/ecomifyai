@@ -22,7 +22,6 @@ function TryItOnPage() {
         <div className="absolute inset-0 -z-10 opacity-70"
           style={{ background: "radial-gradient(ellipse 900px 500px at 50% 0%, rgba(14,165,233,0.22), transparent 70%)" }} />
         <div className="mx-auto max-w-5xl px-6 pt-16 pb-6 text-center">
-          <span className="pill"><Sparkles size={14} /> AI photo try-on · no signup</span>
           <h1 className="mt-4 text-gradient-ocean">See it on you in seconds.</h1>
           <p className="mt-5 max-w-2xl mx-auto text-lg">
             Pick a sample product, upload one photo of yourself or your room, and watch our AI render a photoreal try-on right here. This is exactly what your shoppers see.
