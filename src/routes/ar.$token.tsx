@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { z } from "zod";
 import { Sparkles } from "lucide-react";
 import { LiveAROverlay } from "@/components/LiveAROverlay";
@@ -83,7 +83,6 @@ function NotReady() {
 
 function ArByToken() {
   const product = Route.useLoaderData();
-  const interacted = useRef(false);
 
   useEffect(() => {
     if (document.querySelector('script[data-mv]')) return;
@@ -126,7 +125,7 @@ function ArByToken() {
         showBranding={product.showBranding}
         btnRadius={btnRadius}
         onClose={() => { window.location.href = "/"; }}
-        onInteract={() => { interacted.current = true; }}
+        onInteract={() => {}}
       />
     );
   }
