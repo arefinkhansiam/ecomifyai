@@ -84,6 +84,7 @@ function Landing() {
                   ar-modes="webxr scene-viewer quick-look"
                   camera-controls
                   auto-rotate
+                  suppressHydrationWarning
                   shadow-intensity="1"
                   exposure="0.9"
                   touch-action="pan-y"
