@@ -219,7 +219,7 @@ function Landing() {
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)" }}>Start Free — No Card</Link>
-                <Link to="/try-ar" className="btn-ghost" style={{ background: "transparent", color: "#fff", borderColor: "rgba(255,255,255,0.35)" }}><Play size={16} /> See It in Action</Link>
+                <Link to="/try-ar" className="btn-ghost" style={{ background: "transparent", color: "#fff", borderColor: "rgba(255,255,255,0.35)" }}>See It in Action</Link>
               </div>
             </div>
           </div>
