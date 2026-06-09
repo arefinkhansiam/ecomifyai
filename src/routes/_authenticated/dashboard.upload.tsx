@@ -366,6 +366,33 @@ function UploadPage() {
             </div>
           </label>
 
+          {arMode !== "full_3d" && (
+            <div className="mt-5 p-4 rounded-2xl" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.05), rgba(56,189,248,0.05))", border: "1px solid rgba(124,58,237,0.18)" }}>
+              <div className="text-sm font-semibold text-ink">Extra angles (optional · max 4)</div>
+              <p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>
+                Add back, side or detail photos. The more angles you upload, the more accurate the AI try-on / placement will look.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {extraPreviews.map((src, i) => (
+                  <div key={src} className="relative w-20 h-20 rounded-xl overflow-hidden border" style={{ borderColor: "var(--border)" }}>
+                    <img src={src} alt={`angle ${i + 1}`} className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => removeExtra(i)}
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black text-white grid place-items-center text-xs">×</button>
+                  </div>
+                ))}
+                {extraFiles.length < 4 && (
+                  <label className="w-20 h-20 rounded-xl border-2 border-dashed grid place-items-center cursor-pointer text-primary"
+                    style={{ borderColor: "var(--primary)" }}>
+                    <Plus size={20} />
+                    <input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={(e) => onExtraFiles(e.target.files)} />
+                  </label>
+                )}
+              </div>
+            </div>
+          )}
+
+
+
           <div className="mt-6">
             <label className="text-xs text-muted uppercase tracking-wide">Product name</label>
             <input className="input-base mt-1" value={name} onChange={(e) => setName(e.target.value)} placeholder="Modern Lounge Chair" />
