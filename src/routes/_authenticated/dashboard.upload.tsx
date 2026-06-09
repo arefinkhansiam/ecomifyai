@@ -61,8 +61,10 @@ function UploadPage() {
   const generateHero = useServerFn(generateAiHeroFromImage);
   const [plan, setPlan] = useState<"free" | "starter" | "growth">("free");
   const [file, setFile] = useState<File | null>(null);
+  const [extraFiles, setExtraFiles] = useState<File[]>([]);
   const [name, setName] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
+  const [extraPreviews, setExtraPreviews] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState("");
   const [createdId, setCreatedId] = useState<string | null>(null);
@@ -71,6 +73,7 @@ function UploadPage() {
   const [logs, setLogs] = useState<UploadLog[]>([]);
   const [arMode, setArMode] = useState<ArMode>(search.mode ?? "furniture");
   const [subtype] = useState<ClothingSub | undefined>(search.subtype);
+
   // If user came from /dashboard/create, lock the mode picker to that choice.
   const modeLocked = !!search.mode;
 
@@ -127,6 +130,28 @@ function UploadPage() {
     if (!name) setName(f.name.replace(/\.[^.]+$/, ""));
   };
 
+  const onExtraFiles = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const okType = (f: File) => ["image/jpeg", "image/png", "image/webp"].includes(f.type);
+    const next: File[] = [];
+    Array.from(files).forEach((f) => {
+      if (!okType(f)) { toast.error("Extra angles must be JPG / PNG / WebP"); return; }
+      if (f.size > 10 * 1024 * 1024) { toast.error(`${f.name} too large (max 10MB)`); return; }
+      next.push(f);
+    });
+    const combined = [...extraFiles, ...next].slice(0, 4);
+    setExtraFiles(combined);
+    setExtraPreviews(combined.map((f) => URL.createObjectURL(f)));
+  };
+
+  const removeExtra = (idx: number) => {
+    const next = extraFiles.filter((_, i) => i !== idx);
+    setExtraFiles(next);
+    setExtraPreviews(next.map((f) => URL.createObjectURL(f)));
+  };
+
+
+
   const addColor = () => {
     if (colors.includes(newColor)) return;
     setColors([...colors, newColor]);
@@ -150,6 +175,21 @@ function UploadPage() {
       if (upErr) throw upErr;
       markStep("Upload", "done");
 
+      // Upload any vendor multi-angle photos (back/side/detail) in parallel
+      const extraPaths: string[] = [];
+      if (!isModel && extraFiles.length > 0) {
+        log("Angles", `Uploading ${extraFiles.length} extra angle${extraFiles.length === 1 ? "" : "s"}`);
+        const results = await Promise.all(extraFiles.map(async (f) => {
+          const e = f.name.split(".").pop();
+          const p = `${user.id}/${crypto.randomUUID()}.${e}`;
+          const { error } = await supabase.storage.from("product-images").upload(p, f, { contentType: f.type });
+          if (error) { log("Angle error", error.message); return null; }
+          return p;
+        }));
+        for (const p of results) if (p) extraPaths.push(p);
+      }
+
+
       setStep("Saving product...");
       markStep("Scanning", isModel ? "done" : "active");
       const { data: created, error: insErr } = await supabase.from("ar_products").insert({
@@ -172,6 +212,8 @@ function UploadPage() {
         button_size: size,
         is_public: true,
         product_colors: colors,
+        extra_images: extraPaths,
+
         use_gradient: isPaid ? useGradient : false,
         gradient_from: bg,
         gradient_to: bg2,
@@ -323,6 +365,33 @@ function UploadPage() {
               <input type="file" accept={MODE_INFO[arMode].accept} hidden onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
             </div>
           </label>
+
+          {arMode !== "full_3d" && (
+            <div className="mt-5 p-4 rounded-2xl" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.05), rgba(56,189,248,0.05))", border: "1px solid rgba(124,58,237,0.18)" }}>
+              <div className="text-sm font-semibold text-ink">Extra angles (optional · max 4)</div>
+              <p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>
+                Add back, side or detail photos. The more angles you upload, the more accurate the AI try-on / placement will look.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {extraPreviews.map((src, i) => (
+                  <div key={src} className="relative w-20 h-20 rounded-xl overflow-hidden border" style={{ borderColor: "var(--border)" }}>
+                    <img src={src} alt={`angle ${i + 1}`} className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => removeExtra(i)}
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black text-white grid place-items-center text-xs">×</button>
+                  </div>
+                ))}
+                {extraFiles.length < 4 && (
+                  <label className="w-20 h-20 rounded-xl border-2 border-dashed grid place-items-center cursor-pointer text-primary"
+                    style={{ borderColor: "var(--primary)" }}>
+                    <Plus size={20} />
+                    <input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={(e) => onExtraFiles(e.target.files)} />
+                  </label>
+                )}
+              </div>
+            </div>
+          )}
+
+
 
           <div className="mt-6">
             <label className="text-xs text-muted uppercase tracking-wide">Product name</label>

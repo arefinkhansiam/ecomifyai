@@ -1,8 +1,8 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture } from "lucide-react";
+import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture, ImagePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { LiveAROverlay } from "@/components/LiveAROverlay";
+
 
 
 export const Route = createFileRoute("/ar/view/$productId")({
@@ -141,45 +141,14 @@ function TopBar({ name, showName, overlay, fontColor, accent, onClose, badge }: 
 }
 
 function ARRouter() {
-  const { product, imageUrl } = Route.useLoaderData();
+  const { product } = Route.useLoaderData();
   const raw = (product.ar_mode || "furniture") as string;
   if (raw === "full_3d" || raw === "object_3d") return <Full3DView />;
   const mode: "fashion" | "furniture" | "makeup" =
     raw === "fashion" ? "fashion" : raw === "makeup" ? "makeup" : "furniture";
-  const subtype = (product as any).ar_subtype ?? undefined;
-  const cust = useCustomization(product);
-  const camLabel: "front" | "back" = (mode === "fashion" || mode === "makeup") ? "front" : "back";
-  const tracker = useSessionTracker(product, camLabel, mode);
-
-  const customBadge = (product.ar_customization as any)?.ar_badge_text as string | undefined;
-  const defaultBadge =
-    mode === "fashion"
-      ? (subtype === "bottom" ? "PANTS TRY-ON" : subtype === "accessory" ? "ACCESSORY" : subtype === "jewellery" ? "JEWELLERY" : "TRY-ON")
-      : mode === "makeup" ? "MAKEUP" : "PLACE IT";
-  const badge = customBadge?.trim() ? customBadge.trim().toUpperCase() : defaultBadge;
-
-  return (
-    <LiveAROverlay
-      key={product.id}
-      productId={product.id}
-      productName={product.product_name}
-      productImageUrl={imageUrl}
-      dominantColor={product.dominant_color}
-      mode={mode}
-      subtype={subtype}
-      accent={cust.accent}
-      fontColor={cust.fontColor}
-      overlay={cust.overlay}
-      pageBg={cust.pageBg}
-      badge={badge}
-      showName={cust.showName}
-      showBranding={product.show_branding !== false}
-      btnRadius={cust.btnRadius}
-      onClose={() => { tracker.sendSession(true); exitView(); }}
-      onInteract={() => tracker.markInteract()}
-    />
-  );
+  return <CameraComposeView mode={mode} />;
 }
+
 
 
 /* ============================================================
@@ -236,29 +205,9 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     startCamera(next);
   };
 
-  const capture = async () => {
-    if (!videoRef.current) return;
-    tracker.markInteract();
-    setPhase("capturing");
-    const v = videoRef.current;
-    const w = v.videoWidth || 720;
-    const h = v.videoHeight || 1280;
-    const canvas = canvasRef.current ?? document.createElement("canvas");
-    canvasRef.current = canvas;
-    // Cap to keep payload under ~3MB
-    const maxDim = 1024;
-    const scale = Math.min(1, maxDim / Math.max(w, h));
-    canvas.width = Math.round(w * scale);
-    canvas.height = Math.round(h * scale);
-    const ctx = canvas.getContext("2d");
-    if (!ctx) { setPhase("ready"); return; }
-    if (facing === "user") { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
-    ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-
+  const composeWith = async (dataUrl: string) => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     setPhase("processing");
-
     try {
       const r = await fetch("/api/public/ar-compose", {
         method: "POST",
@@ -275,6 +224,61 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       startCamera(facing);
     }
   };
+
+  const capture = async () => {
+    if (!videoRef.current) return;
+    tracker.markInteract();
+    setPhase("capturing");
+    const v = videoRef.current;
+    const w = v.videoWidth || 720;
+    const h = v.videoHeight || 1280;
+    const canvas = canvasRef.current ?? document.createElement("canvas");
+    canvasRef.current = canvas;
+    const maxDim = 1024;
+    const scale = Math.min(1, maxDim / Math.max(w, h));
+    canvas.width = Math.round(w * scale);
+    canvas.height = Math.round(h * scale);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) { setPhase("ready"); return; }
+    if (facing === "user") { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
+    ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+    await composeWith(dataUrl);
+  };
+
+  const onPickPhoto = async (file: File | null) => {
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { setErrorMsg("Please pick an image file"); return; }
+    if (file.size > 8 * 1024 * 1024) { setErrorMsg("Image too large (max 8MB)"); return; }
+    tracker.markInteract();
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const src = String(reader.result || "");
+      // Downscale to max 1280px to keep payload reasonable
+      try {
+        const img = new Image();
+        img.onload = async () => {
+          const maxDim = 1280;
+          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+          const w = Math.round(img.width * scale);
+          const h = Math.round(img.height * scale);
+          const c = document.createElement("canvas");
+          c.width = w; c.height = h;
+          const cx = c.getContext("2d");
+          if (!cx) { await composeWith(src); return; }
+          cx.drawImage(img, 0, 0, w, h);
+          await composeWith(c.toDataURL("image/jpeg", 0.85));
+        };
+        img.onerror = () => composeWith(src);
+        img.src = src;
+      } catch {
+        await composeWith(src);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+
 
   const retake = () => {
     setResultUrl(null);
@@ -370,21 +374,29 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
       {/* Bottom controls */}
       {phase === "ready" && (
-        <div className="absolute left-0 right-0 z-30 flex items-center justify-center gap-4" style={{ bottom: "calc(env(safe-area-inset-bottom) + 24px)" }}>
-          <div className="w-12" />
-          <button onClick={capture} aria-label="Capture"
-            className="w-20 h-20 rounded-full grid place-items-center transition-transform active:scale-95"
-            style={{ background: "#fff", boxShadow: `0 0 0 4px ${cust.accent}, 0 18px 40px -10px rgba(0,0,0,0.5)` }}>
-            <div className="w-16 h-16 rounded-full grid place-items-center" style={{ background: cust.accent }}>
-              <Aperture size={28} color="#fff" />
-            </div>
-          </button>
-          <button onClick={flipCamera} aria-label="Flip camera"
-            className="w-12 h-12 rounded-full grid place-items-center" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
-            <SwitchCamera size={18} />
-          </button>
+        <div className="absolute left-0 right-0 z-30 flex flex-col items-center gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
+          <label className="px-4 py-2 rounded-full text-xs font-semibold inline-flex items-center gap-2 cursor-pointer"
+            style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+            <ImagePlus size={14} /> Upload your photo instead
+            <input type="file" accept="image/*" hidden onChange={(e) => onPickPhoto(e.target.files?.[0] ?? null)} />
+          </label>
+          <div className="flex items-center justify-center gap-4">
+            <div className="w-12" />
+            <button onClick={capture} aria-label="Capture"
+              className="w-20 h-20 rounded-full grid place-items-center transition-transform active:scale-95"
+              style={{ background: "#fff", boxShadow: `0 0 0 4px ${cust.accent}, 0 18px 40px -10px rgba(0,0,0,0.5)` }}>
+              <div className="w-16 h-16 rounded-full grid place-items-center" style={{ background: cust.accent }}>
+                <Aperture size={28} color="#fff" />
+              </div>
+            </button>
+            <button onClick={flipCamera} aria-label="Flip camera"
+              className="w-12 h-12 rounded-full grid place-items-center" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              <SwitchCamera size={18} />
+            </button>
+          </div>
         </div>
       )}
+
 
       {phase === "result" && (
         <div className="absolute left-3 right-3 z-30 flex items-center justify-center gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
@@ -405,9 +417,17 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
             <p className="mt-2 text-white/70 text-sm">
               {phase === "denied" ? "Allow camera permission to continue." : "Open on a mobile browser to use AR."}
             </p>
-            {phase === "denied" && (
-              <button onClick={() => startCamera()} className="btn-primary mt-6 inline-flex"><RefreshCw size={16} /> Retry</button>
-            )}
+            <div className="mt-6 flex flex-col items-center gap-2">
+              {phase === "denied" && (
+                <button onClick={() => startCamera()} className="btn-primary inline-flex"><RefreshCw size={16} /> Retry camera</button>
+              )}
+              <label className="px-5 py-3 rounded-full font-semibold text-sm inline-flex items-center gap-2 cursor-pointer"
+                style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius }}>
+                <ImagePlus size={15} /> Upload a photo instead
+                <input type="file" accept="image/*" hidden onChange={(e) => onPickPhoto(e.target.files?.[0] ?? null)} />
+              </label>
+            </div>
+
           </div>
         </div>
       )}

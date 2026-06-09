@@ -37,7 +37,7 @@ export const Route = createFileRoute("/api/public/ar-compose")({
 
           const { data: prod, error } = await supabaseAdmin
             .from("ar_products")
-            .select("id, original_image_url, processed_image_url, is_public, status, ar_mode, ar_subtype")
+            .select("id, original_image_url, processed_image_url, extra_images, is_public, status, ar_mode, ar_subtype")
             .eq("id", data.productId)
             .maybeSingle();
           if (error || !prod) return Response.json({ error: "Product not found" }, { status: 404, headers: CORS });
@@ -47,16 +47,27 @@ export const Route = createFileRoute("/api/public/ar-compose")({
           const subtype = (data.subtype ?? (prod as any).ar_subtype) as
             | "top" | "bottom" | "accessory" | "jewellery" | null | undefined;
 
-          let productImageUrl = prod.processed_image_url as string | null;
-          if (!productImageUrl && prod.original_image_url) {
-            const { data: signed } = await supabaseAdmin.storage
-              .from("product-images")
-              .createSignedUrl(prod.original_image_url, 3600);
-            productImageUrl = signed?.signedUrl ?? null;
+          // Collect every available product angle: processed hero + original + vendor-uploaded extras.
+          const paths: string[] = [];
+          if ((prod as any).processed_image_url) paths.push((prod as any).processed_image_url);
+          if (prod.original_image_url && prod.original_image_url !== (prod as any).processed_image_url) {
+            paths.push(prod.original_image_url);
           }
-          if (!productImageUrl) return Response.json({ error: "Product image missing" }, { status: 422, headers: CORS });
+          const extras = ((prod as any).extra_images as string[] | null) ?? [];
+          for (const p of extras) if (p && !paths.includes(p)) paths.push(p);
 
-          const productDataUrl = await fetchAsDataUrl(productImageUrl);
+          if (paths.length === 0) return Response.json({ error: "Product image missing" }, { status: 422, headers: CORS });
+
+          const signed = await Promise.all(paths.map(async (p) => {
+            // If already a fully-qualified URL, use as-is.
+            if (/^https?:\/\//i.test(p)) return p;
+            const { data: s } = await supabaseAdmin.storage.from("product-images").createSignedUrl(p, 3600);
+            return s?.signedUrl ?? null;
+          }));
+          const productUrls = signed.filter((u): u is string => !!u).slice(0, 5);
+          if (productUrls.length === 0) return Response.json({ error: "Could not load product image" }, { status: 500, headers: CORS });
+
+          const productDataUrls = await Promise.all(productUrls.map(fetchAsDataUrl));
           const captureDataUrl = data.captureBase64.startsWith("data:")
             ? data.captureBase64
             : `data:image/jpeg;base64,${data.captureBase64}`;
@@ -64,42 +75,39 @@ export const Route = createFileRoute("/api/public/ar-compose")({
           const key = process.env.LOVABLE_API_KEY;
           if (!key) return Response.json({ error: "AI not configured" }, { status: 500, headers: CORS });
 
+          const angleNote = productDataUrls.length > 1
+            ? `Images 2 through ${productDataUrls.length + 1} are MULTIPLE ANGLES (front / back / side / detail) of the SAME product — use them together to understand the product's true shape, colour, fabric/material, and details from every side.`
+            : `Image 2 is the product.`;
+
           const fashionPrompt = (() => {
             if (subtype === "bottom") {
-              return `Virtual try-on. FIRST image: a person standing. SECOND image: a bottom garment (pants / jeans / trousers / skirt / shorts). Generate a photorealistic image of the SAME person wearing the bottom garment. Preserve the person's face, hair, pose, upper body, skin tone, lighting and background EXACTLY. Replace only the bottom garment with the new one — fit naturally to the legs/waist, realistic folds, accurate length, shadows and shading matching the scene light. Do NOT change shoes, top, accessories or background. Return only the resulting image.`;
+              return `Virtual try-on. Image 1: a person standing. ${angleNote} Render a photorealistic image of the SAME person wearing this bottom garment (pants / jeans / trousers / skirt / shorts). Preserve the person's face, hair, pose, upper body, skin tone, lighting and background EXACTLY. Replace ONLY the bottom garment — natural fit, accurate length, realistic folds, shadows matching the scene light. Use all reference angles to keep colour, pattern and back details accurate. Do NOT change shoes, top, accessories or background. Return only the resulting image.`;
             }
             if (subtype === "accessory") {
-              return `Virtual try-on. FIRST image: a person. SECOND image: a single accessory (watch / bag / hat / glasses / shoes / belt). Generate a photorealistic image of the SAME person wearing/holding ONLY that accessory in the natural location (watch on wrist, hat on head, glasses on face, bag in hand, shoes on feet). Preserve the person's face, hair, pose, body shape, skin tone, clothing, lighting and background EXACTLY. Match scale, perspective, and shadows. Do NOT change anything else. Return only the resulting image.`;
+              return `Virtual try-on. Image 1: a person. ${angleNote} Place this accessory (watch / bag / hat / glasses / shoes / belt) on the SAME person in its natural location (watch on wrist, hat on head, glasses on face, bag in hand, shoes on feet). Preserve face, hair, pose, body shape, skin tone, clothing, lighting and background EXACTLY. Match scale, perspective and shadows. Use all reference angles for accurate shape and details. Return only the resulting image.`;
             }
             if (subtype === "jewellery") {
-              return `Virtual jewellery try-on. FIRST image: a person (selfie or upper body). SECOND image: a piece of jewellery (necklace / earrings / ring / bracelet). Place the jewellery photorealistically on the correct body part (necklace on neckline, earrings on earlobes, ring on finger, bracelet on wrist). Match scale, metal reflections, gemstone sparkle, and shadows to the scene lighting. Preserve the person's identity, skin texture, hair, pose, clothing and background EXACTLY. Do NOT change face shape or smooth skin. Return only the resulting image.`;
+              return `Virtual jewellery try-on. Image 1: a person. ${angleNote} Place the jewellery photorealistically on the correct body part (necklace on neckline, earrings on earlobes, ring on finger, bracelet on wrist). Match metal reflections, gemstone sparkle, scale and scene shadows. Preserve identity, skin texture, hair, pose, clothing and background EXACTLY. Use all reference angles for accurate detail. Return only the resulting image.`;
             }
-            // default: top / shirt / dress
-            return `Virtual try-on. FIRST image: a person. SECOND image: a top garment (shirt / t-shirt / blouse / jacket / dress). Generate a photorealistic image of the SAME person wearing the top garment. Preserve the person's face, hair, pose, body shape, skin tone, lower-body clothing, lighting and background EXACTLY. The garment must fit naturally with realistic folds, shadows, and shading matching the scene light. Do NOT change anything besides the upper-body garment. Return only the resulting image.`;
+            return `Virtual try-on. Image 1: a person. ${angleNote} Render a photorealistic image of the SAME person wearing this top garment (shirt / t-shirt / blouse / jacket / dress). Preserve face, hair, pose, body shape, skin tone, lower-body clothing, lighting and background EXACTLY. The garment must drape naturally with realistic folds, shadows and shading matching scene light. Use all reference angles to keep colour, pattern and back details accurate. Return only the resulting image.`;
           })();
+
           const prompt =
             data.mode === "fashion"
               ? fashionPrompt
               : data.mode === "makeup"
-              ? `Virtual makeup try-on. FIRST image: a selfie of a person's face. SECOND image: a makeup product (lipstick / eyeshadow / foundation / blush / etc.) — use it as the COLOR and FINISH reference. Apply that makeup to the person's face photorealistically. Preserve the person's identity, facial features, pose, hair, skin texture, lighting, and background EXACTLY. Only modify the relevant area (lips for lipstick, eyelids for eyeshadow, cheeks for blush, full face for foundation). Match the product's exact shade, opacity, and finish (matte, glossy, shimmer). No skin smoothing, no face shape changes, no filters. Return only the resulting image.`
-              : `Interior visualisation. FIRST image: a real room photo from a phone camera. SECOND image: a product (furniture / decor) on its own (possibly with a background). Place the product naturally inside the room with correct perspective, realistic scale, ground contact shadows, and lighting matching the room. Remove the product's original background. Keep the room background unchanged. Return only the resulting composed image.`;
+              ? `Virtual makeup try-on. Image 1: a selfie of a person's face. ${angleNote} Use the product as the COLOR + FINISH reference. Apply that makeup photorealistically to the person (lips for lipstick, eyelids for eyeshadow, cheeks for blush, full face for foundation). Preserve identity, facial features, pose, hair, skin texture, lighting and background EXACTLY. Match the product's exact shade, opacity and finish (matte / glossy / shimmer). No skin smoothing, no face changes, no filters. Return only the resulting image.`
+              : `Interior visualisation. Image 1: a real room photo. ${angleNote} Place this furniture / decor item naturally inside the room — correct perspective, realistic scale, ground-contact shadow, lighting matching the room. Remove the product's original background. Keep the room background unchanged. Use all reference angles to render the product from the correct viewing angle for the room scene. Return only the resulting image.`;
 
+          const content: any[] = [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: captureDataUrl } }];
+          for (const u of productDataUrls) content.push({ type: "image_url", image_url: { url: u } });
 
           const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
+            headers: { "Content-Type": "application/json", "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
             body: JSON.stringify({
               model: "google/gemini-2.5-flash-image",
-              messages: [
-                {
-                  role: "user",
-                  content: [
-                    { type: "text", text: prompt },
-                    { type: "image_url", image_url: { url: captureDataUrl } },
-                    { type: "image_url", image_url: { url: productDataUrl } },
-                  ],
-                },
-              ],
+              messages: [{ role: "user", content }],
               modalities: ["image", "text"],
             }),
           });
@@ -115,7 +123,7 @@ export const Route = createFileRoute("/api/public/ar-compose")({
           const imageUrl: string | undefined =
             msg?.images?.[0]?.image_url?.url ?? msg?.images?.[0]?.url ?? undefined;
           if (!imageUrl) return Response.json({ error: "No image returned" }, { status: 502, headers: CORS });
-          return Response.json({ imageUrl }, { headers: CORS });
+          return Response.json({ imageUrl, anglesUsed: productDataUrls.length }, { headers: CORS });
         } catch (e: any) {
           return Response.json({ error: e?.message ?? "Bad request" }, { status: 400, headers: CORS });
         }

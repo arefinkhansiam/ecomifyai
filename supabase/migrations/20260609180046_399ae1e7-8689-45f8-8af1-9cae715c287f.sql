@@ -1,0 +1,1 @@
+ALTER TABLE public.ar_products ADD COLUMN IF NOT EXISTS extra_images text[] NOT NULL DEFAULT '{}'::text[];
