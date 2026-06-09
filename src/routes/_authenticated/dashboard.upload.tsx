@@ -175,6 +175,21 @@ function UploadPage() {
       if (upErr) throw upErr;
       markStep("Upload", "done");
 
+      // Upload any vendor multi-angle photos (back/side/detail) in parallel
+      const extraPaths: string[] = [];
+      if (!isModel && extraFiles.length > 0) {
+        log("Angles", `Uploading ${extraFiles.length} extra angle${extraFiles.length === 1 ? "" : "s"}`);
+        const results = await Promise.all(extraFiles.map(async (f) => {
+          const e = f.name.split(".").pop();
+          const p = `${user.id}/${crypto.randomUUID()}.${e}`;
+          const { error } = await supabase.storage.from("product-images").upload(p, f, { contentType: f.type });
+          if (error) { log("Angle error", error.message); return null; }
+          return p;
+        }));
+        for (const p of results) if (p) extraPaths.push(p);
+      }
+
+
       setStep("Saving product...");
       markStep("Scanning", isModel ? "done" : "active");
       const { data: created, error: insErr } = await supabase.from("ar_products").insert({
