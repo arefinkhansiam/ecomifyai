@@ -502,13 +502,11 @@ function drawFashion(
   }
 
   // Top (t-shirt / shirt)
-  if (!ls || !rs || Math.min(ls.v, rs.v) < 0.3) return false;
+  if (!ls || !rs || !lh || !rh || Math.min(ls.v, rs.v, lh.v, rh.v) < 0.45) return false;
   const shoulderW = Math.hypot(ls.x - rs.x, ls.y - rs.y);
   const cx = (ls.x + rs.x) / 2;
   const shoulderTop = (ls.y + rs.y) / 2;
-  const hipMidY = (lh && rh && Math.min(lh.v, rh.v) > 0.25)
-    ? (lh.y + rh.y) / 2
-    : shoulderTop + shoulderW * 1.7;
+  const hipMidY = (lh.y + rh.y) / 2;
   // Tilt to match shoulder line
   const angle = Math.atan2(rs.y - ls.y, rs.x - ls.x);
   const w = shoulderW * 1.95;
