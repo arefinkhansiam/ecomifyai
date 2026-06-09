@@ -18,7 +18,7 @@ function PricingPage() {
       <section className="py-24">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <span className="pill">Pricing</span>
-          <h1 className="mt-6 text-white">Simple, transparent pricing.</h1>
+          <h1 className="mt-6 text-gradient-ocean">Simple, transparent pricing.</h1>
           <p className="mt-6 text-lg">Start free. Upgrade when you are ready to scale.</p>
         </div>
         <div className="mx-auto max-w-6xl px-6">
