@@ -47,7 +47,7 @@ function ProductsPage() {
   };
 
   return (
-    <DashboardShell title="My AR Products">
+    <DashboardShell title="My Try-Ons">
       <div className="flex items-center justify-between mb-6">
         <p className="text-sm">{items.length} products</p>
         <Link to="/dashboard/upload" className="btn-primary text-xs"><Upload size={14} /> New Product</Link>
@@ -59,7 +59,7 @@ function ProductsPage() {
       ) : items.length === 0 ? (
         <div className="bg-card rounded-2xl p-12 text-center">
           <Box size={48} className="mx-auto text-[var(--lavender)]" />
-          <h3 className="text-white mt-4">No AR products yet</h3>
+          <h3 className="text-white mt-4">No try-on products yet</h3>
           <p className="mt-2 text-sm">Upload your first product photo to get started.</p>
           <Link to="/dashboard/upload" className="btn-primary mt-6 inline-flex"><Upload size={14} /> Upload Now</Link>
         </div>
@@ -104,7 +104,7 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
           style={{
             background: p.status === "ready" ? "rgba(16,185,129,0.15)" : p.status === "failed" ? "rgba(239,68,68,0.15)" : "rgba(245,158,11,0.15)",
             color: p.status === "ready" ? "var(--success)" : p.status === "failed" ? "var(--error)" : "var(--warning)",
-          }}>{p.status === "ready" ? "AR Ready" : p.status}</span>
+          }}>{p.status === "ready" ? "Try-On Ready" : p.status}</span>
       </div>
       {p.status === "processing" && (
         <div className="h-1 bg-[var(--surface)]"><div className="h-full bg-[var(--primary)]" style={{ width: `${p.processing_progress}%` }} /></div>
@@ -114,7 +114,7 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
         <div className="text-xs text-muted mt-1">{(p.view_count ?? p.views_count ?? 0).toLocaleString()} views</div>
         <div className="flex gap-2 mt-4 flex-wrap">
           {p.status === "ready" && (
-            <a href={viewerUrl} target="_blank" rel="noreferrer" className="flex-1 btn-ghost text-[10px]"><ExternalLink size={12} /> Preview AR</a>
+            <a href={viewerUrl} target="_blank" rel="noreferrer" className="flex-1 btn-ghost text-[10px]"><ExternalLink size={12} /> Preview Try-On</a>
           )}
           {p.status === "ready" && (
             <button onClick={copyEmbed} className="btn-ghost text-[10px]">
