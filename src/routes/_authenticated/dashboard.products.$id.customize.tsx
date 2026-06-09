@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Loader2, Save, RotateCcw, Crown, Lock } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { ArLivePreview } from "@/components/ArLivePreview";
+import { AdvancedColorPicker } from "@/components/AdvancedColorPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 
