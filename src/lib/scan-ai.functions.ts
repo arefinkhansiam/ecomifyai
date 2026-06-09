@@ -165,14 +165,18 @@ export const generateAiHeroFromImage = createServerFn({ method: "POST" })
     if (!product || product.user_id !== userId) throw new Error("Not found");
     if (!product.original_image_url) return { ok: false, reason: "no_image" as const };
 
+    const { data: existing } = await supabase
+      .from("models_3d").select("id").eq("product_id", productId).maybeSingle();
+    const modelRow = existing?.id
+      ? (await supabase.from("models_3d").update({ processing_status: "generating", error_message: null }).eq("id", existing.id).select().single()).data
+      : (await supabase.from("models_3d").insert({ product_id: productId, processing_status: "generating" }).select().single()).data;
+
+    await supabase.from("ar_products").update({
+      status: "processing", processing_step: "mockup_generation", processing_progress: 70, error_message: null,
+    }).eq("id", productId);
+
     try {
-      const { data: signed } = await supabase.storage
-        .from("product-images").createSignedUrl(product.original_image_url, 600);
-      if (!signed?.signedUrl) throw new Error("Could not read source image");
-      const res = await fetch(signed.signedUrl);
-      const buf = await res.arrayBuffer();
-      const sourceMime = res.headers.get("content-type") || "image/jpeg";
-      const dataUrl = `data:${sourceMime};base64,${Buffer.from(buf).toString("base64")}`;
+      const dataUrl = await storagePathToDataUrl(supabase, product.original_image_url);
 
       const { mime, bytes } = await callGeminiHero(dataUrl, promptForCategory((product as any).ar_mode, (product as any).ar_subtype));
       const ext = mime === "image/jpeg" ? "jpg" : "png";
@@ -181,18 +185,25 @@ export const generateAiHeroFromImage = createServerFn({ method: "POST" })
         .upload(path, bytes, { contentType: mime, upsert: true });
       if (upErr) throw upErr;
 
-      const { data: existing } = await supabase
-        .from("models_3d").select("id").eq("product_id", productId).maybeSingle();
-      if (existing?.id) {
-        await supabase.from("models_3d").update({ preview_url: path, processing_status: "done" }).eq("id", existing.id);
-      } else {
-        await supabase.from("models_3d").insert({ product_id: productId, preview_url: path, processing_status: "done" });
-      }
+      await supabase.from("models_3d").update({ preview_url: path, processing_status: "done", error_message: null }).eq("id", modelRow!.id);
 
-      await supabase.from("ar_products").update({ processed_image_url: path }).eq("id", productId);
+      await supabase.from("ar_products").update({
+        processed_image_url: path,
+        status: "ready",
+        processing_step: "complete",
+        processing_progress: 100,
+        error_message: null,
+      }).eq("id", productId);
       return { ok: true as const, previewPath: path };
     } catch (e: any) {
-      // Don't fail the product — caller already created it as "ready" with the raw image.
+      await supabase.from("models_3d").update({ processing_status: "failed", error_message: String(e?.message ?? e) }).eq("id", modelRow!.id);
+      await supabase.from("ar_products").update({
+        processed_image_url: product.original_image_url,
+        status: "ready",
+        processing_step: "complete_with_fallback",
+        processing_progress: 100,
+        error_message: String(e?.message ?? e),
+      }).eq("id", productId);
       return { ok: false as const, reason: String(e?.message ?? e) };
     }
   });
