@@ -25,6 +25,7 @@ export type Database = {
           button_label: string
           button_size: string
           button_text_color: string
+          category_id: string | null
           created_at: string | null
           dominant_color: string | null
           embed_count: number
@@ -38,6 +39,7 @@ export type Database = {
           id: string
           image_height: number | null
           image_width: number | null
+          is_demo: boolean
           is_public: boolean | null
           original_image_url: string | null
           processed_image_url: string | null
@@ -66,6 +68,7 @@ export type Database = {
           button_label?: string
           button_size?: string
           button_text_color?: string
+          category_id?: string | null
           created_at?: string | null
           dominant_color?: string | null
           embed_count?: number
@@ -79,6 +82,7 @@ export type Database = {
           id?: string
           image_height?: number | null
           image_width?: number | null
+          is_demo?: boolean
           is_public?: boolean | null
           original_image_url?: string | null
           processed_image_url?: string | null
@@ -107,6 +111,7 @@ export type Database = {
           button_label?: string
           button_size?: string
           button_text_color?: string
+          category_id?: string | null
           created_at?: string | null
           dominant_color?: string | null
           embed_count?: number
@@ -120,6 +125,7 @@ export type Database = {
           id?: string
           image_height?: number | null
           image_width?: number | null
+          is_demo?: boolean
           is_public?: boolean | null
           original_image_url?: string | null
           processed_image_url?: string | null
@@ -138,7 +144,15 @@ export type Database = {
           view_count?: number
           views_count?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ar_products_category_fk"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ar_sessions: {
         Row: {
@@ -335,6 +349,77 @@ export type Database = {
         }
         Relationships: []
       }
+      product_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      product_variants: {
+        Row: {
+          created_at: string
+          extra_images: string[]
+          id: string
+          image_url: string
+          label: string
+          position: number
+          product_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          extra_images?: string[]
+          id?: string
+          image_url: string
+          label: string
+          position?: number
+          product_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          extra_images?: string[]
+          id?: string
+          image_url?: string
+          label?: string
+          position?: number
+          product_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "ar_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           ar_slots_used: number
@@ -430,9 +515,95 @@ export type Database = {
           },
         ]
       }
+      tryon_branding: {
+        Row: {
+          accent_color: string
+          button_bg: string
+          button_label: string
+          button_text_color: string
+          created_at: string
+          font: string
+          logo_url: string | null
+          store_name: string | null
+          updated_at: string
+          user_id: string
+          viewer_bg: string
+          watermark_text: string | null
+          watermark_url: string | null
+        }
+        Insert: {
+          accent_color?: string
+          button_bg?: string
+          button_label?: string
+          button_text_color?: string
+          created_at?: string
+          font?: string
+          logo_url?: string | null
+          store_name?: string | null
+          updated_at?: string
+          user_id: string
+          viewer_bg?: string
+          watermark_text?: string | null
+          watermark_url?: string | null
+        }
+        Update: {
+          accent_color?: string
+          button_bg?: string
+          button_label?: string
+          button_text_color?: string
+          created_at?: string
+          font?: string
+          logo_url?: string | null
+          store_name?: string | null
+          updated_at?: string
+          user_id?: string
+          viewer_bg?: string
+          watermark_text?: string | null
+          watermark_url?: string | null
+        }
+        Relationships: []
+      }
+      tryon_feedback: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          liked: boolean
+          product_id: string
+          session_id: string | null
+          vendor_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          liked: boolean
+          product_id: string
+          session_id?: string | null
+          vendor_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          liked?: boolean
+          product_id?: string
+          session_id?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tryon_feedback_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "ar_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_plans: {
         Row: {
-          ar_product_limit: number
+          ar_product_limit: number | null
           billing_end_date: string | null
           billing_start_date: string | null
           billing_status: string | null
@@ -445,7 +616,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          ar_product_limit?: number
+          ar_product_limit?: number | null
           billing_end_date?: string | null
           billing_start_date?: string | null
           billing_status?: string | null
@@ -458,7 +629,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          ar_product_limit?: number
+          ar_product_limit?: number | null
           billing_end_date?: string | null
           billing_start_date?: string | null
           billing_status?: string | null

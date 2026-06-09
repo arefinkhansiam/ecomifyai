@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ArTokenRouteImport } from './routes/ar.$token'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as ArViewProductIdRouteImport } from './routes/ar.view.$productId'
+import { Route as ApiPublicTryonDemoRouteImport } from './routes/api/public/tryon-demo'
 import { Route as ApiPublicTrackArSessionRouteImport } from './routes/api/public/track-ar-session'
 import { Route as ApiPublicArComposeRouteImport } from './routes/api/public/ar-compose'
 import { Route as AuthenticatedDashboardUploadRouteImport } from './routes/_authenticated/dashboard.upload'
@@ -84,6 +85,11 @@ const AuthenticatedDashboardIndexRoute =
 const ArViewProductIdRoute = ArViewProductIdRouteImport.update({
   id: '/ar/view/$productId',
   path: '/ar/view/$productId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTryonDemoRoute = ApiPublicTryonDemoRouteImport.update({
+  id: '/api/public/tryon-demo',
+  path: '/api/public/tryon-demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicTrackArSessionRoute = ApiPublicTrackArSessionRouteImport.update({
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
+  '/api/public/tryon-demo': typeof ApiPublicTryonDemoRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
+  '/api/public/tryon-demo': typeof ApiPublicTryonDemoRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
+  '/api/public/tryon-demo': typeof ApiPublicTryonDemoRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/dashboard/upload'
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
+    | '/api/public/tryon-demo'
     | '/ar/view/$productId'
     | '/dashboard/'
     | '/dashboard/products/$id/customize'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/dashboard/upload'
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
+    | '/api/public/tryon-demo'
     | '/ar/view/$productId'
     | '/dashboard'
     | '/dashboard/products/$id/customize'
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/upload'
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
+    | '/api/public/tryon-demo'
     | '/ar/view/$productId'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/products/$id/customize'
@@ -295,6 +307,7 @@ export interface RootRouteChildren {
   ArTokenRoute: typeof ArTokenRoute
   ApiPublicArComposeRoute: typeof ApiPublicArComposeRoute
   ApiPublicTrackArSessionRoute: typeof ApiPublicTrackArSessionRoute
+  ApiPublicTryonDemoRoute: typeof ApiPublicTryonDemoRoute
   ArViewProductIdRoute: typeof ArViewProductIdRoute
 }
 
@@ -375,6 +388,13 @@ declare module '@tanstack/react-router' {
       path: '/ar/view/$productId'
       fullPath: '/ar/view/$productId'
       preLoaderRoute: typeof ArViewProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tryon-demo': {
+      id: '/api/public/tryon-demo'
+      path: '/api/public/tryon-demo'
+      fullPath: '/api/public/tryon-demo'
+      preLoaderRoute: typeof ApiPublicTryonDemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/track-ar-session': {
@@ -503,6 +523,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArTokenRoute: ArTokenRoute,
   ApiPublicArComposeRoute: ApiPublicArComposeRoute,
   ApiPublicTrackArSessionRoute: ApiPublicTrackArSessionRoute,
+  ApiPublicTryonDemoRoute: ApiPublicTryonDemoRoute,
   ArViewProductIdRoute: ArViewProductIdRoute,
 }
 export const routeTree = rootRouteImport
