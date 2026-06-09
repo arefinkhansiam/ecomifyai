@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Box, Upload, BarChart2, Link as LinkIcon, CreditCard, Settings, LogOut, Bell, HelpCircle, Sparkles, Crown, Activity, ScanLine } from "lucide-react";
+import { LayoutDashboard, Box, BarChart2, Link as LinkIcon, CreditCard, Settings, LogOut, Bell, HelpCircle, Sparkles, Crown, Activity, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,8 +8,7 @@ import { useAuth } from "@/lib/use-auth";
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/dashboard/products", label: "My AR Products", icon: Box },
-  { to: "/dashboard/scan", label: "Scan Product", icon: ScanLine },
-  { to: "/dashboard/upload", label: "Upload New", icon: Upload },
+  { to: "/dashboard/create", label: "Create AR", icon: Plus },
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
   { to: "/dashboard/behaviour", label: "Customer Behaviour", icon: Activity },
   { to: "/dashboard/embed", label: "Embed and Share", icon: LinkIcon },

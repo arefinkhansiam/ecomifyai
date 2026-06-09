@@ -227,7 +227,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       const r = await fetch("/api/public/ar-compose", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: product.id, captureBase64: dataUrl, mode }),
+        body: JSON.stringify({ productId: product.id, captureBase64: dataUrl, mode, subtype }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.error || `AI error (${r.status})`);
@@ -265,12 +265,19 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const close = () => { tracker.sendSession(true); streamRef.current?.getTracks().forEach((t) => t.stop()); exitView(); };
 
   const customBadge = (product.ar_customization as any)?.ar_badge_text as string | undefined;
-  const defaultBadge = mode === "fashion" ? "TRY-ON" : mode === "makeup" ? "MAKEUP" : "PLACE IT";
+  const defaultBadge =
+    mode === "fashion"
+      ? (subtype === "bottom" ? "PANTS TRY-ON" : subtype === "accessory" ? "ACCESSORY" : subtype === "jewellery" ? "JEWELLERY" : "TRY-ON")
+      : mode === "makeup" ? "MAKEUP" : "PLACE IT";
   const badge = customBadge?.trim() ? customBadge.trim().toUpperCase() : defaultBadge;
   const captureHint =
-    mode === "fashion" ? "Stand in frame, then capture" :
-    mode === "makeup"  ? "Center your face, then capture" :
-                         "Aim at the spot, then capture";
+    mode === "fashion"
+      ? (subtype === "bottom" ? "Stand so legs are in frame, then capture"
+        : subtype === "accessory" ? "Show the body part (wrist / face / feet) and capture"
+        : subtype === "jewellery" ? "Show neck / hand / ear close to camera, then capture"
+        : "Stand in frame, then capture")
+      : mode === "makeup"  ? "Center your face, then capture"
+      :                      "Aim at the spot, then capture";
 
   return (
     <div className="fixed inset-0 overflow-hidden" style={{ background: cust.pageBg, color: cust.fontColor, fontFamily: "var(--font-body)" }}>
