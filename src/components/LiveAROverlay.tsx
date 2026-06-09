@@ -59,6 +59,9 @@ export function LiveAROverlay(p: Props) {
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const [tracking, setTracking] = useState<boolean>(false);
   const [modelReady, setModelReady] = useState<boolean>(false);
+  const [modelStatus, setModelStatus] = useState<string>(p.mode === "furniture" ? "Placement ready" : "Loading tracking model…");
+  const [trackingConfidence, setTrackingConfidence] = useState(0);
+  const [detectLatency, setDetectLatency] = useState<number | null>(null);
   const [hint, setHint] = useState<string>("");
 
   const furnRef = useRef({ x: 0.5, y: 0.7, scale: 0.4, rot: 0 });
@@ -110,28 +113,31 @@ export function LiveAROverlay(p: Props) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      if (p.mode === "furniture") { setModelReady(true); return; }
+      if (p.mode === "furniture") { setModelReady(true); setModelStatus("Furniture placement ready"); return; }
       try {
+        setModelStatus("Loading MediaPipe vision files…");
         const vision = await import(/* @vite-ignore */ MP_VISION_URL);
         const fileset = await vision.FilesetResolver.forVisionTasks(WASM_BASE);
         if (cancelled) return;
         if (p.mode === "makeup") {
+          setModelStatus("Loading face landmarks…");
           landmarkerRef.current = await vision.FaceLandmarker.createFromOptions(fileset, {
             baseOptions: { modelAssetPath: FACE_MODEL, delegate: "GPU" },
             runningMode: "VIDEO",
             numFaces: 1,
           });
         } else {
+          setModelStatus("Loading body pose landmarks…");
           landmarkerRef.current = await vision.PoseLandmarker.createFromOptions(fileset, {
             baseOptions: { modelAssetPath: POSE_MODEL, delegate: "GPU" },
             runningMode: "VIDEO",
             numPoses: 1,
           });
         }
-        if (!cancelled) setModelReady(true);
+        if (!cancelled) { setModelReady(true); setModelStatus(p.mode === "makeup" ? "Face tracking ready" : "Body tracking ready"); }
       } catch (e) {
         console.warn("MediaPipe failed, using centered fallback overlay", e);
-        if (!cancelled) setModelReady(true); // unblock UI; fallback overlay will render
+        if (!cancelled) { setModelReady(true); setModelStatus("Tracking fallback active"); } // unblock UI; fallback overlay will render
       }
     })();
     return () => { cancelled = true; try { landmarkerRef.current?.close?.(); } catch {} };
