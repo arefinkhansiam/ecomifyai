@@ -35,7 +35,11 @@ type GenStep = "capturing" | "cleaning" | "composing";
 function ScanPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const generate = useServerFn(generate3dPreview);
+  // Category passed from /dashboard/create. Falls back to legacy "scan_ai" flow.
+  const arMode: ArMode = search.mode ?? "furniture";
+  const subtype = search.subtype;
 
   const [phase, setPhase] = useState<Phase>("intro");
   const [productName, setProductName] = useState("");
@@ -92,7 +96,8 @@ function ScanPage() {
     const { data: created, error: insErr } = await supabase.from("ar_products").insert({
       user_id: user.id,
       product_name: productName.trim(),
-      ar_mode: "scan_ai",
+      ar_mode: arMode,
+      ar_subtype: subtype ?? null,
       status: "processing",
       processing_step: "scanning",
       processing_progress: 0,
