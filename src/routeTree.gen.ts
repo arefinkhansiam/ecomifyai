@@ -20,6 +20,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ArTokenRouteImport } from './routes/ar.$token'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as ArViewProductIdRouteImport } from './routes/ar.view.$productId'
+import { Route as ApiPublicTryonRelatedRouteImport } from './routes/api/public/tryon-related'
+import { Route as ApiPublicTryonFeedbackRouteImport } from './routes/api/public/tryon-feedback'
 import { Route as ApiPublicTryonDemoRouteImport } from './routes/api/public/tryon-demo'
 import { Route as ApiPublicTrackArSessionRouteImport } from './routes/api/public/track-ar-session'
 import { Route as ApiPublicArComposeRouteImport } from './routes/api/public/ar-compose'
@@ -85,6 +87,16 @@ const AuthenticatedDashboardIndexRoute =
 const ArViewProductIdRoute = ArViewProductIdRouteImport.update({
   id: '/ar/view/$productId',
   path: '/ar/view/$productId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTryonRelatedRoute = ApiPublicTryonRelatedRouteImport.update({
+  id: '/api/public/tryon-related',
+  path: '/api/public/tryon-related',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTryonFeedbackRoute = ApiPublicTryonFeedbackRouteImport.update({
+  id: '/api/public/tryon-feedback',
+  path: '/api/public/tryon-feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicTryonDemoRoute = ApiPublicTryonDemoRouteImport.update({
@@ -170,6 +182,8 @@ export interface FileRoutesByFullPath {
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
   '/api/public/tryon-demo': typeof ApiPublicTryonDemoRoute
+  '/api/public/tryon-feedback': typeof ApiPublicTryonFeedbackRoute
+  '/api/public/tryon-related': typeof ApiPublicTryonRelatedRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
@@ -193,6 +207,8 @@ export interface FileRoutesByTo {
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
   '/api/public/tryon-demo': typeof ApiPublicTryonDemoRoute
+  '/api/public/tryon-feedback': typeof ApiPublicTryonFeedbackRoute
+  '/api/public/tryon-related': typeof ApiPublicTryonRelatedRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
@@ -218,6 +234,8 @@ export interface FileRoutesById {
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
   '/api/public/tryon-demo': typeof ApiPublicTryonDemoRoute
+  '/api/public/tryon-feedback': typeof ApiPublicTryonFeedbackRoute
+  '/api/public/tryon-related': typeof ApiPublicTryonRelatedRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
@@ -243,6 +261,8 @@ export interface FileRouteTypes {
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
     | '/api/public/tryon-demo'
+    | '/api/public/tryon-feedback'
+    | '/api/public/tryon-related'
     | '/ar/view/$productId'
     | '/dashboard/'
     | '/dashboard/products/$id/customize'
@@ -266,6 +286,8 @@ export interface FileRouteTypes {
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
     | '/api/public/tryon-demo'
+    | '/api/public/tryon-feedback'
+    | '/api/public/tryon-related'
     | '/ar/view/$productId'
     | '/dashboard'
     | '/dashboard/products/$id/customize'
@@ -290,6 +312,8 @@ export interface FileRouteTypes {
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
     | '/api/public/tryon-demo'
+    | '/api/public/tryon-feedback'
+    | '/api/public/tryon-related'
     | '/ar/view/$productId'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/products/$id/customize'
@@ -308,6 +332,8 @@ export interface RootRouteChildren {
   ApiPublicArComposeRoute: typeof ApiPublicArComposeRoute
   ApiPublicTrackArSessionRoute: typeof ApiPublicTrackArSessionRoute
   ApiPublicTryonDemoRoute: typeof ApiPublicTryonDemoRoute
+  ApiPublicTryonFeedbackRoute: typeof ApiPublicTryonFeedbackRoute
+  ApiPublicTryonRelatedRoute: typeof ApiPublicTryonRelatedRoute
   ArViewProductIdRoute: typeof ArViewProductIdRoute
 }
 
@@ -388,6 +414,20 @@ declare module '@tanstack/react-router' {
       path: '/ar/view/$productId'
       fullPath: '/ar/view/$productId'
       preLoaderRoute: typeof ArViewProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tryon-related': {
+      id: '/api/public/tryon-related'
+      path: '/api/public/tryon-related'
+      fullPath: '/api/public/tryon-related'
+      preLoaderRoute: typeof ApiPublicTryonRelatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tryon-feedback': {
+      id: '/api/public/tryon-feedback'
+      path: '/api/public/tryon-feedback'
+      fullPath: '/api/public/tryon-feedback'
+      preLoaderRoute: typeof ApiPublicTryonFeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/tryon-demo': {
@@ -524,18 +564,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicArComposeRoute: ApiPublicArComposeRoute,
   ApiPublicTrackArSessionRoute: ApiPublicTrackArSessionRoute,
   ApiPublicTryonDemoRoute: ApiPublicTryonDemoRoute,
+  ApiPublicTryonFeedbackRoute: ApiPublicTryonFeedbackRoute,
+  ApiPublicTryonRelatedRoute: ApiPublicTryonRelatedRoute,
   ArViewProductIdRoute: ArViewProductIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

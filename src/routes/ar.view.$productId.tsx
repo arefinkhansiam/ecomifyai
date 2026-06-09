@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture, ImagePlus } from "lucide-react";
+import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture, ImagePlus, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 
@@ -173,6 +173,11 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const [phase, setPhase] = useState<"requesting" | "ready" | "capturing" | "processing" | "result" | "denied" | "unsupported">("requesting");
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<null | "liked" | "disliked">(null);
+  const [related, setRelated] = useState<Array<{ id: string; name: string; imageUrl: string | null }>>([]);
+  const sessionIdRef = useRef<string>(
+    typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+  );
 
   const startCamera = async (mode: "user" | "environment" = facing) => {
     setPhase("requesting");
@@ -283,23 +288,98 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const retake = () => {
     setResultUrl(null);
     setErrorMsg(null);
+    setFeedback(null);
+    setRelated([]);
     startCamera(facing);
   };
 
-  const share = async () => {
-    if (!resultUrl) return;
+  // Compose result + watermark into a single PNG blob
+  const composeWatermarkedBlob = async (): Promise<{ blob: Blob; url: string } | null> => {
+    if (!resultUrl) return null;
     try {
-      const blob = await (await fetch(resultUrl)).blob();
-      const file = new File([blob], `${product.product_name || "easibie-ar"}.png`, { type: blob.type });
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      await new Promise<void>((res, rej) => { img.onload = () => res(); img.onerror = () => rej(); img.src = resultUrl; });
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const ctx = c.getContext("2d")!;
+      ctx.drawImage(img, 0, 0);
+      const wmText = product.show_branding === false
+        ? `${product.product_name || "Try-on"}`
+        : "Try-on by Easibie · easibie.app";
+      const pad = Math.round(Math.min(c.width, c.height) * 0.025);
+      const fontSize = Math.round(Math.min(c.width, c.height) * 0.028);
+      ctx.font = `600 ${fontSize}px ${getComputedStyle(document.body).fontFamily || "sans-serif"}`;
+      const metrics = ctx.measureText(wmText);
+      const boxW = metrics.width + pad * 1.4;
+      const boxH = fontSize * 1.9;
+      const x = c.width - boxW - pad;
+      const y = c.height - boxH - pad;
+      ctx.fillStyle = "rgba(11,18,32,0.55)";
+      const r = boxH / 2;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + boxW, y, x + boxW, y + boxH, r);
+      ctx.arcTo(x + boxW, y + boxH, x, y + boxH, r);
+      ctx.arcTo(x, y + boxH, x, y, r);
+      ctx.arcTo(x, y, x + boxW, y, r);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.textBaseline = "middle";
+      ctx.fillText(wmText, x + pad * 0.7, y + boxH / 2);
+      const blob: Blob = await new Promise((res) => c.toBlob((b) => res(b!), "image/png", 0.95));
+      return { blob, url: URL.createObjectURL(blob) };
+    } catch {
+      const r = await fetch(resultUrl);
+      const blob = await r.blob();
+      return { blob, url: URL.createObjectURL(blob) };
+    }
+  };
+
+  const download = async () => {
+    const wm = await composeWatermarkedBlob();
+    if (!wm) return;
+    const a = document.createElement("a");
+    a.href = wm.url;
+    a.download = `${product.product_name || "easibie-tryon"}.png`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(wm.url), 5000);
+  };
+
+  const share = async () => {
+    const wm = await composeWatermarkedBlob();
+    if (!wm) return;
+    const file = new File([wm.blob], `${product.product_name || "easibie-tryon"}.png`, { type: "image/png" });
+    try {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: product.product_name });
+        await navigator.share({ files: [file], title: product.product_name, text: "Check out my virtual try-on!" });
         return;
       }
-      const a = document.createElement("a");
-      a.href = resultUrl;
-      a.download = file.name;
-      a.click();
     } catch {}
+    const a = document.createElement("a");
+    a.href = wm.url;
+    a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(wm.url), 5000);
+  };
+
+  const submitFeedback = async (liked: boolean) => {
+    setFeedback(liked ? "liked" : "disliked");
+    try {
+      await fetch("/api/public/tryon-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id, sessionId: sessionIdRef.current, liked }),
+      });
+    } catch {}
+    if (!liked) {
+      try {
+        const r = await fetch(`/api/public/tryon-related?productId=${product.id}`);
+        const j = await r.json();
+        setRelated(j.items ?? []);
+      } catch {}
+    }
   };
 
   const close = () => { tracker.sendSession(true); streamRef.current?.getTracks().forEach((t) => t.stop()); exitView(); };
@@ -399,13 +479,43 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
 
       {phase === "result" && (
-        <div className="absolute left-3 right-3 z-30 flex items-center justify-center gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
-          <button onClick={retake} className="px-5 py-3 rounded-full font-semibold text-sm" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
-            <RefreshCw size={14} className="inline mr-1.5" /> Retake
-          </button>
-          <button onClick={share} className="px-6 py-3 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius, boxShadow: `0 12px 28px -8px ${cust.accent}88` }}>
-            <Share2 size={15} /> Share
-          </button>
+        <div className="absolute left-0 right-0 z-30 flex flex-col items-center gap-3 px-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 14px)" }}>
+          {feedback === null ? (
+            <div className="px-4 py-2.5 rounded-2xl flex items-center gap-3 text-xs font-semibold" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              <span>Did you like it?</span>
+              <button onClick={() => submitFeedback(true)} className="px-3 py-1.5 rounded-full" style={{ background: "rgba(16,185,129,0.85)", color: "#fff" }}>👍 Yes</button>
+              <button onClick={() => submitFeedback(false)} className="px-3 py-1.5 rounded-full" style={{ background: "rgba(239,68,68,0.85)", color: "#fff" }}>👎 No</button>
+            </div>
+          ) : feedback === "disliked" && related.length > 0 ? (
+            <div className="w-full max-w-md p-3 rounded-2xl" style={{ background: cust.overlay, backdropFilter: "blur(10px)" }}>
+              <div className="text-xs font-semibold mb-2" style={{ color: cust.fontColor }}>Try these instead</div>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {related.map((r) => (
+                  <a key={r.id} href={`/ar/view/${r.id}`} className="shrink-0 w-20 text-center">
+                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-white/10 border" style={{ borderColor: cust.fontColor + "33" }}>
+                      {r.imageUrl && <img src={r.imageUrl} alt={r.name} className="w-full h-full object-cover" />}
+                    </div>
+                    <div className="text-[10px] mt-1 truncate" style={{ color: cust.fontColor }}>{r.name}</div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="px-3 py-1.5 rounded-full text-xs font-medium" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              Thanks for the feedback! 💙
+            </div>
+          )}
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <button onClick={retake} className="px-4 py-2.5 rounded-full font-semibold text-sm" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              <RefreshCw size={14} className="inline mr-1.5" /> Retake
+            </button>
+            <button onClick={download} className="px-4 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              <Download size={15} /> Download
+            </button>
+            <button onClick={share} className="px-5 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius, boxShadow: `0 12px 28px -8px ${cust.accent}88` }}>
+              <Share2 size={15} /> Share
+            </button>
+          </div>
         </div>
       )}
 

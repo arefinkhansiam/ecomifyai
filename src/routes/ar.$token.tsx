@@ -33,11 +33,11 @@ export const Route = createFileRoute("/ar/$token")({
 
 function NotReady() {
   return (
-    <div className="min-h-screen grid place-items-center text-center px-6 bg-[#0B1220] text-white">
+    <div className="min-h-screen grid place-items-center text-center px-6 bg-soft text-ink">
       <div>
-        <Sparkles size={48} className="mx-auto text-sky-400" />
-        <h2 className="mt-4 font-display text-2xl">AR experience unavailable</h2>
-        <p className="mt-2 text-white/70">This link is invalid or the product is still processing.</p>
+        <Sparkles size={48} className="mx-auto text-primary" />
+        <h2 className="mt-4 font-display text-2xl">Try-On unavailable</h2>
+        <p className="mt-2 text-muted">This link is invalid or the product is still processing.</p>
       </div>
     </div>
   );
