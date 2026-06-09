@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { z } from "zod";
 import { Sparkles } from "lucide-react";
 import { LiveAROverlay } from "@/components/LiveAROverlay";
