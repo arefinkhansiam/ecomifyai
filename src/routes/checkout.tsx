@@ -69,10 +69,10 @@ function Checkout() {
               </ul>
             </div>
           </div>
-          <div className="bg-card rounded-2xl p-8 h-fit">
+          <div className="bg-card rounded-2xl p-8 h-fit glow-card">
             <div className="flex items-center gap-2 text-cyan text-sm"><CreditCard size={16} /> Mock checkout</div>
-            <h3 className="text-white mt-2">Payment details</h3>
-            <p className="text-sm mt-2">Connect Stripe to take real payments. This demo activates the plan immediately for testing.</p>
+            <h3 className="text-ink mt-2">Payment details</h3>
+            <p className="text-sm mt-2 text-muted">Connect Stripe to take real payments. This demo activates the plan immediately for testing.</p>
             <div className="mt-6 space-y-3">
               <input className="input-base" placeholder="Card number" defaultValue="4242 4242 4242 4242" />
               <div className="grid grid-cols-2 gap-3">
