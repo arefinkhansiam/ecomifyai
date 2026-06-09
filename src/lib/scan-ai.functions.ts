@@ -33,7 +33,7 @@ async function callGeminiHero(dataUrl: string, prompt: string = DEFAULT_PROMPT):
       messages: [{
         role: "user",
         content: [
-          { type: "text", text: AI_PROMPT },
+          { type: "text", text: prompt },
           { type: "image_url", image_url: { url: dataUrl } },
         ],
       }],
