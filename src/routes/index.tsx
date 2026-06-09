@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Play, Star, UploadCloud, Box, Smartphone, BarChart2, Link as LinkIcon, ShieldCheck, Camera, Share2 } from "lucide-react";
 import { MarketingShell } from "@/components/MarketingShell";
@@ -19,7 +20,17 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
+function useClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
 function Landing() {
+  const clock = useClock();
   return (
     <MarketingShell>
       {/* HERO */}
@@ -74,7 +85,7 @@ function Landing() {
             <div className="float w-[280px] h-[560px] rounded-[44px] bg-card p-3 relative" style={{ boxShadow: "0 40px 120px rgba(2,132,199,0.4)" }}>
               <div className="w-full h-full rounded-[34px] bg-bg overflow-hidden relative">
                 <div className="absolute top-4 left-4 right-4 flex justify-between text-xs text-muted z-10">
-                  <span>9:41</span><span>•••</span>
+                  <span>{clock}</span><span>•••</span>
                 </div>
                 <model-viewer
                   src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
@@ -90,12 +101,6 @@ function Landing() {
                   touch-action="pan-y"
                   style={{ width: "100%", height: "100%", background: "linear-gradient(180deg, #f6fafe 0%, #e0f2fe 100%)", "--poster-color": "transparent" } as any}
                 />
-                <div className="absolute bottom-6 left-4 right-4 z-10">
-                  <div className="bg-card/95 backdrop-blur-md rounded-xl p-3 shadow-lg">
-                    <div className="text-[10px] uppercase tracking-wider text-muted">Live AR Demo · Tap & drag</div>
-                    <div className="text-sm font-semibold text-ink">Modern Lounge Chair</div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
