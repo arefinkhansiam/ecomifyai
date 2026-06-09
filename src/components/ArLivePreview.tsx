@@ -15,7 +15,7 @@ type Props = {
   arButtonText: string;
   showBranding: boolean;
   showProductName: boolean;
-  mode: "fashion" | "furniture" | "full_3d";
+  mode: "fashion" | "furniture" | "full_3d" | "makeup";
 };
 
 /**
