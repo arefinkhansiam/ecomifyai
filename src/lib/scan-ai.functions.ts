@@ -102,7 +102,7 @@ export const generate3dPreview = createServerFn({ method: "POST" })
       const imgBuf = await imgRes.arrayBuffer();
       const dataUrl = `data:image/jpeg;base64,${Buffer.from(imgBuf).toString("base64")}`;
 
-      const { mime, bytes } = await callGeminiHero(dataUrl);
+      const { mime, bytes } = await callGeminiHero(dataUrl, promptForCategory((product as any).ar_mode, (product as any).ar_subtype));
       const ext = mime === "image/jpeg" ? "jpg" : "png";
 
       const path = `${userId}/${productId}/preview.${ext}`;
