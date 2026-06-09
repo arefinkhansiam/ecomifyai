@@ -524,7 +524,7 @@ function drawFashion(
   return true;
 }
 
-function drawProductImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement, cx: number, cy: number, w: number, h: number) {
+function drawProductImage(ctx: CanvasRenderingContext2D, img: ProductImage, cx: number, cy: number, w: number, h: number) {
   ctx.save();
   ctx.shadowColor = "rgba(0,0,0,0.4)";
   ctx.shadowBlur = 20;
@@ -533,7 +533,7 @@ function drawProductImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
   ctx.restore();
 }
 
-function drawFurniture(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img: HTMLImageElement, s: { x: number; y: number; scale: number; rot: number }) {
+function drawFurniture(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img: ProductImage, s: { x: number; y: number; scale: number; rot: number }) {
   const targetW = c.width * s.scale;
   const targetH = targetW * (img.height / img.width);
   ctx.save();
@@ -546,7 +546,7 @@ function drawFurniture(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img:
   ctx.restore();
 }
 
-function drawGhost(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img: HTMLImageElement, subtype: Subtype) {
+function drawGhost(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img: ProductImage, subtype: Subtype) {
   ctx.save();
   ctx.globalAlpha = 0.35;
   let w, h, cx = c.width / 2, cy = c.height / 2;
