@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture, ImagePlus } from "lucide-react";
+import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture, ImagePlus, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 
