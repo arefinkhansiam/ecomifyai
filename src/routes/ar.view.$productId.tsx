@@ -173,6 +173,11 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const [phase, setPhase] = useState<"requesting" | "ready" | "capturing" | "processing" | "result" | "denied" | "unsupported">("requesting");
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<null | "liked" | "disliked">(null);
+  const [related, setRelated] = useState<Array<{ id: string; name: string; imageUrl: string | null }>>([]);
+  const sessionIdRef = useRef<string>(
+    typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+  );
 
   const startCamera = async (mode: "user" | "environment" = facing) => {
     setPhase("requesting");
