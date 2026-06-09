@@ -53,7 +53,7 @@ function Landing() {
             className="mt-10 flex flex-wrap justify-center gap-4"
           >
             <Link to="/auth" search={{ mode: "signup" }} className="btn-cyan">Start for Free</Link>
-            <Link to="/try-ar" className="btn-outline-cyan"><Play size={16} /> See a Try-On</Link>
+            <Link to="/try-ar" className="btn-outline-cyan">See a Try-On</Link>
           </motion.div>
           <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
             <div className="flex -space-x-3">
