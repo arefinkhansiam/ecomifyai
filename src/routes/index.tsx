@@ -238,11 +238,11 @@ function Landing() {
         </div>
       </section>
 
-      {/* REVIEWS */}
-      <section className="py-24">
-        <div className="mx-auto max-w-7xl px-6 mb-12 text-center">
-          <h2 className="text-gradient-ocean">Loved by Store Owners Worldwide</h2>
-          <p className="mt-4">Real results from real Easibie users.</p>
+      {/* REVIEWS — compact */}
+      <section className="py-14">
+        <div className="mx-auto max-w-6xl px-6 mb-6 text-center">
+          <h2 className="text-gradient-ocean text-3xl md:text-4xl">Loved by Store Owners</h2>
+          <p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>Real results from real Easibie users.</p>
         </div>
         <ReviewCarousel />
       </section>
