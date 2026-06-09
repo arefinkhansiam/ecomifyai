@@ -391,11 +391,12 @@ function UploadPage() {
             <input className="input-base mt-1" value={name} onChange={(e) => setName(e.target.value)} placeholder="Modern Lounge Chair" />
           </div>
 
-          {/* Available colors removed per product spec — variants live on the product page */}
+          {/* Available colors removed — variants live on the product page */}
+        </div>
 
         {/* Right: button customization + live preview */}
         <div className="bg-card rounded-2xl p-6 glow-card">
-          <h4 className="text-ink">2. Customize your AR button</h4>
+          <h4 className="text-ink">2. Customize your Try-On button</h4>
           <div className="mt-4 space-y-4">
             <div>
               <label className="text-xs text-muted uppercase tracking-wide">Button label</label>
