@@ -22,19 +22,24 @@ function promptForCategory(mode?: string | null, subtype?: string | null): strin
   return DEFAULT_PROMPT;
 }
 
-async function callGeminiHero(dataUrl: string, prompt: string = DEFAULT_PROMPT): Promise<{ mime: string; bytes: Buffer }> {
+async function callGeminiHero(dataUrl: string | string[], prompt: string = DEFAULT_PROMPT): Promise<{ mime: string; bytes: Buffer }> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("Missing LOVABLE_API_KEY");
+  const imageUrls = Array.isArray(dataUrl) ? dataUrl : [dataUrl];
   const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    headers: {
+      "Lovable-API-Key": apiKey,
+      "X-Lovable-AIG-SDK": "vercel-ai-sdk",
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       model: "google/gemini-2.5-flash-image",
       messages: [{
         role: "user",
         content: [
           { type: "text", text: prompt },
-          { type: "image_url", image_url: { url: dataUrl } },
+          ...imageUrls.map((url) => ({ type: "image_url", image_url: { url } })),
         ],
       }],
       modalities: ["image", "text"],
@@ -51,6 +56,22 @@ async function callGeminiHero(dataUrl: string, prompt: string = DEFAULT_PROMPT):
   const m = img.match(/^data:(image\/[a-z]+);base64,(.+)$/);
   if (!m) throw new Error("AI image not a data URL");
   return { mime: m[1], bytes: Buffer.from(m[2], "base64") };
+}
+
+function pickAngleFrames(frames: Array<{ frame_url: string; frame_number: number }>) {
+  if (frames.length <= 4) return frames;
+  const indexes = [0, Math.floor((frames.length - 1) / 3), Math.floor(((frames.length - 1) * 2) / 3), frames.length - 1];
+  return Array.from(new Set(indexes)).map((i) => frames[i]);
+}
+
+async function storagePathToDataUrl(supabase: any, path: string, fallbackMime = "image/jpeg") {
+  const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(path, 600);
+  if (!signed?.signedUrl) throw new Error("Could not read source image");
+  const imgRes = await fetch(signed.signedUrl);
+  if (!imgRes.ok) throw new Error(`Could not fetch image (${imgRes.status})`);
+  const imgBuf = await imgRes.arrayBuffer();
+  const mime = imgRes.headers.get("content-type") || fallbackMime;
+  return `data:${mime};base64,${Buffer.from(imgBuf).toString("base64")}`;
 }
 
 /**
