@@ -77,7 +77,7 @@ function Landing() {
                   <span>9:41</span><span>•••</span>
                 </div>
                 <model-viewer
-                  src="https://modelviewer.dev/shared-assets/models/glTF-Sample-Models/2.0/SheenChair/glTF-Binary/SheenChair.glb"
+                  src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
                   ios-src="/models/demo-ar.usdz"
                   alt="Easibie AR demo"
                   ar
