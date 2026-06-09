@@ -578,6 +578,38 @@ function StepDot({ label, done, active }: { label: string; done?: boolean; activ
   );
 }
 
+function ProgressTimeline({ steps, dark = false }: { steps: TimelineStep[]; dark?: boolean }) {
+  return (
+    <div className="rounded-2xl p-4" style={{ background: dark ? "rgba(255,255,255,0.08)" : "var(--soft)", border: `1px solid ${dark ? "rgba(255,255,255,0.14)" : "var(--border)"}` }}>
+      <div className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: dark ? "rgba(255,255,255,0.65)" : "var(--muted)" }}>AR / Scan progress</div>
+      <div className="mt-3 space-y-2">
+        {steps.map((step) => (
+          <div key={step.label} className="flex items-start gap-2 text-xs" style={{ color: dark ? "#fff" : "var(--ink)" }}>
+            <span className="mt-0.5 w-2.5 h-2.5 rounded-full shrink-0" style={{ background: step.status === "done" ? "#10B981" : step.status === "active" ? "#38BDF8" : step.status === "error" ? "#EF4444" : dark ? "rgba(255,255,255,0.28)" : "#CBD5E1" }} />
+            <span className="flex-1"><span className="font-semibold">{step.label}</span>{step.at ? ` · ${step.at}` : ""}{step.error ? <span className="block text-red-400 mt-0.5">{step.error}</span> : null}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DiagnosticsPanel({ items, dark = false }: { items: Diagnostic[]; dark?: boolean }) {
+  return (
+    <div className="rounded-2xl p-4" style={{ background: dark ? "rgba(255,255,255,0.08)" : "var(--soft)", border: `1px solid ${dark ? "rgba(255,255,255,0.14)" : "var(--border)"}` }}>
+      <div className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: dark ? "rgba(255,255,255,0.65)" : "var(--muted)" }}>Diagnostics</div>
+      <div className="mt-3 space-y-2 text-xs" style={{ color: dark ? "rgba(255,255,255,0.88)" : "var(--ink-soft)" }}>
+        {items.length ? items.map((item, i) => (
+          <div key={`${item.at}-${item.label}-${i}`} className="flex justify-between gap-3">
+            <span><span className="font-semibold" style={{ color: dark ? "#fff" : "var(--ink)" }}>{item.label}</span> · {item.value}</span>
+            <span className="shrink-0 opacity-70">{item.at}</span>
+          </div>
+        )) : <div>No scan diagnostics yet.</div>}
+      </div>
+    </div>
+  );
+}
+
 function ShutterRing({ pct, count, total, angle }: { pct: number; count: number; total: number; angle: string }) {
   const r = 54, c = 2 * Math.PI * r;
   const off = c - (pct / 100) * c;
