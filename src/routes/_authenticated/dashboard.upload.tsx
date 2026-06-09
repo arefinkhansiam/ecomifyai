@@ -67,6 +67,8 @@ function UploadPage() {
   const [step, setStep] = useState("");
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [timeline, setTimeline] = useState<TimelineStep[]>(initialTimeline);
+  const [logs, setLogs] = useState<UploadLog[]>([]);
   const [arMode, setArMode] = useState<ArMode>(search.mode ?? "furniture");
   const [subtype] = useState<ClothingSub | undefined>(search.subtype);
   // If user came from /dashboard/create, lock the mode picker to that choice.
@@ -96,6 +98,11 @@ function UploadPage() {
   const [showProductName, setShowProductName] = useState(true);
 
   const isPaid = plan !== "free";
+
+  const log = (label: string, value: string) => setLogs((items) => [{ label, value, at: stamp() }, ...items].slice(0, 8));
+  const markStep = (label: string, status: TimelineStep["status"], error?: string) => {
+    setTimeline((items) => items.map((item) => item.label === label ? { ...item, status, at: stamp(), error } : item));
+  };
 
   useEffect(() => {
     if (!user) return;
