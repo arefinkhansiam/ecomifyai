@@ -110,6 +110,7 @@ function ArByToken() {
       : mode === "makeup" ? "MAKEUP" : "PLACE IT";
     return (
       <LiveAROverlay
+        key={product.id}
         productId={product.id}
         productName={product.name}
         productImageUrl={product.imageUrl}

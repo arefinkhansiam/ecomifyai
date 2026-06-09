@@ -69,6 +69,7 @@ export function LiveAROverlay(p: Props) {
   const dragRef = useRef<{ active: boolean } | null>(null);
 
   useEffect(() => {
+    productImgRef.current = null;
     if (!p.productImageUrl) return;
     const img = new Image();
     img.crossOrigin = "anonymous";
