@@ -352,11 +352,12 @@ function ScanPage() {
               </button>
             </div>
 
-            {/* Shutter ring */}
-            <div className="absolute left-1/2 -translate-x-1/2"
-                 style={{ bottom: "calc(env(safe-area-inset-bottom) + 28px)" }}>
+            {/* Shutter ring — tap to manually capture an extra angle */}
+            <button onClick={manualCapture} aria-label="Capture angle"
+              className="absolute left-1/2 -translate-x-1/2 active:scale-95 transition-transform"
+              style={{ bottom: "calc(env(safe-area-inset-bottom) + 28px)" }}>
               <ShutterRing pct={pct} count={count} total={TOTAL_FRAMES} angle={angleLabel} />
-            </div>
+            </button>
 
             {/* Generating overlay */}
             {phase === "generating" && (
