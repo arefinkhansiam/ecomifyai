@@ -39,6 +39,7 @@ const P = {
 const LIP_OUTER = [61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185];
 
 type Smoothed = { x: number; y: number; v: number } | null;
+type ProductImage = HTMLCanvasElement | HTMLImageElement;
 
 export function LiveAROverlay(p: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -64,7 +65,7 @@ export function LiveAROverlay(p: Props) {
   const [detectLatency, setDetectLatency] = useState<number | null>(null);
   const [hint, setHint] = useState<string>("");
 
-  const furnRef = useRef({ x: 0.5, y: 0.7, scale: 0.4, rot: 0 });
+  const furnRef = useRef({ x: 0.5, y: 0.78, scale: 0.32, rot: 0 });
   const dragRef = useRef<{ active: boolean } | null>(null);
 
   useEffect(() => {
