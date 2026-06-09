@@ -136,12 +136,24 @@ export const generate3dPreview = createServerFn({ method: "POST" })
 
       return { ok: true, previewPath: path };
     } catch (e: any) {
+      const { data: fallbackFrames } = await supabase
+        .from("scan_frames").select("frame_url, frame_number")
+        .eq("product_id", productId).order("frame_number", { ascending: true }).limit(1);
+      const fallbackPath = fallbackFrames?.[0]?.frame_url;
       await supabase.from("models_3d").update({
         processing_status: "failed", error_message: String(e?.message ?? e),
       }).eq("id", modelRow!.id);
-      await supabase.from("ar_products").update({
-        status: "failed", error_message: String(e?.message ?? e),
-      }).eq("id", productId);
+      if (fallbackPath) {
+        await supabase.from("ar_products").update({
+          processed_image_url: fallbackPath,
+          status: "ready",
+          processing_step: "complete_with_fallback",
+          processing_progress: 100,
+          error_message: String(e?.message ?? e),
+        }).eq("id", productId);
+        return { ok: false as const, previewPath: fallbackPath, reason: String(e?.message ?? e) };
+      }
+      await supabase.from("ar_products").update({ status: "failed", error_message: String(e?.message ?? e) }).eq("id", productId);
       throw e;
     }
   });
