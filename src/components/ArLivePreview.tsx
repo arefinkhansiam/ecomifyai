@@ -24,7 +24,7 @@ type Props = {
  * what-you-see-is-what-you-get.
  */
 export function ArLivePreview(p: Props) {
-  const badge = p.mode === "fashion" ? "TRY-ON" : p.mode === "full_3d" ? "3D AR" : "PLACE IT";
+  const badge = p.mode === "fashion" ? "TRY-ON" : p.mode === "full_3d" ? "3D AR" : p.mode === "makeup" ? "MAKEUP" : "PLACE IT";
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Store button preview */}
