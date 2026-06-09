@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Camera, X, RefreshCw, Share2, Aperture, SwitchCamera, Loader2, Sparkles, Move } from "lucide-react";
+import { Camera, X, RefreshCw, Share2, Aperture, SwitchCamera, Loader2, Move, RotateCw } from "lucide-react";
 
 type Mode = "fashion" | "furniture" | "makeup";
 type Subtype = "top" | "bottom" | "accessory" | "jewellery" | undefined;
@@ -28,17 +28,17 @@ const POSE_MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmar
 const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
 const WASM_BASE = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
 
-// Pose indices (MediaPipe Pose 33 keypoints)
 const P = {
   L_SHOULDER: 11, R_SHOULDER: 12,
   L_HIP: 23, R_HIP: 24,
+  L_KNEE: 25, R_KNEE: 26,
   L_ANKLE: 27, R_ANKLE: 28,
-  L_WRIST: 15, R_WRIST: 16,
   NOSE: 0,
 };
 
-// Lip outline indices for face landmarker
 const LIP_OUTER = [61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185];
+
+type Smoothed = { x: number; y: number; v: number } | null;
 
 export function LiveAROverlay(p: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -48,6 +48,9 @@ export function LiveAROverlay(p: Props) {
   const productImgRef = useRef<HTMLImageElement | null>(null);
   const landmarkerRef = useRef<any>(null);
   const lastTsRef = useRef<number>(0);
+  const lastResultRef = useRef<any>(null);
+  const smoothRef = useRef<Record<number, Smoothed>>({});
+  const lastDetectAtRef = useRef<number>(0);
 
   const [facing, setFacing] = useState<"user" | "environment">(
     p.mode === "furniture" ? "environment" : "user"
@@ -55,18 +58,18 @@ export function LiveAROverlay(p: Props) {
   const [phase, setPhase] = useState<"loading" | "ready" | "denied" | "unsupported">("loading");
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const [tracking, setTracking] = useState<boolean>(false);
+  const [modelReady, setModelReady] = useState<boolean>(false);
   const [hint, setHint] = useState<string>("");
 
-  // Furniture free-transform state
   const furnRef = useRef({ x: 0.5, y: 0.7, scale: 0.4, rot: 0 });
-  const dragRef = useRef<{ active: boolean; ox: number; oy: number; mode: "move" | "pinch"; pinchD?: number; pinchS?: number } | null>(null);
+  const dragRef = useRef<{ active: boolean } | null>(null);
 
-  // Load product image
   useEffect(() => {
     if (!p.productImageUrl) return;
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => { productImgRef.current = img; };
+    img.onerror = () => { console.warn("product image failed to load"); };
     img.src = p.productImageUrl;
   }, [p.productImageUrl]);
 
@@ -103,11 +106,11 @@ export function LiveAROverlay(p: Props) {
     }
   }, []);
 
-  // Init landmarker for fashion/makeup
+  // Init landmarker
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      if (p.mode === "furniture") return;
+      if (p.mode === "furniture") { setModelReady(true); return; }
       try {
         const vision = await import(/* @vite-ignore */ MP_VISION_URL);
         const fileset = await vision.FilesetResolver.forVisionTasks(WASM_BASE);
@@ -125,19 +128,23 @@ export function LiveAROverlay(p: Props) {
             numPoses: 1,
           });
         }
+        if (!cancelled) setModelReady(true);
       } catch (e) {
-        console.warn("MediaPipe failed, falling back to centered overlay", e);
+        console.warn("MediaPipe failed, using centered fallback overlay", e);
+        if (!cancelled) setModelReady(true); // unblock UI; fallback overlay will render
       }
     })();
     return () => { cancelled = true; try { landmarkerRef.current?.close?.(); } catch {} };
   }, [p.mode]);
 
-  // Start camera on mount + on facing change
   useEffect(() => {
     startCamera(facing);
     return () => stopCamera();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Reset smoothing when facing flips
+  useEffect(() => { smoothRef.current = {}; lastResultRef.current = null; }, [facing, p.mode]);
 
   // Render loop
   useEffect(() => {
@@ -155,72 +162,61 @@ export function LiveAROverlay(p: Props) {
       if (c.width !== vw || c.height !== vh) { c.width = vw; c.height = vh; }
       ctx.clearRect(0, 0, c.width, c.height);
 
-      let detected = false;
       const flipped = facing === "user";
+      let detected = false;
+      let result: any = lastResultRef.current;
 
-      // Detection
       if (landmarkerRef.current && (p.mode === "fashion" || p.mode === "makeup")) {
         const ts = performance.now();
-        if (ts - lastTsRef.current > 30) {
+        if (ts - lastTsRef.current > 33) {
           lastTsRef.current = ts;
           try {
-            const res = landmarkerRef.current.detectForVideo(v, ts);
-            if (p.mode === "fashion") {
-              const lm = res?.landmarks?.[0];
-              if (lm) { detected = true; drawFashion(ctx, c, lm, flipped, p.subtype, productImgRef.current); }
-            } else if (p.mode === "makeup") {
-              const lm = res?.faceLandmarks?.[0];
-              if (lm) { detected = true; drawMakeup(ctx, c, lm, flipped, p.dominantColor || p.accent, p.subtype); }
+            const r = landmarkerRef.current.detectForVideo(v, ts);
+            if (p.mode === "fashion" ? r?.landmarks?.[0] : r?.faceLandmarks?.[0]) {
+              lastResultRef.current = r;
+              lastDetectAtRef.current = ts;
+              result = r;
             }
-          } catch (e) { /* ignore frame */ }
-        } else if (tracking) {
-          // keep previous? simplest: re-draw current frame using last result skipped — leave clear
+          } catch {}
         }
       }
 
-      if (p.mode === "furniture" && productImgRef.current) {
-        const img = productImgRef.current;
-        const targetW = c.width * furnRef.current.scale;
-        const targetH = targetW * (img.height / img.width);
-        const cx = c.width * furnRef.current.x;
-        const cy = c.height * furnRef.current.y;
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(furnRef.current.rot);
-        // soft shadow under
-        ctx.shadowColor = "rgba(0,0,0,0.45)";
-        ctx.shadowBlur = 30;
-        ctx.shadowOffsetY = 20;
-        ctx.drawImage(img, -targetW / 2, -targetH / 2, targetW, targetH);
-        ctx.restore();
+      // Stale check (>1s without detection = lost)
+      const fresh = performance.now() - lastDetectAtRef.current < 800;
+
+      if (p.mode === "fashion" && result?.landmarks?.[0] && fresh) {
+        const smoothed = smoothLandmarks(result.landmarks[0], smoothRef.current, c, flipped);
+        if (drawFashion(ctx, c, smoothed, p.subtype, productImgRef.current)) detected = true;
+      } else if (p.mode === "makeup" && result?.faceLandmarks?.[0] && fresh) {
+        drawMakeup(ctx, c, result.faceLandmarks[0], flipped, p.dominantColor || p.accent);
+        detected = true;
+      } else if (p.mode === "furniture" && productImgRef.current) {
+        drawFurniture(ctx, c, productImgRef.current, furnRef.current);
         detected = true;
       }
 
-      // Fallback if no landmarker available for fashion/makeup
-      if (!detected && (p.mode === "fashion") && productImgRef.current && !landmarkerRef.current) {
-        const img = productImgRef.current;
-        const targetW = c.width * 0.45;
-        const targetH = targetW * (img.height / img.width);
-        ctx.globalAlpha = 0.85;
-        ctx.drawImage(img, (c.width - targetW) / 2, (c.height - targetH) / 2, targetW, targetH);
-        ctx.globalAlpha = 1;
+      // Fallback ghost overlay so user knows where to stand
+      if (!detected && (p.mode === "fashion") && productImgRef.current) {
+        drawGhost(ctx, c, productImgRef.current, p.subtype);
+      } else if (!detected && p.mode === "makeup") {
+        drawFaceGuide(ctx, c, p.accent);
       }
 
-      setTracking(detected);
+      setTracking(detected && p.mode !== "furniture");
     };
 
     render();
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [phase, facing, p.mode, p.subtype, p.dominantColor, p.accent, tracking]);
+  }, [phase, facing, p.mode, p.subtype, p.dominantColor, p.accent]);
 
-  // Update hint
   useEffect(() => {
     if (phase !== "ready") return setHint("");
+    if (p.mode === "furniture") return setHint("Drag to move • pinch to resize • rotate button");
     if (tracking) return setHint("");
-    if (p.mode === "fashion") setHint(p.subtype === "bottom" ? "Stand back so your legs are visible" : "Step back so your full upper body is visible");
-    else if (p.mode === "makeup") setHint("Center your face in the frame");
-    else setHint("Drag to move • pinch to resize");
-  }, [phase, tracking, p.mode, p.subtype]);
+    if (!modelReady) return setHint("Loading AI model…");
+    if (p.mode === "fashion") setHint(p.subtype === "bottom" ? "Step back so your full legs are visible" : "Step back so your full upper body is visible");
+    else setHint("Center your face in the frame");
+  }, [phase, tracking, modelReady, p.mode, p.subtype]);
 
   const flip = () => {
     const next = facing === "user" ? "environment" : "user";
@@ -259,11 +255,11 @@ export function LiveAROverlay(p: Props) {
     } catch {}
   };
 
-  // Furniture touch/pointer handlers
+  // Furniture interactions
   const onPointerDown = (e: React.PointerEvent) => {
     if (p.mode !== "furniture") return;
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    dragRef.current = { active: true, ox: e.clientX, oy: e.clientY, mode: "move" };
+    dragRef.current = { active: true };
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (p.mode !== "furniture" || !dragRef.current?.active) return;
@@ -278,7 +274,6 @@ export function LiveAROverlay(p: Props) {
     furnRef.current.scale = Math.max(0.1, Math.min(0.95, next));
   };
 
-  // Pinch on touch
   const touchRef = useRef<{ d: number; s: number } | null>(null);
   const onTouchStart = (e: React.TouchEvent) => {
     if (p.mode !== "furniture" || e.touches.length !== 2) return;
@@ -296,12 +291,12 @@ export function LiveAROverlay(p: Props) {
   };
   const onTouchEnd = () => { touchRef.current = null; };
 
+  const rotateFurn = () => { furnRef.current.rot += Math.PI / 12; };
+
   return (
     <div className="fixed inset-0 overflow-hidden" style={{ background: p.pageBg, color: p.fontColor, fontFamily: "var(--font-body)" }}>
-      {/* Live video */}
       <video ref={videoRef} playsInline muted className="absolute inset-0 w-full h-full object-cover"
         style={{ transform: facing === "user" ? "scaleX(-1)" : undefined, display: snapshot ? "none" : "block" }} />
-      {/* Overlay canvas */}
       <canvas ref={canvasRef}
         className="absolute inset-0 w-full h-full object-cover touch-none"
         style={{ display: snapshot ? "none" : "block", pointerEvents: p.mode === "furniture" ? "auto" : "none" }}
@@ -311,7 +306,6 @@ export function LiveAROverlay(p: Props) {
 
       <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.35), transparent 30%, transparent 60%, rgba(0,0,0,0.55))" }} />
 
-      {/* Top bar */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-30" style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}>
         <div className="px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2" style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: tracking ? "#10b981" : p.accent }} />
@@ -325,14 +319,12 @@ export function LiveAROverlay(p: Props) {
         <button onClick={p.onClose} className="w-10 h-10 rounded-full grid place-items-center" style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}><X size={18} /></button>
       </div>
 
-      {/* Hint */}
       {!snapshot && hint && (
-        <div className="absolute left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full text-xs font-medium flex items-center gap-1.5" style={{ top: "calc(env(safe-area-inset-top) + 70px)", background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
+        <div className="absolute left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full text-xs font-medium flex items-center gap-1.5 max-w-[85%] text-center" style={{ top: "calc(env(safe-area-inset-top) + 70px)", background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
           {p.mode === "furniture" && <Move size={12} />} {hint}
         </div>
       )}
 
-      {/* Loading overlay while camera/model loads */}
       {phase === "loading" && (
         <div className="absolute inset-0 z-40 grid place-items-center bg-black/70 backdrop-blur-sm text-center px-6">
           <div>
@@ -342,10 +334,13 @@ export function LiveAROverlay(p: Props) {
         </div>
       )}
 
-      {/* Bottom controls — live */}
       {!snapshot && phase === "ready" && (
         <div className="absolute left-0 right-0 z-30 flex items-center justify-center gap-4" style={{ bottom: "calc(env(safe-area-inset-bottom) + 24px)" }}>
-          <div className="w-12" />
+          {p.mode === "furniture" ? (
+            <button onClick={rotateFurn} aria-label="Rotate" className="w-12 h-12 rounded-full grid place-items-center" style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
+              <RotateCw size={18} />
+            </button>
+          ) : <div className="w-12" />}
           <button onClick={snap} aria-label="Snapshot"
             className="w-20 h-20 rounded-full grid place-items-center transition-transform active:scale-95"
             style={{ background: "#fff", boxShadow: `0 0 0 4px ${p.accent}, 0 18px 40px -10px rgba(0,0,0,0.5)` }}>
@@ -360,7 +355,6 @@ export function LiveAROverlay(p: Props) {
         </div>
       )}
 
-      {/* Snapshot actions */}
       {snapshot && (
         <div className="absolute left-3 right-3 z-30 flex items-center justify-center gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
           <button onClick={() => setSnapshot(null)} className="px-5 py-3 rounded-full font-semibold text-sm" style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
@@ -395,85 +389,149 @@ export function LiveAROverlay(p: Props) {
   );
 }
 
-/* ---------- drawing helpers ---------- */
+/* ---------- drawing ---------- */
 
-function lmPoint(c: HTMLCanvasElement, lm: any, idx: number, flipped: boolean) {
-  const x = (flipped ? 1 - lm[idx].x : lm[idx].x) * c.width;
-  const y = lm[idx].y * c.height;
-  return { x, y, v: lm[idx].visibility ?? 1 };
+function smoothLandmarks(lm: any, store: Record<number, Smoothed>, c: HTMLCanvasElement, flipped: boolean) {
+  const ALPHA = 0.45; // smoothing factor (higher = more responsive)
+  const out: Record<number, { x: number; y: number; v: number }> = {};
+  const indices = [P.L_SHOULDER, P.R_SHOULDER, P.L_HIP, P.R_HIP, P.L_KNEE, P.R_KNEE, P.L_ANKLE, P.R_ANKLE, P.NOSE];
+  for (const i of indices) {
+    if (!lm[i]) continue;
+    const x = (flipped ? 1 - lm[i].x : lm[i].x) * c.width;
+    const y = lm[i].y * c.height;
+    const v = lm[i].visibility ?? 1;
+    const prev = store[i];
+    const sx = prev ? prev.x + (x - prev.x) * ALPHA : x;
+    const sy = prev ? prev.y + (y - prev.y) * ALPHA : y;
+    store[i] = { x: sx, y: sy, v };
+    out[i] = { x: sx, y: sy, v };
+  }
+  return out;
 }
 
 function drawFashion(
   ctx: CanvasRenderingContext2D,
   c: HTMLCanvasElement,
-  lm: any,
-  flipped: boolean,
+  pts: Record<number, { x: number; y: number; v: number }>,
   subtype: Subtype,
   img: HTMLImageElement | null,
-) {
-  if (!img) return;
+): boolean {
+  if (!img) return false;
+  const ls = pts[P.L_SHOULDER], rs = pts[P.R_SHOULDER];
+  const lh = pts[P.L_HIP], rh = pts[P.R_HIP];
 
   if (subtype === "bottom") {
-    const lh = lmPoint(c, lm, P.L_HIP, flipped);
-    const rh = lmPoint(c, lm, P.R_HIP, flipped);
-    const la = lmPoint(c, lm, P.L_ANKLE, flipped);
-    const ra = lmPoint(c, lm, P.R_ANKLE, flipped);
-    if (Math.min(lh.v, rh.v) < 0.4) return;
+    if (!lh || !rh || Math.min(lh.v, rh.v) < 0.3) return false;
+    const la = pts[P.L_ANKLE], ra = pts[P.R_ANKLE];
     const cx = (lh.x + rh.x) / 2;
     const top = (lh.y + rh.y) / 2;
-    const ankleY = Math.max(la.y, ra.y);
-    const bottom = Math.max(top + 100, isFinite(ankleY) ? ankleY : c.height * 0.95);
-    const hipW = Math.hypot(lh.x - rh.x, lh.y - rh.y) * 2.0;
+    const ankleY = (la && ra) ? Math.max(la.y, ra.y) : c.height * 0.95;
+    const bottom = Math.max(top + 150, ankleY);
+    const hipW = Math.hypot(lh.x - rh.x, lh.y - rh.y) * 2.2;
     const h = bottom - top;
-    const w = Math.max(hipW, h * (img.width / img.height) * 0.8);
-    drawProductImage(ctx, img, cx, top + h / 2, w, h);
-    return;
+    drawProductImage(ctx, img, cx, top + h / 2, Math.max(hipW, h * 0.5), h);
+    return true;
   }
 
   if (subtype === "accessory" || subtype === "jewellery") {
-    // Place near neckline / chest
-    const ls = lmPoint(c, lm, P.L_SHOULDER, flipped);
-    const rs = lmPoint(c, lm, P.R_SHOULDER, flipped);
-    const nose = lmPoint(c, lm, P.NOSE, flipped);
-    if (Math.min(ls.v, rs.v) < 0.4) return;
+    if (!ls || !rs || Math.min(ls.v, rs.v) < 0.3) return false;
+    const nose = pts[P.NOSE];
     const cx = (ls.x + rs.x) / 2;
-    const cy = (ls.y + rs.y) / 2 + (((ls.y + rs.y) / 2 - nose.y) * 0.15);
-    const w = Math.hypot(ls.x - rs.x, ls.y - rs.y) * 0.55;
+    const cy = (ls.y + rs.y) / 2 + (nose ? (((ls.y + rs.y) / 2 - nose.y) * 0.2) : 0);
+    const w = Math.hypot(ls.x - rs.x, ls.y - rs.y) * 0.6;
     const h = w * (img.height / img.width);
     drawProductImage(ctx, img, cx, cy, w, h);
-    return;
+    return true;
   }
 
-  // default top
-  const ls = lmPoint(c, lm, P.L_SHOULDER, flipped);
-  const rs = lmPoint(c, lm, P.R_SHOULDER, flipped);
-  const lh = lmPoint(c, lm, P.L_HIP, flipped);
-  const rh = lmPoint(c, lm, P.R_HIP, flipped);
-  if (Math.min(ls.v, rs.v) < 0.4) return;
+  // Top (t-shirt / shirt)
+  if (!ls || !rs || Math.min(ls.v, rs.v) < 0.3) return false;
+  const shoulderW = Math.hypot(ls.x - rs.x, ls.y - rs.y);
   const cx = (ls.x + rs.x) / 2;
   const shoulderTop = (ls.y + rs.y) / 2;
-  const hipY = (lh.v > 0.3 && rh.v > 0.3) ? (lh.y + rh.y) / 2 : shoulderTop + Math.hypot(ls.x - rs.x, ls.y - rs.y) * 1.5;
-  const shoulderW = Math.hypot(ls.x - rs.x, ls.y - rs.y);
-  const w = shoulderW * 1.7;
-  const h = (hipY - shoulderTop) * 1.15;
-  drawProductImage(ctx, img, cx, shoulderTop + h / 2 - shoulderW * 0.1, w, h);
+  const hipMidY = (lh && rh && Math.min(lh.v, rh.v) > 0.25)
+    ? (lh.y + rh.y) / 2
+    : shoulderTop + shoulderW * 1.7;
+  // Tilt to match shoulder line
+  const angle = Math.atan2(rs.y - ls.y, rs.x - ls.x);
+  const w = shoulderW * 1.95;
+  const h = (hipMidY - shoulderTop) * 1.25;
+  const centerY = shoulderTop + h * 0.42; // shift slightly down from neckline
+  ctx.save();
+  ctx.translate(cx, centerY);
+  ctx.rotate(angle);
+  ctx.shadowColor = "rgba(0,0,0,0.4)";
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetY = 8;
+  ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  ctx.restore();
+  return true;
 }
 
 function drawProductImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement, cx: number, cy: number, w: number, h: number) {
   ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,0.45)";
-  ctx.shadowBlur = 24;
-  ctx.shadowOffsetY = 12;
+  ctx.shadowColor = "rgba(0,0,0,0.4)";
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetY = 8;
   ctx.drawImage(img, cx - w / 2, cy - h / 2, w, h);
   ctx.restore();
 }
 
-function drawMakeup(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, lm: any, flipped: boolean, color: string, subtype: Subtype) {
-  // Default: lipstick using lip outline
+function drawFurniture(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img: HTMLImageElement, s: { x: number; y: number; scale: number; rot: number }) {
+  const targetW = c.width * s.scale;
+  const targetH = targetW * (img.height / img.width);
+  ctx.save();
+  ctx.translate(c.width * s.x, c.height * s.y);
+  ctx.rotate(s.rot);
+  ctx.shadowColor = "rgba(0,0,0,0.5)";
+  ctx.shadowBlur = 35;
+  ctx.shadowOffsetY = 24;
+  ctx.drawImage(img, -targetW / 2, -targetH / 2, targetW, targetH);
+  ctx.restore();
+}
+
+function drawGhost(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, img: HTMLImageElement, subtype: Subtype) {
+  ctx.save();
+  ctx.globalAlpha = 0.35;
+  let w, h, cx = c.width / 2, cy = c.height / 2;
+  if (subtype === "bottom") {
+    h = c.height * 0.55; w = h * (img.width / img.height);
+    cy = c.height * 0.7;
+  } else if (subtype === "accessory" || subtype === "jewellery") {
+    w = c.width * 0.25; h = w * (img.height / img.width);
+    cy = c.height * 0.45;
+  } else {
+    w = c.width * 0.55; h = w * (img.height / img.width);
+    cy = c.height * 0.48;
+  }
+  ctx.drawImage(img, cx - w / 2, cy - h / 2, w, h);
+  ctx.restore();
+  // Dashed outline guide
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,0.5)";
+  ctx.setLineDash([8, 8]);
+  ctx.lineWidth = 2;
+  ctx.strokeRect(cx - w / 2, cy - h / 2, w, h);
+  ctx.restore();
+}
+
+function drawFaceGuide(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, color: string) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = 0.55;
+  ctx.setLineDash([6, 8]);
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(c.width / 2, c.height / 2, c.width * 0.22, c.height * 0.28, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawMakeup(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, lm: any, flipped: boolean, color: string) {
   ctx.save();
   ctx.globalCompositeOperation = "multiply";
   ctx.fillStyle = color;
-  ctx.globalAlpha = 0.55;
+  ctx.globalAlpha = 0.6;
   ctx.beginPath();
   LIP_OUTER.forEach((i, k) => {
     const x = (flipped ? 1 - lm[i].x : lm[i].x) * c.width;
