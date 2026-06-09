@@ -240,13 +240,43 @@ function ScanPage() {
 
   const cancel = () => { stopAll(); setPhase("intro"); setCount(0); countRef.current = 0; };
 
-  const hint = (() => {
-    if (count < 10) return "Slowly rotate the product to the left";
-    if (count < 20) return "Now tilt up slightly";
-    if (count < 30) return "Show the back of the product";
-    return "Almost done — show the bottom";
+  // Per-category scan guidance. Different products need different angles.
+  const guidance = (() => {
+    if (arMode === "fashion" && subtype === "jewellery") {
+      return [
+        { until: 10, hint: "Lay it flat on a clean surface, top view",  label: "Top" },
+        { until: 20, hint: "Tilt 45° — show the clasp/details",          label: "Side" },
+        { until: 30, hint: "Flip to back — show the closure",            label: "Back" },
+        { until: 40, hint: "Close-up of any stones or engravings",       label: "Detail" },
+      ];
+    }
+    if (arMode === "fashion") {
+      return [
+        { until: 10, hint: "Lay the item flat — full front view",       label: "Front" },
+        { until: 20, hint: "Smooth out wrinkles, rotate slowly left",   label: "Left" },
+        { until: 30, hint: "Flip to back side, full view",              label: "Back" },
+        { until: 40, hint: "Close-ups of tag, fabric, stitching",       label: "Detail" },
+      ];
+    }
+    if (arMode === "makeup") {
+      return [
+        { until: 10, hint: "Front of the product, label visible",        label: "Front" },
+        { until: 20, hint: "Open it — show the actual color / swatch",   label: "Swatch" },
+        { until: 30, hint: "Rotate slowly, capture every side",          label: "Side" },
+        { until: 40, hint: "Close-up of the shade / finish",             label: "Detail" },
+      ];
+    }
+    // furniture / generic object
+    return [
+      { until: 10, hint: "Front view — keep whole product in frame",   label: "Front" },
+      { until: 20, hint: "Rotate to the left side",                    label: "Left" },
+      { until: 30, hint: "Now show the back",                          label: "Back" },
+      { until: 40, hint: "Top-down and any unique details",            label: "Top" },
+    ];
   })();
-  const angleLabel = count < 10 ? "Left side" : count < 20 ? "Top" : count < 30 ? "Back" : "Bottom";
+  const step = guidance.find((g) => count < g.until) ?? guidance[guidance.length - 1];
+  const hint = step.hint;
+  const angleLabel = step.label;
   const pct = Math.round((count / TOTAL_FRAMES) * 100);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
