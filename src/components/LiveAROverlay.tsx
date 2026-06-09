@@ -422,6 +422,15 @@ function smoothLandmarks(lm: any, store: Record<number, Smoothed>, c: HTMLCanvas
   return out;
 }
 
+function poseConfidence(pts: Record<number, { x: number; y: number; v: number }>, subtype: Subtype) {
+  const required = subtype === "bottom"
+    ? [P.L_HIP, P.R_HIP, P.L_ANKLE, P.R_ANKLE]
+    : [P.L_SHOULDER, P.R_SHOULDER, P.L_HIP, P.R_HIP];
+  const values = required.map((i) => pts[i]?.v ?? 0).filter((v) => Number.isFinite(v));
+  if (!values.length) return 0;
+  return Math.max(0, Math.min(1, values.reduce((sum, v) => sum + v, 0) / values.length));
+}
+
 function drawFashion(
   ctx: CanvasRenderingContext2D,
   c: HTMLCanvasElement,
