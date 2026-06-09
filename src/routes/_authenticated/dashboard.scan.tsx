@@ -265,6 +265,9 @@ function ScanPage() {
     stopAll();
     setPhase("generating");
     setGenStep("cleaning");
+    markStep("Scanning", "done");
+    markStep("Mockup generation", "active");
+    addDiagnostic("Mockup", "AI generation started");
     // 3-step animation timing
     setTimeout(() => setGenStep("composing"), 1500);
     try {
@@ -279,10 +282,16 @@ function ScanPage() {
           .createSignedUrl(data.processed_image_url, 3600);
         if (signed?.signedUrl) setPreviewThumb(signed.signedUrl);
       }
+      markStep("Mockup generation", "done");
+      markStep("AR render", "done");
+      addDiagnostic("AR", "Live AR viewer ready");
       setPhase("done");
       toast.success("AR Ready!");
     } catch (e: any) {
-      setError(String(e?.message ?? e));
+      const message = String(e?.message ?? e);
+      setError(message);
+      addDiagnostic("Mockup error", message);
+      markStep("Mockup generation", "error", message);
       setPhase("error");
     }
   };
@@ -292,6 +301,7 @@ function ScanPage() {
     setPhase("intro"); setCount(0); countRef.current = 0; setProductName("");
     setProductId(null); productIdRef.current = null;
     setPreviewThumb(null); setEmbedToken(null); setError(null);
+    setDiagnostics([]); setTimeline(initialTimeline()); setDetectConfidence(0); confidenceRef.current = 0; setCaptureLatency(null);
   };
 
   const cancel = () => { stopAll(); setPhase("intro"); setCount(0); countRef.current = 0; };
