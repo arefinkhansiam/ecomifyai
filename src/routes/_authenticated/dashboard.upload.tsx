@@ -117,7 +117,7 @@ function UploadPage() {
 
   const onFile = (f: File | null) => {
     if (!f) return;
-    const isModel = arMode === "full_3d";
+    const isModel = false;
     const okType = isModel
       ? /\.(glb|gltf)$/i.test(f.name) || f.type === "model/gltf-binary" || f.type === "model/gltf+json"
       : ["image/jpeg", "image/png", "image/webp"].includes(f.type);
@@ -162,7 +162,7 @@ function UploadPage() {
     setTimeline(initialTimeline());
     setLogs([]);
     try {
-      const isModel = arMode === "full_3d";
+      const isModel = false;
       setStep(isModel ? "Uploading 3D model..." : "Uploading image...");
       markStep("Upload", "active");
       log("Upload", `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)}MB`);
@@ -332,7 +332,7 @@ function UploadPage() {
             </>
           )}
 
-          <h4 className="text-ink mt-6">2. {arMode === "full_3d" ? "3D model file" : "Product image"}</h4>
+          <h4 className="text-ink mt-6">2. {false ? "3D model file" : "Product image"}</h4>
           <label className="block mt-3">
             <div
               className="border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-colors hover:border-primary bg-soft"
@@ -341,7 +341,7 @@ function UploadPage() {
             >
               {preview ? (
                 <img src={preview} alt="preview" className="max-h-60 mx-auto object-contain" />
-              ) : file && arMode === "full_3d" ? (
+              ) : file && false ? (
                 <div className="flex flex-col items-center gap-2">
                   <Box size={48} className="text-primary" />
                   <div className="font-display text-lg text-ink">{file.name}</div>
@@ -350,15 +350,15 @@ function UploadPage() {
               ) : (
                 <>
                   <UploadCloud size={48} className="mx-auto text-primary" />
-                  <div className="mt-4 font-display text-lg text-ink">Drop a {arMode === "full_3d" ? "GLB/GLTF file" : "photo"} here</div>
-                  <p className="text-sm mt-1">{MODE_INFO[arMode].hint}. Max {arMode === "full_3d" ? "50MB" : "10MB"}.</p>
+                  <div className="mt-4 font-display text-lg text-ink">Drop a {false ? "GLB/GLTF file" : "photo"} here</div>
+                  <p className="text-sm mt-1">{MODE_INFO[arMode].hint}. Max {false ? "50MB" : "10MB"}.</p>
                 </>
               )}
               <input type="file" accept={MODE_INFO[arMode].accept} hidden onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
             </div>
           </label>
 
-          {arMode !== "full_3d" && (
+          {true && (
             <div className="mt-5 p-4 rounded-2xl" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.05), rgba(56,189,248,0.05))", border: "1px solid rgba(124,58,237,0.18)" }}>
               <div className="text-sm font-semibold text-ink">Extra angles (optional · max 4)</div>
               <p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>
