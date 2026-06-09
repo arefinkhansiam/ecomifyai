@@ -163,13 +163,13 @@ function UploadPage() {
     setLogs([]);
     try {
       const isModel = false;
-      setStep(isModel ? "Uploading 3D model..." : "Uploading image...");
+      setStep("Uploading image...");
       markStep("Upload", "active");
       log("Upload", `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)}MB`);
       const ext = file.name.split(".").pop();
       const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, {
-        contentType: file.type || (isModel ? "model/gltf-binary" : undefined),
+        contentType: file.type || (undefined),
       });
       if (upErr) throw upErr;
       markStep("Upload", "done");
@@ -332,7 +332,7 @@ function UploadPage() {
             </>
           )}
 
-          <h4 className="text-ink mt-6">2. {false ? "3D model file" : "Product image"}</h4>
+          <h4 className="text-ink mt-6">2. Product image</h4>
           <label className="block mt-3">
             <div
               className="border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-colors hover:border-primary bg-soft"
