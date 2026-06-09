@@ -116,7 +116,7 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
           {p.status === "ready" && (
             <a href={viewerUrl} target="_blank" rel="noreferrer" className="flex-1 btn-ghost text-[10px]"><ExternalLink size={12} /> Preview AR</a>
           )}
-          {p.status === "ready" && p.embed_token && (
+          {p.status === "ready" && (
             <button onClick={copyEmbed} className="btn-ghost text-[10px]">
               {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? "Copied" : "Embed"}
             </button>
