@@ -6,9 +6,9 @@ import { InlineTryOnDemo } from "@/components/InlineTryOnDemo";
 export const Route = createFileRoute("/try-ar")({
   head: () => ({
     meta: [
-      { title: "Try It On — Live AI Photo Try-On Demo | Easibie" },
+      { title: "Try It On — Live AI Photo Try-On Demo | Ecomify" },
       { name: "description", content: "Try our AI photo try-on right now. Pick a sample t-shirt, chair, or lipstick — upload your photo and see the result in seconds. No signup." },
-      { property: "og:title", content: "Try It On — Easibie AI Try-On Demo" },
+      { property: "og:title", content: "Try It On — Ecomify AI Try-On Demo" },
       { property: "og:description", content: "Photoreal try-on from a single photo. Try a t-shirt, place a chair, swatch a lipstick — instantly." },
     ],
   }),

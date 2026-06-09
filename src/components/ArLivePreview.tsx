@@ -45,7 +45,7 @@ export function ArLivePreview(p: Props) {
           <Sparkles size={16} /> {p.buttonLabel}
         </button>
         {p.showBranding && (
-          <div className="mt-3 text-[10px] uppercase tracking-wider text-muted">Powered by Easibie</div>
+          <div className="mt-3 text-[10px] uppercase tracking-wider text-muted">Powered by Ecomify</div>
         )}
       </div>
 
@@ -104,7 +104,7 @@ export function ArLivePreview(p: Props) {
           {p.showBranding && (
             <div className="absolute bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[7px] uppercase tracking-wider"
                  style={{ background: p.overlay, color: p.fontColor, opacity: 0.8 }}>
-              Powered by <span style={{ color: p.accent, fontWeight: 700 }}>Easibie</span>
+              Powered by <span style={{ color: p.accent, fontWeight: 700 }}>Ecomify</span>
             </div>
           )}
         </div>

@@ -11,8 +11,8 @@ export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Sign in to Easibie" },
-      { name: "description", content: "Sign in or create your Easibie account to launch AI-powered Try-On experiences in minutes." },
+      { title: "Sign in to Ecomify" },
+      { name: "description", content: "Sign in or create your Ecomify account to launch AI-powered Try-On experiences in minutes." },
     ],
   }),
   component: AuthPage,
@@ -37,7 +37,7 @@ function AuthPage() {
           options: { data: { full_name: fullName }, emailRedirectTo: window.location.origin + "/dashboard" },
         });
         if (error) throw error;
-        toast.success("Account created. Welcome to Easibie.");
+        toast.success("Account created. Welcome to Ecomify.");
         navigate({ to: "/dashboard" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -70,7 +70,7 @@ function AuthPage() {
               </span>
             </div>
             <h1 className="mt-5 text-[34px] leading-[1.05] font-display font-extrabold tracking-tight text-gradient-ocean">
-              {mode === "signup" ? "Start free in 30 seconds." : "Sign in to Easibie."}
+              {mode === "signup" ? "Start free in 30 seconds." : "Sign in to Ecomify."}
             </h1>
             <p className="mt-3 text-sm" style={{ color: "var(--ink-soft)" }}>
               {mode === "signup" ? "No credit card. 1 Try-On product on us — forever." : "Pick up exactly where you left off."}
@@ -101,7 +101,7 @@ function AuthPage() {
                 <>Already have an account?{" "}
                   <button onClick={() => setMode("signin")} className="font-semibold" style={{ color: "var(--primary)" }}>Sign in</button></>
               ) : (
-                <>New to Easibie?{" "}
+                <>New to Ecomify?{" "}
                   <button onClick={() => setMode("signup")} className="font-semibold" style={{ color: "var(--primary)" }}>Create a free account</button></>
               )}
             </div>

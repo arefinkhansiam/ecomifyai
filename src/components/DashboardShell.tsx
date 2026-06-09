@@ -58,7 +58,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
           <span className="w-8 h-8 rounded-xl grid place-items-center text-white" style={{ background: GRAD, boxShadow: "0 8px 20px -6px rgba(2,132,199,0.5)" }}>
             <Sparkles size={16} />
           </span>
-          <span style={{ background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>EASIBIE</span>
+          <span style={{ background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>ECOMIFY</span>
         </Link>
         <div className="mt-6 p-3 rounded-2xl flex items-center gap-3" style={{ background: "rgba(255,255,255,0.9)", border: "1px solid rgba(2,132,199,0.15)", boxShadow: "0 10px 30px -18px rgba(2,132,199,0.35)" }}>
           <div className="w-11 h-11 rounded-full overflow-hidden grid place-items-center text-white font-display font-bold" style={{ background: GRAD }}>

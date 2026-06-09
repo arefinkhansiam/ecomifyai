@@ -21,7 +21,7 @@ export const PLANS: Plan[] = [
       "1 Try-On product",
       "Basic Try-On viewer",
       "Shareable link & QR code",
-      "“Powered by Easibie” branding",
+      "“Powered by Ecomify” branding",
       "Email support",
     ],
     cta: "Get Started Free", href: "/auth?mode=signup", variant: "ghost", icon: Sparkles,
@@ -31,7 +31,7 @@ export const PLANS: Plan[] = [
     features: [
       "10 Try-On products",
       "Basic button colour customizer",
-      "Remove “Powered by Easibie” branding",
+      "Remove “Powered by Ecomify” branding",
       "Embed code + Shopify snippet",
       "Analytics dashboard",
       "Priority support",

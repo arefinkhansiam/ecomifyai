@@ -187,7 +187,7 @@ function CustomizePage() {
                 <input className="input-base" value={arBadge} maxLength={20} placeholder="auto (PLACE IT / TRY-ON / 3D AR)" onChange={(e) => setArBadge(e.target.value)} />
               </Field>
               <Toggle label="Show product name on AR page" on={showProductName} onChange={setShowProductName} />
-              <Toggle label='Show "Powered by Easibie"' on={showBranding} onChange={setShowBranding} />
+              <Toggle label='Show "Powered by Ecomify"' on={showBranding} onChange={setShowBranding} />
             </>
           )}
 

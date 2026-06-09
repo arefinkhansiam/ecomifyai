@@ -20,7 +20,7 @@ function EmbedPage() {
   const [products, setProducts] = useState<{ id: string; product_name: string }[]>([]);
   const [selected, setSelected] = useState<string>("");
   const [qrData, setQrData] = useState<string | null>(null);
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://easibie.com";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://ecomify.com";
 
   useEffect(() => {
     if (!user) return;
@@ -40,7 +40,7 @@ function EmbedPage() {
 
   const url = selected ? `${origin}/ar/view/${selected}` : "";
   const embedCode = `<iframe src="${url}" width="100%" height="640" style="border:0;border-radius:16px" allow="xr-spatial-tracking; camera"></iframe>`;
-  const shopify = `{% comment %} Easibie Try-On {% endcomment %}\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
+  const shopify = `{% comment %} Ecomify Try-On {% endcomment %}\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
 
   const copy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -73,7 +73,7 @@ function EmbedPage() {
           {qrData ? (
             <>
               <img src={qrData} alt="QR" className="mt-4 w-56 h-56 rounded-xl bg-[var(--bg)] p-3" />
-              <a href={qrData} download={`easibie-qr.png`} className="btn-ghost text-xs mt-4 inline-flex"><Download size={12} /> Download PNG</a>
+              <a href={qrData} download={`ecomify-qr.png`} className="btn-ghost text-xs mt-4 inline-flex"><Download size={12} /> Download PNG</a>
             </>
           ) : <div className="mt-4 w-56 h-56 rounded-xl bg-[var(--bg)] animate-pulse" />}
         </div>

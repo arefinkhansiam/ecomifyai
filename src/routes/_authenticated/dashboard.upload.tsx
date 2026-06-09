@@ -268,7 +268,7 @@ function UploadPage() {
   const origin = typeof window !== "undefined" ? window.location.origin : "https://your-domain.com";
   const productId = createdId ?? "PRODUCT_ID";
   const htmlSnippet = `<script src="${origin}/widget.js" data-product-id="${productId}"></script>`;
-  const liquidSnippet = `{% comment %} Easibie AR — paste in product template {% endcomment %}\n<script\n  src="${origin}/widget.js"\n  data-product-id="${productId}"\n  data-label="${label}"\n></script>`;
+  const liquidSnippet = `{% comment %} Ecomify AR — paste in product template {% endcomment %}\n<script\n  src="${origin}/widget.js"\n  data-product-id="${productId}"\n  data-label="${label}"\n></script>`;
 
   const sizePad = useMemo(() => size === "small" ? "10px 18px" : size === "large" ? "18px 36px" : "14px 28px", [size]);
   const sizeFs = useMemo(() => size === "small" ? "13px" : size === "large" ? "17px" : "15px", [size]);
@@ -463,7 +463,7 @@ function UploadPage() {
             <div className="flex items-center justify-between p-4 rounded-xl gap-3" style={{ background: "linear-gradient(135deg, rgba(2,132,199,0.06), rgba(56,189,248,0.06))", border: "1px solid rgba(2,132,199,0.15)" }}>
               <div>
                 <div className="text-sm font-semibold text-ink flex items-center gap-2">
-                  Show "Powered by Easibie"
+                  Show "Powered by Ecomify"
                   {!isPaid && <Lock size={11} className="text-muted" />}
                 </div>
                 <div className="text-xs" style={{ color: "var(--ink-soft)" }}>{isPaid ? "Turn off to hide branding on your AR viewer." : "Free plan keeps branding. Upgrade to remove it."}</div>

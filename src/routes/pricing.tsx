@@ -5,7 +5,7 @@ import { PricingCards } from "@/components/PricingCards";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Easibie Pricing — Free, Starter and Growth" },
+      { title: "Ecomify Pricing — Free, Starter and Growth" },
       { name: "description", content: "Simple plans for stores of every size. Start free and upgrade when you scale." },
     ],
   }),
