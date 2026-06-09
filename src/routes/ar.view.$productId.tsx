@@ -374,21 +374,29 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
       {/* Bottom controls */}
       {phase === "ready" && (
-        <div className="absolute left-0 right-0 z-30 flex items-center justify-center gap-4" style={{ bottom: "calc(env(safe-area-inset-bottom) + 24px)" }}>
-          <div className="w-12" />
-          <button onClick={capture} aria-label="Capture"
-            className="w-20 h-20 rounded-full grid place-items-center transition-transform active:scale-95"
-            style={{ background: "#fff", boxShadow: `0 0 0 4px ${cust.accent}, 0 18px 40px -10px rgba(0,0,0,0.5)` }}>
-            <div className="w-16 h-16 rounded-full grid place-items-center" style={{ background: cust.accent }}>
-              <Aperture size={28} color="#fff" />
-            </div>
-          </button>
-          <button onClick={flipCamera} aria-label="Flip camera"
-            className="w-12 h-12 rounded-full grid place-items-center" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
-            <SwitchCamera size={18} />
-          </button>
+        <div className="absolute left-0 right-0 z-30 flex flex-col items-center gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
+          <label className="px-4 py-2 rounded-full text-xs font-semibold inline-flex items-center gap-2 cursor-pointer"
+            style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+            <ImagePlus size={14} /> Upload your photo instead
+            <input type="file" accept="image/*" hidden onChange={(e) => onPickPhoto(e.target.files?.[0] ?? null)} />
+          </label>
+          <div className="flex items-center justify-center gap-4">
+            <div className="w-12" />
+            <button onClick={capture} aria-label="Capture"
+              className="w-20 h-20 rounded-full grid place-items-center transition-transform active:scale-95"
+              style={{ background: "#fff", boxShadow: `0 0 0 4px ${cust.accent}, 0 18px 40px -10px rgba(0,0,0,0.5)` }}>
+              <div className="w-16 h-16 rounded-full grid place-items-center" style={{ background: cust.accent }}>
+                <Aperture size={28} color="#fff" />
+              </div>
+            </button>
+            <button onClick={flipCamera} aria-label="Flip camera"
+              className="w-12 h-12 rounded-full grid place-items-center" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              <SwitchCamera size={18} />
+            </button>
+          </div>
         </div>
       )}
+
 
       {phase === "result" && (
         <div className="absolute left-3 right-3 z-30 flex items-center justify-center gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
