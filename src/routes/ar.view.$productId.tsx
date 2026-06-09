@@ -2,6 +2,8 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { LiveAROverlay } from "@/components/LiveAROverlay";
+
 
 export const Route = createFileRoute("/ar/view/$productId")({
   ssr: false,
