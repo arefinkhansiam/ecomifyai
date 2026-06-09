@@ -112,6 +112,9 @@ function ScanPage() {
   const start = async () => {
     if (!user) return;
     setError(null);
+    setDiagnostics([]);
+    setTimeline(initialTimeline());
+    addDiagnostic("Scan", "Starting product scan");
     if (!productName.trim()) { toast.error("Add a product name first"); return; }
 
     // Camera supported?
@@ -127,11 +130,13 @@ function ScanPage() {
       ar_mode: arMode,
       ar_subtype: subtype ?? null,
       status: "processing",
-      processing_step: "scanning",
-      processing_progress: 0,
+      processing_step: "scanning_camera",
+      processing_progress: 5,
       is_public: true,
     } as any).select("id").single();
     if (insErr || !created) { toast.error(insErr?.message ?? "Could not start scan"); return; }
+    markStep("Upload", "done");
+    markStep("Scanning", "active");
     setProductId(created.id);
     productIdRef.current = created.id;
 
@@ -151,6 +156,7 @@ function ScanPage() {
       v.srcObject = stream;
       await v.play().catch(() => {});
       await waitForVideoReady(v);
+      addDiagnostic("Camera", `${v.videoWidth}×${v.videoHeight} ready`);
       console.log("[scan] camera ready", v.videoWidth, "x", v.videoHeight);
     } catch (e: any) {
       const name = e?.name ?? "";
@@ -160,6 +166,8 @@ function ScanPage() {
         : name === "NotReadableError" ? "Camera is already in use by another app."
         : `Couldn't start camera: ${e?.message ?? name ?? "unknown"}`;
       setError(msg);
+      addDiagnostic("Camera error", msg);
+      markStep("Scanning", "error", msg);
       setPhase("error");
       stopAll();
       return;
@@ -180,6 +188,7 @@ function ScanPage() {
         runningMode: "VIDEO",
       });
       setAutoDetect(true);
+      addDiagnostic("Model", "Object detector loaded");
       console.log("[scan] detector ready");
     } catch (e) {
       console.warn("[scan] detector unavailable, fallback to always-capture", e);
@@ -187,6 +196,9 @@ function ScanPage() {
       setAutoDetect(false);
       objectVisibleRef.current = true;
       setObjectVisible(true);
+      setDetectConfidence(1);
+      confidenceRef.current = 1;
+      addDiagnostic("Model", "Detector fallback active");
     }
 
     // Detection loop
@@ -198,8 +210,11 @@ function ScanPage() {
       }
       try {
         const r = detectorRef.current.detectForVideo(v, performance.now());
-        const visible = (r?.detections?.length ?? 0) > 0;
+        const topScore = Math.max(0, ...(r?.detections ?? []).map((d: any) => d?.categories?.[0]?.score ?? 0));
+        const visible = topScore > 0.18 || (r?.detections?.length ?? 0) > 0;
         objectVisibleRef.current = visible;
+        confidenceRef.current = topScore;
+        setDetectConfidence(topScore);
         setObjectVisible(visible);
       } catch {/* ignore */}
     }, DETECT_INTERVAL_MS);
