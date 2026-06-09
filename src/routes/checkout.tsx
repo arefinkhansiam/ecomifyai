@@ -55,14 +55,14 @@ function Checkout() {
       <section className="py-20 px-6">
         <div className="mx-auto max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
-            <h1 className="text-white">Confirm your plan</h1>
+            <h1 className="text-ink">Confirm your plan</h1>
             <p className="mt-3">7-day free trial. Cancel any time from Billing.</p>
-            <div className="mt-8 bg-card rounded-2xl p-8">
+            <div className="mt-8 bg-card rounded-2xl p-8 glow-card">
               <div className="text-sm text-muted">{planDef.name}</div>
-              <div className="font-display text-5xl font-extrabold text-white mt-1">{planDef.price}<span className="text-base text-muted font-normal"> / month</span></div>
+              <div className="font-display text-5xl font-extrabold text-ink mt-1">{planDef.price}<span className="text-base text-muted font-normal"> / month</span></div>
               <ul className="mt-6 space-y-3">
                 {planDef.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-white text-sm">
+                  <li key={f} className="flex items-start gap-2 text-ink text-sm">
                     <CheckCircle2 size={18} className="text-[var(--success)] shrink-0 mt-0.5" /> {f}
                   </li>
                 ))}
