@@ -83,6 +83,7 @@ function NotReady() {
 
 function ArByToken() {
   const product = Route.useLoaderData();
+  const interacted = useRef(false);
 
   useEffect(() => {
     if (document.querySelector('script[data-mv]')) return;
@@ -97,10 +98,38 @@ function ArByToken() {
   const pageBg = c.page_bg || "#0B1220";
   const fontColor = c.font_color || "#FFFFFF";
   const accent = c.accent_color || product.dominant || "#38BDF8";
+  const overlay = c.overlay_color || "rgba(255,255,255,0.14)";
   const showName = c.show_product_name !== false;
-  const btnText = c.custom_button_text || "View in Your Space";
+  const btnRadius = (c.button_radius ?? 14) + "px";
 
   const has3d = !!product.glbUrl;
+  if (!has3d) {
+    const raw = product.mode || "furniture";
+    const mode: "fashion" | "furniture" | "makeup" = raw === "fashion" ? "fashion" : raw === "makeup" ? "makeup" : "furniture";
+    const badge = mode === "fashion"
+      ? (product.subtype === "bottom" ? "PANTS TRY-ON" : product.subtype === "accessory" ? "ACCESSORY" : product.subtype === "jewellery" ? "JEWELLERY" : "TRY-ON")
+      : mode === "makeup" ? "MAKEUP" : "PLACE IT";
+    return (
+      <LiveAROverlay
+        productId={product.id}
+        productName={product.name}
+        productImageUrl={product.imageUrl}
+        dominantColor={product.dominant}
+        mode={mode}
+        subtype={product.subtype as any}
+        accent={accent}
+        fontColor={fontColor}
+        overlay={overlay}
+        pageBg={pageBg}
+        badge={badge}
+        showName={showName}
+        showBranding={product.showBranding}
+        btnRadius={btnRadius}
+        onClose={() => { window.location.href = "/"; }}
+        onInteract={() => { interacted.current = true; }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ background: pageBg, color: fontColor }}>
@@ -122,22 +151,8 @@ function ArByToken() {
           )}
         </div>
 
-        {!has3d && (
-          <div className="mt-4 text-center text-xs rounded-2xl px-4 py-3" style={{ background: "rgba(56,189,248,0.08)", color: "#bae6fd", border: "1px solid rgba(56,189,248,0.18)" }}>
-            AI 3D preview · True GLB/USDZ AR coming when a 3D pipeline is connected
-          </div>
-        )}
-
-        <div className="mt-6 flex justify-center">
-          <a
-            href={product.imageUrl ?? "#"}
-            target="_blank"
-            rel="noreferrer"
-            className="px-6 py-3 rounded-2xl font-bold text-sm uppercase tracking-wider"
-            style={{ background: accent, color: "#0B1220", boxShadow: `0 16px 40px -16px ${accent}` }}
-          >
-            {btnText}
-          </a>
+        <div className="mt-4 text-center text-xs rounded-2xl px-4 py-3" style={{ background: "rgba(56,189,248,0.08)", color: "#bae6fd", border: "1px solid rgba(56,189,248,0.18)" }}>
+          True 3D model · use the AR icon to place it in your room
         </div>
       </div>
     </div>
