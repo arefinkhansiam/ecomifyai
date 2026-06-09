@@ -212,6 +212,8 @@ function UploadPage() {
         button_size: size,
         is_public: true,
         product_colors: colors,
+        extra_images: extraPaths,
+
         use_gradient: isPaid ? useGradient : false,
         gradient_from: bg,
         gradient_to: bg2,
