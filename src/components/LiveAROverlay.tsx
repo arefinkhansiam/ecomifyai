@@ -45,7 +45,7 @@ export function LiveAROverlay(p: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
-  const productImgRef = useRef<HTMLImageElement | null>(null);
+  const productImgRef = useRef<HTMLCanvasElement | HTMLImageElement | null>(null);
   const landmarkerRef = useRef<any>(null);
   const lastTsRef = useRef<number>(0);
   const lastResultRef = useRef<any>(null);
@@ -71,7 +71,7 @@ export function LiveAROverlay(p: Props) {
     if (!p.productImageUrl) return;
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => { productImgRef.current = img; };
+    img.onload = () => { productImgRef.current = makeTransparentCutout(img); };
     img.onerror = () => { console.warn("product image failed to load"); };
     img.src = p.productImageUrl;
   }, [p.productImageUrl]);
@@ -196,7 +196,7 @@ export function LiveAROverlay(p: Props) {
       if (p.mode === "fashion" && result?.landmarks?.[0] && fresh) {
         const smoothed = smoothLandmarks(result.landmarks[0], smoothRef.current, c, flipped);
         confidence = poseConfidence(smoothed, p.subtype);
-        if (drawFashion(ctx, c, smoothed, p.subtype, productImgRef.current)) detected = true;
+        if (confidence >= 0.58 && drawFashion(ctx, c, smoothed, p.subtype, productImgRef.current)) detected = true;
       } else if (p.mode === "makeup" && result?.faceLandmarks?.[0] && fresh) {
         drawMakeup(ctx, c, result.faceLandmarks[0], flipped, p.dominantColor || p.accent);
         confidence = 1;
