@@ -134,6 +134,7 @@ function UploadPage() {
         original_image_url: isModel ? null : path,
         glb_url: isModel ? path : null,
         ar_mode: arMode,
+        ar_subtype: subtype ?? null,
         status: "ready",
         processing_step: "complete",
         processing_progress: 100,
@@ -201,44 +202,63 @@ function UploadPage() {
 
   return (
     <DashboardShell title="Upload New AR Product">
-      <Link to="/dashboard/scan" className="mb-6 block rounded-2xl p-4 text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", boxShadow: "0 18px 40px -18px rgba(2,132,199,0.55)" }}>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl grid place-items-center" style={{ background: "rgba(255,255,255,0.15)" }}>📷</div>
-          <div className="flex-1">
-            <div className="text-sm font-bold">Don't have a photo? Scan with your camera</div>
-            <div className="text-xs opacity-80">Capture the product from 40 angles → AI builds an AR-ready preview</div>
+      {modeLocked ? (
+        <Link to="/dashboard/create" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+          <ArrowLeft size={14} /> Change category
+        </Link>
+      ) : (
+        <Link to="/dashboard/scan" className="mb-6 block rounded-2xl p-4 text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", boxShadow: "0 18px 40px -18px rgba(2,132,199,0.55)" }}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl grid place-items-center" style={{ background: "rgba(255,255,255,0.15)" }}>📷</div>
+            <div className="flex-1">
+              <div className="text-sm font-bold">Don't have a photo? Scan with your camera</div>
+              <div className="text-xs opacity-80">Capture the product from 40 angles → AI builds an AR-ready preview</div>
+            </div>
+            <span className="text-xs font-bold underline">Open scanner →</span>
           </div>
-          <span className="text-xs font-bold underline">Open scanner →</span>
-        </div>
-      </Link>
+        </Link>
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: image upload + colors */}
         <div className="bg-card rounded-2xl p-6 glow-card">
-          <h4 className="text-ink">1. Choose AR mode</h4>
-          <p className="text-sm mt-1" style={{ color: "var(--ink-soft)" }}>How will customers experience this product?</p>
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
-            {(Object.keys(MODE_INFO) as ArMode[]).map((m) => {
-              const info = MODE_INFO[m];
-              const active = arMode === m;
-              return (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => { setArMode(m); setFile(null); setPreview(null); }}
-                  className="text-left p-3 rounded-xl border transition-all"
-                  style={{
-                    borderColor: active ? "var(--primary)" : "var(--border)",
-                    background: active ? "linear-gradient(135deg, rgba(2,132,199,0.10), rgba(56,189,248,0.06))" : "#fff",
-                    boxShadow: active ? "0 8px 24px -12px rgba(2,132,199,0.45)" : "none",
-                  }}
-                >
-                  <info.Icon size={20} style={{ color: active ? "var(--primary)" : "var(--ink-soft)" }} />
-                  <div className="mt-2 text-sm font-semibold text-ink">{info.label}</div>
-                  <div className="text-[11px] mt-0.5" style={{ color: "var(--ink-soft)" }}>{info.desc}</div>
-                </button>
-              );
-            })}
-          </div>
+          {modeLocked ? (
+            <div className="p-3 rounded-xl flex items-center gap-3"
+              style={{ background: "linear-gradient(135deg, rgba(2,132,199,0.08), rgba(56,189,248,0.04))", border: "1px solid rgba(2,132,199,0.18)" }}>
+              {(() => { const I = MODE_INFO[arMode].Icon; return <I size={22} className="text-primary" />; })()}
+              <div className="text-sm">
+                <div className="font-semibold text-ink">{MODE_INFO[arMode].label}{subtype ? ` · ${subtype}` : ""}</div>
+                <div className="text-[11px]" style={{ color: "var(--ink-soft)" }}>{MODE_INFO[arMode].desc}</div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <h4 className="text-ink">1. Choose AR mode</h4>
+              <p className="text-sm mt-1" style={{ color: "var(--ink-soft)" }}>How will customers experience this product?</p>
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {(Object.keys(MODE_INFO) as ArMode[]).map((m) => {
+                  const info = MODE_INFO[m];
+                  const active = arMode === m;
+                  return (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => { setArMode(m); setFile(null); setPreview(null); }}
+                      className="text-left p-3 rounded-xl border transition-all"
+                      style={{
+                        borderColor: active ? "var(--primary)" : "var(--border)",
+                        background: active ? "linear-gradient(135deg, rgba(2,132,199,0.10), rgba(56,189,248,0.06))" : "#fff",
+                        boxShadow: active ? "0 8px 24px -12px rgba(2,132,199,0.45)" : "none",
+                      }}
+                    >
+                      <info.Icon size={20} style={{ color: active ? "var(--primary)" : "var(--ink-soft)" }} />
+                      <div className="mt-2 text-sm font-semibold text-ink">{info.label}</div>
+                      <div className="text-[11px] mt-0.5" style={{ color: "var(--ink-soft)" }}>{info.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
           <h4 className="text-ink mt-6">2. {arMode === "full_3d" ? "3D model file" : "Product image"}</h4>
           <label className="block mt-3">
