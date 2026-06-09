@@ -1,0 +1,2 @@
+ALTER TABLE public.ar_products ADD COLUMN IF NOT EXISTS ar_subtype TEXT;
+COMMENT ON COLUMN public.ar_products.ar_subtype IS 'Sub-category within ar_mode (e.g. top, bottom, accessory, jewellery for fashion).';
