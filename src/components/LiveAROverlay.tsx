@@ -1,0 +1,486 @@
+import { useEffect, useRef, useState, useCallback } from "react";
+import { Camera, X, RefreshCw, Share2, Aperture, SwitchCamera, Loader2, Sparkles, Move } from "lucide-react";
+
+type Mode = "fashion" | "furniture" | "makeup";
+type Subtype = "top" | "bottom" | "accessory" | "jewellery" | undefined;
+
+type Props = {
+  productId: string;
+  productName: string;
+  productImageUrl: string | null;
+  dominantColor?: string | null;
+  mode: Mode;
+  subtype?: Subtype;
+  accent: string;
+  fontColor: string;
+  overlay: string;
+  pageBg: string;
+  badge: string;
+  showName: boolean;
+  showBranding: boolean;
+  btnRadius: string;
+  onClose: () => void;
+  onInteract: () => void;
+};
+
+const MP_VISION_URL = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+const POSE_MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
+const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
+const WASM_BASE = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
+
+// Pose indices (MediaPipe Pose 33 keypoints)
+const P = {
+  L_SHOULDER: 11, R_SHOULDER: 12,
+  L_HIP: 23, R_HIP: 24,
+  L_ANKLE: 27, R_ANKLE: 28,
+  L_WRIST: 15, R_WRIST: 16,
+  NOSE: 0,
+};
+
+// Lip outline indices for face landmarker
+const LIP_OUTER = [61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185];
+
+export function LiveAROverlay(p: Props) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const productImgRef = useRef<HTMLImageElement | null>(null);
+  const landmarkerRef = useRef<any>(null);
+  const lastTsRef = useRef<number>(0);
+
+  const [facing, setFacing] = useState<"user" | "environment">(
+    p.mode === "furniture" ? "environment" : "user"
+  );
+  const [phase, setPhase] = useState<"loading" | "ready" | "denied" | "unsupported">("loading");
+  const [snapshot, setSnapshot] = useState<string | null>(null);
+  const [tracking, setTracking] = useState<boolean>(false);
+  const [hint, setHint] = useState<string>("");
+
+  // Furniture free-transform state
+  const furnRef = useRef({ x: 0.5, y: 0.7, scale: 0.4, rot: 0 });
+  const dragRef = useRef<{ active: boolean; ox: number; oy: number; mode: "move" | "pinch"; pinchD?: number; pinchS?: number } | null>(null);
+
+  // Load product image
+  useEffect(() => {
+    if (!p.productImageUrl) return;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => { productImgRef.current = img; };
+    img.src = p.productImageUrl;
+  }, [p.productImageUrl]);
+
+  const stopCamera = () => {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+  };
+
+  const startCamera = useCallback(async (f: "user" | "environment") => {
+    setPhase("loading");
+    stopCamera();
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) { setPhase("unsupported"); return; }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: f }, width: { ideal: 1280 }, height: { ideal: 1280 } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      const v = videoRef.current;
+      if (v) {
+        v.srcObject = stream;
+        await new Promise<void>((res) => {
+          if (v.readyState >= 2) return res();
+          v.onloadedmetadata = () => res();
+        });
+        await v.play().catch(() => {});
+      }
+      setPhase("ready");
+    } catch (e) {
+      console.error("camera", e);
+      setPhase("denied");
+    }
+  }, []);
+
+  // Init landmarker for fashion/makeup
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (p.mode === "furniture") return;
+      try {
+        const vision = await import(/* @vite-ignore */ MP_VISION_URL);
+        const fileset = await vision.FilesetResolver.forVisionTasks(WASM_BASE);
+        if (cancelled) return;
+        if (p.mode === "makeup") {
+          landmarkerRef.current = await vision.FaceLandmarker.createFromOptions(fileset, {
+            baseOptions: { modelAssetPath: FACE_MODEL, delegate: "GPU" },
+            runningMode: "VIDEO",
+            numFaces: 1,
+          });
+        } else {
+          landmarkerRef.current = await vision.PoseLandmarker.createFromOptions(fileset, {
+            baseOptions: { modelAssetPath: POSE_MODEL, delegate: "GPU" },
+            runningMode: "VIDEO",
+            numPoses: 1,
+          });
+        }
+      } catch (e) {
+        console.warn("MediaPipe failed, falling back to centered overlay", e);
+      }
+    })();
+    return () => { cancelled = true; try { landmarkerRef.current?.close?.(); } catch {} };
+  }, [p.mode]);
+
+  // Start camera on mount + on facing change
+  useEffect(() => {
+    startCamera(facing);
+    return () => stopCamera();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Render loop
+  useEffect(() => {
+    if (phase !== "ready") return;
+    const v = videoRef.current;
+    const c = canvasRef.current;
+    if (!v || !c) return;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
+
+    const render = () => {
+      rafRef.current = requestAnimationFrame(render);
+      const vw = v.videoWidth, vh = v.videoHeight;
+      if (!vw || !vh) return;
+      if (c.width !== vw || c.height !== vh) { c.width = vw; c.height = vh; }
+      ctx.clearRect(0, 0, c.width, c.height);
+
+      let detected = false;
+      const flipped = facing === "user";
+
+      // Detection
+      if (landmarkerRef.current && (p.mode === "fashion" || p.mode === "makeup")) {
+        const ts = performance.now();
+        if (ts - lastTsRef.current > 30) {
+          lastTsRef.current = ts;
+          try {
+            const res = landmarkerRef.current.detectForVideo(v, ts);
+            if (p.mode === "fashion") {
+              const lm = res?.landmarks?.[0];
+              if (lm) { detected = true; drawFashion(ctx, c, lm, flipped, p.subtype, productImgRef.current); }
+            } else if (p.mode === "makeup") {
+              const lm = res?.faceLandmarks?.[0];
+              if (lm) { detected = true; drawMakeup(ctx, c, lm, flipped, p.dominantColor || p.accent, p.subtype); }
+            }
+          } catch (e) { /* ignore frame */ }
+        } else if (tracking) {
+          // keep previous? simplest: re-draw current frame using last result skipped — leave clear
+        }
+      }
+
+      if (p.mode === "furniture" && productImgRef.current) {
+        const img = productImgRef.current;
+        const targetW = c.width * furnRef.current.scale;
+        const targetH = targetW * (img.height / img.width);
+        const cx = c.width * furnRef.current.x;
+        const cy = c.height * furnRef.current.y;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(furnRef.current.rot);
+        // soft shadow under
+        ctx.shadowColor = "rgba(0,0,0,0.45)";
+        ctx.shadowBlur = 30;
+        ctx.shadowOffsetY = 20;
+        ctx.drawImage(img, -targetW / 2, -targetH / 2, targetW, targetH);
+        ctx.restore();
+        detected = true;
+      }
+
+      // Fallback if no landmarker available for fashion/makeup
+      if (!detected && (p.mode === "fashion") && productImgRef.current && !landmarkerRef.current) {
+        const img = productImgRef.current;
+        const targetW = c.width * 0.45;
+        const targetH = targetW * (img.height / img.width);
+        ctx.globalAlpha = 0.85;
+        ctx.drawImage(img, (c.width - targetW) / 2, (c.height - targetH) / 2, targetW, targetH);
+        ctx.globalAlpha = 1;
+      }
+
+      setTracking(detected);
+    };
+
+    render();
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [phase, facing, p.mode, p.subtype, p.dominantColor, p.accent, tracking]);
+
+  // Update hint
+  useEffect(() => {
+    if (phase !== "ready") return setHint("");
+    if (tracking) return setHint("");
+    if (p.mode === "fashion") setHint(p.subtype === "bottom" ? "Stand back so your legs are visible" : "Step back so your full upper body is visible");
+    else if (p.mode === "makeup") setHint("Center your face in the frame");
+    else setHint("Drag to move • pinch to resize");
+  }, [phase, tracking, p.mode, p.subtype]);
+
+  const flip = () => {
+    const next = facing === "user" ? "environment" : "user";
+    setFacing(next);
+    startCamera(next);
+  };
+
+  const snap = () => {
+    p.onInteract();
+    const v = videoRef.current;
+    const c = canvasRef.current;
+    if (!v || !c) return;
+    const out = document.createElement("canvas");
+    out.width = v.videoWidth;
+    out.height = v.videoHeight;
+    const octx = out.getContext("2d");
+    if (!octx) return;
+    if (facing === "user") { octx.translate(out.width, 0); octx.scale(-1, 1); }
+    octx.drawImage(v, 0, 0, out.width, out.height);
+    if (facing === "user") { octx.setTransform(1, 0, 0, 1, 0, 0); }
+    octx.drawImage(c, 0, 0, out.width, out.height);
+    setSnapshot(out.toDataURL("image/jpeg", 0.92));
+  };
+
+  const share = async () => {
+    if (!snapshot) return;
+    try {
+      const blob = await (await fetch(snapshot)).blob();
+      const file = new File([blob], `${p.productName || "easibie-ar"}.jpg`, { type: "image/jpeg" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: p.productName });
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = snapshot; a.download = file.name; a.click();
+    } catch {}
+  };
+
+  // Furniture touch/pointer handlers
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (p.mode !== "furniture") return;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    dragRef.current = { active: true, ox: e.clientX, oy: e.clientY, mode: "move" };
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (p.mode !== "furniture" || !dragRef.current?.active) return;
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    furnRef.current.x = Math.max(0.05, Math.min(0.95, (e.clientX - rect.left) / rect.width));
+    furnRef.current.y = Math.max(0.05, Math.min(0.95, (e.clientY - rect.top) / rect.height));
+  };
+  const onPointerUp = () => { dragRef.current = null; };
+  const onWheel = (e: React.WheelEvent) => {
+    if (p.mode !== "furniture") return;
+    const next = furnRef.current.scale * (e.deltaY > 0 ? 0.94 : 1.06);
+    furnRef.current.scale = Math.max(0.1, Math.min(0.95, next));
+  };
+
+  // Pinch on touch
+  const touchRef = useRef<{ d: number; s: number } | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (p.mode !== "furniture" || e.touches.length !== 2) return;
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    touchRef.current = { d: Math.hypot(dx, dy), s: furnRef.current.scale };
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (p.mode !== "furniture" || e.touches.length !== 2 || !touchRef.current) return;
+    e.preventDefault();
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const d = Math.hypot(dx, dy);
+    furnRef.current.scale = Math.max(0.1, Math.min(0.95, touchRef.current.s * (d / touchRef.current.d)));
+  };
+  const onTouchEnd = () => { touchRef.current = null; };
+
+  return (
+    <div className="fixed inset-0 overflow-hidden" style={{ background: p.pageBg, color: p.fontColor, fontFamily: "var(--font-body)" }}>
+      {/* Live video */}
+      <video ref={videoRef} playsInline muted className="absolute inset-0 w-full h-full object-cover"
+        style={{ transform: facing === "user" ? "scaleX(-1)" : undefined, display: snapshot ? "none" : "block" }} />
+      {/* Overlay canvas */}
+      <canvas ref={canvasRef}
+        className="absolute inset-0 w-full h-full object-cover touch-none"
+        style={{ display: snapshot ? "none" : "block", pointerEvents: p.mode === "furniture" ? "auto" : "none" }}
+        onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
+        onWheel={onWheel} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} />
+      {snapshot && <img src={snapshot} alt="" className="absolute inset-0 w-full h-full object-contain bg-black" />}
+
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.35), transparent 30%, transparent 60%, rgba(0,0,0,0.55))" }} />
+
+      {/* Top bar */}
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-30" style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)" }}>
+        <div className="px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2" style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
+          <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: tracking ? "#10b981" : p.accent }} />
+          {snapshot ? "PREVIEW" : (tracking ? "LIVE • " + p.badge : p.badge)}
+        </div>
+        {p.showName && (
+          <div className="px-3 py-1.5 rounded-full text-xs font-semibold max-w-[55%] truncate" style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
+            {p.productName}
+          </div>
+        )}
+        <button onClick={p.onClose} className="w-10 h-10 rounded-full grid place-items-center" style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}><X size={18} /></button>
+      </div>
+
+      {/* Hint */}
+      {!snapshot && hint && (
+        <div className="absolute left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full text-xs font-medium flex items-center gap-1.5" style={{ top: "calc(env(safe-area-inset-top) + 70px)", background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
+          {p.mode === "furniture" && <Move size={12} />} {hint}
+        </div>
+      )}
+
+      {/* Loading overlay while camera/model loads */}
+      {phase === "loading" && (
+        <div className="absolute inset-0 z-40 grid place-items-center bg-black/70 backdrop-blur-sm text-center px-6">
+          <div>
+            <Loader2 className="animate-spin mx-auto" size={36} style={{ color: p.accent }} />
+            <p className="mt-4 text-sm opacity-80">Starting camera…</p>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom controls — live */}
+      {!snapshot && phase === "ready" && (
+        <div className="absolute left-0 right-0 z-30 flex items-center justify-center gap-4" style={{ bottom: "calc(env(safe-area-inset-bottom) + 24px)" }}>
+          <div className="w-12" />
+          <button onClick={snap} aria-label="Snapshot"
+            className="w-20 h-20 rounded-full grid place-items-center transition-transform active:scale-95"
+            style={{ background: "#fff", boxShadow: `0 0 0 4px ${p.accent}, 0 18px 40px -10px rgba(0,0,0,0.5)` }}>
+            <div className="w-16 h-16 rounded-full grid place-items-center" style={{ background: p.accent }}>
+              <Aperture size={28} color="#fff" />
+            </div>
+          </button>
+          <button onClick={flip} aria-label="Flip camera"
+            className="w-12 h-12 rounded-full grid place-items-center" style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
+            <SwitchCamera size={18} />
+          </button>
+        </div>
+      )}
+
+      {/* Snapshot actions */}
+      {snapshot && (
+        <div className="absolute left-3 right-3 z-30 flex items-center justify-center gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
+          <button onClick={() => setSnapshot(null)} className="px-5 py-3 rounded-full font-semibold text-sm" style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(10px)" }}>
+            <RefreshCw size={14} className="inline mr-1.5" /> Retake
+          </button>
+          <button onClick={share} className="px-6 py-3 rounded-full font-semibold text-sm inline-flex items-center gap-2"
+            style={{ background: p.accent, color: "#fff", borderRadius: p.btnRadius, boxShadow: `0 12px 28px -8px ${p.accent}88` }}>
+            <Share2 size={15} /> Share / Save
+          </button>
+        </div>
+      )}
+
+      {(phase === "denied" || phase === "unsupported") && (
+        <div className="absolute inset-0 z-40 grid place-items-center p-6 text-center bg-black/95">
+          <div className="max-w-sm">
+            <Camera size={44} className="mx-auto" style={{ color: p.accent }} />
+            <h3 className="mt-4 text-white">{phase === "denied" ? "Camera access needed" : "Camera not supported"}</h3>
+            <p className="mt-2 text-white/70 text-sm">{phase === "denied" ? "Allow camera permission to continue." : "Open on a mobile browser to use AR."}</p>
+            {phase === "denied" && (
+              <button onClick={() => startCamera(facing)} className="mt-6 px-5 py-2.5 rounded-full inline-flex items-center gap-2" style={{ background: p.accent, color: "#fff" }}><RefreshCw size={16} /> Retry</button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {p.showBranding !== false && !snapshot && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70" style={{ background: p.overlay, color: p.fontColor }}>
+          Powered by <span className="font-bold" style={{ color: p.accent }}>Easibie</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------- drawing helpers ---------- */
+
+function lmPoint(c: HTMLCanvasElement, lm: any, idx: number, flipped: boolean) {
+  const x = (flipped ? 1 - lm[idx].x : lm[idx].x) * c.width;
+  const y = lm[idx].y * c.height;
+  return { x, y, v: lm[idx].visibility ?? 1 };
+}
+
+function drawFashion(
+  ctx: CanvasRenderingContext2D,
+  c: HTMLCanvasElement,
+  lm: any,
+  flipped: boolean,
+  subtype: Subtype,
+  img: HTMLImageElement | null,
+) {
+  if (!img) return;
+
+  if (subtype === "bottom") {
+    const lh = lmPoint(c, lm, P.L_HIP, flipped);
+    const rh = lmPoint(c, lm, P.R_HIP, flipped);
+    const la = lmPoint(c, lm, P.L_ANKLE, flipped);
+    const ra = lmPoint(c, lm, P.R_ANKLE, flipped);
+    if (Math.min(lh.v, rh.v) < 0.4) return;
+    const cx = (lh.x + rh.x) / 2;
+    const top = (lh.y + rh.y) / 2;
+    const ankleY = Math.max(la.y, ra.y);
+    const bottom = Math.max(top + 100, isFinite(ankleY) ? ankleY : c.height * 0.95);
+    const hipW = Math.hypot(lh.x - rh.x, lh.y - rh.y) * 2.0;
+    const h = bottom - top;
+    const w = Math.max(hipW, h * (img.width / img.height) * 0.8);
+    drawProductImage(ctx, img, cx, top + h / 2, w, h);
+    return;
+  }
+
+  if (subtype === "accessory" || subtype === "jewellery") {
+    // Place near neckline / chest
+    const ls = lmPoint(c, lm, P.L_SHOULDER, flipped);
+    const rs = lmPoint(c, lm, P.R_SHOULDER, flipped);
+    const nose = lmPoint(c, lm, P.NOSE, flipped);
+    if (Math.min(ls.v, rs.v) < 0.4) return;
+    const cx = (ls.x + rs.x) / 2;
+    const cy = (ls.y + rs.y) / 2 + (((ls.y + rs.y) / 2 - nose.y) * 0.15);
+    const w = Math.hypot(ls.x - rs.x, ls.y - rs.y) * 0.55;
+    const h = w * (img.height / img.width);
+    drawProductImage(ctx, img, cx, cy, w, h);
+    return;
+  }
+
+  // default top
+  const ls = lmPoint(c, lm, P.L_SHOULDER, flipped);
+  const rs = lmPoint(c, lm, P.R_SHOULDER, flipped);
+  const lh = lmPoint(c, lm, P.L_HIP, flipped);
+  const rh = lmPoint(c, lm, P.R_HIP, flipped);
+  if (Math.min(ls.v, rs.v) < 0.4) return;
+  const cx = (ls.x + rs.x) / 2;
+  const shoulderTop = (ls.y + rs.y) / 2;
+  const hipY = (lh.v > 0.3 && rh.v > 0.3) ? (lh.y + rh.y) / 2 : shoulderTop + Math.hypot(ls.x - rs.x, ls.y - rs.y) * 1.5;
+  const shoulderW = Math.hypot(ls.x - rs.x, ls.y - rs.y);
+  const w = shoulderW * 1.7;
+  const h = (hipY - shoulderTop) * 1.15;
+  drawProductImage(ctx, img, cx, shoulderTop + h / 2 - shoulderW * 0.1, w, h);
+}
+
+function drawProductImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement, cx: number, cy: number, w: number, h: number) {
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,0.45)";
+  ctx.shadowBlur = 24;
+  ctx.shadowOffsetY = 12;
+  ctx.drawImage(img, cx - w / 2, cy - h / 2, w, h);
+  ctx.restore();
+}
+
+function drawMakeup(ctx: CanvasRenderingContext2D, c: HTMLCanvasElement, lm: any, flipped: boolean, color: string, subtype: Subtype) {
+  // Default: lipstick using lip outline
+  ctx.save();
+  ctx.globalCompositeOperation = "multiply";
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 0.55;
+  ctx.beginPath();
+  LIP_OUTER.forEach((i, k) => {
+    const x = (flipped ? 1 - lm[i].x : lm[i].x) * c.width;
+    const y = lm[i].y * c.height;
+    if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
