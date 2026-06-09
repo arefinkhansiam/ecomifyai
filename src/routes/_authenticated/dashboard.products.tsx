@@ -41,7 +41,7 @@ function ProductsPage() {
   }, [user]);
 
   const del = async (id: string) => {
-    if (!confirm("Delete this AR product?")) return;
+    if (!confirm("Delete this try-on product?")) return;
     await supabase.from("ar_products").delete().eq("id", id);
     toast.success("Deleted");
   };

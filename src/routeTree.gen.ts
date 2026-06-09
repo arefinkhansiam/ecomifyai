@@ -24,10 +24,8 @@ import { Route as ApiPublicTrackArSessionRouteImport } from './routes/api/public
 import { Route as ApiPublicArComposeRouteImport } from './routes/api/public/ar-compose'
 import { Route as AuthenticatedDashboardUploadRouteImport } from './routes/_authenticated/dashboard.upload'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
-import { Route as AuthenticatedDashboardScanRouteImport } from './routes/_authenticated/dashboard.scan'
 import { Route as AuthenticatedDashboardProductsRouteImport } from './routes/_authenticated/dashboard.products'
 import { Route as AuthenticatedDashboardEmbedRouteImport } from './routes/_authenticated/dashboard.embed'
-import { Route as AuthenticatedDashboardCreateRouteImport } from './routes/_authenticated/dashboard.create'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardBehaviourRouteImport } from './routes/_authenticated/dashboard.behaviour'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
@@ -110,12 +108,6 @@ const AuthenticatedDashboardSettingsRoute =
     path: '/dashboard/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardScanRoute =
-  AuthenticatedDashboardScanRouteImport.update({
-    id: '/dashboard/scan',
-    path: '/dashboard/scan',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedDashboardProductsRoute =
   AuthenticatedDashboardProductsRouteImport.update({
     id: '/dashboard/products',
@@ -126,12 +118,6 @@ const AuthenticatedDashboardEmbedRoute =
   AuthenticatedDashboardEmbedRouteImport.update({
     id: '/dashboard/embed',
     path: '/dashboard/embed',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardCreateRoute =
-  AuthenticatedDashboardCreateRouteImport.update({
-    id: '/dashboard/create',
-    path: '/dashboard/create',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardBillingRoute =
@@ -171,10 +157,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/dashboard/create': typeof AuthenticatedDashboardCreateRoute
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRouteWithChildren
-  '/dashboard/scan': typeof AuthenticatedDashboardScanRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
@@ -195,10 +179,8 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/dashboard/create': typeof AuthenticatedDashboardCreateRoute
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRouteWithChildren
-  '/dashboard/scan': typeof AuthenticatedDashboardScanRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
@@ -221,10 +203,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
-  '/_authenticated/dashboard/create': typeof AuthenticatedDashboardCreateRoute
   '/_authenticated/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/_authenticated/dashboard/products': typeof AuthenticatedDashboardProductsRouteWithChildren
-  '/_authenticated/dashboard/scan': typeof AuthenticatedDashboardScanRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
@@ -247,10 +227,8 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/behaviour'
     | '/dashboard/billing'
-    | '/dashboard/create'
     | '/dashboard/embed'
     | '/dashboard/products'
-    | '/dashboard/scan'
     | '/dashboard/settings'
     | '/dashboard/upload'
     | '/api/public/ar-compose'
@@ -271,10 +249,8 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/behaviour'
     | '/dashboard/billing'
-    | '/dashboard/create'
     | '/dashboard/embed'
     | '/dashboard/products'
-    | '/dashboard/scan'
     | '/dashboard/settings'
     | '/dashboard/upload'
     | '/api/public/ar-compose'
@@ -296,10 +272,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/behaviour'
     | '/_authenticated/dashboard/billing'
-    | '/_authenticated/dashboard/create'
     | '/_authenticated/dashboard/embed'
     | '/_authenticated/dashboard/products'
-    | '/_authenticated/dashboard/scan'
     | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/upload'
     | '/api/public/ar-compose'
@@ -431,13 +405,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard/scan': {
-      id: '/_authenticated/dashboard/scan'
-      path: '/dashboard/scan'
-      fullPath: '/dashboard/scan'
-      preLoaderRoute: typeof AuthenticatedDashboardScanRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard/products': {
       id: '/_authenticated/dashboard/products'
       path: '/dashboard/products'
@@ -450,13 +417,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/embed'
       fullPath: '/dashboard/embed'
       preLoaderRoute: typeof AuthenticatedDashboardEmbedRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/create': {
-      id: '/_authenticated/dashboard/create'
-      path: '/dashboard/create'
-      fullPath: '/dashboard/create'
-      preLoaderRoute: typeof AuthenticatedDashboardCreateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/billing': {
@@ -509,10 +469,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardBehaviourRoute: typeof AuthenticatedDashboardBehaviourRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
-  AuthenticatedDashboardCreateRoute: typeof AuthenticatedDashboardCreateRoute
   AuthenticatedDashboardEmbedRoute: typeof AuthenticatedDashboardEmbedRoute
   AuthenticatedDashboardProductsRoute: typeof AuthenticatedDashboardProductsRouteWithChildren
-  AuthenticatedDashboardScanRoute: typeof AuthenticatedDashboardScanRoute
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardUploadRoute: typeof AuthenticatedDashboardUploadRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -522,11 +480,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
   AuthenticatedDashboardBehaviourRoute: AuthenticatedDashboardBehaviourRoute,
   AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
-  AuthenticatedDashboardCreateRoute: AuthenticatedDashboardCreateRoute,
   AuthenticatedDashboardEmbedRoute: AuthenticatedDashboardEmbedRoute,
   AuthenticatedDashboardProductsRoute:
     AuthenticatedDashboardProductsRouteWithChildren,
-  AuthenticatedDashboardScanRoute: AuthenticatedDashboardScanRoute,
   AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
   AuthenticatedDashboardUploadRoute: AuthenticatedDashboardUploadRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
@@ -552,3 +508,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
