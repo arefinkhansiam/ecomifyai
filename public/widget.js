@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  // Easibie AR Widget — drop-in script for any website
+  // Ecomify Try-On Widget - drop-in script for any website
   var SUPABASE_URL = "https://ygsaduwfmycbrvjqbdbu.supabase.co";
   var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlnc2FkdXdmbXljYnJ2anFiZGJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTc1MTYsImV4cCI6MjA5NjM5MzUxNn0.H_sQ0JmPLfR62HXaJ5NrXWmVcm1s8xk5a1ez2XhF8M0";
 
@@ -11,7 +11,7 @@
 
   var productId = currentScript.getAttribute("data-product-id");
   if (!productId) {
-    console.warn("[Easibie] Missing data-product-id");
+    console.warn("[Ecomify] Missing data-product-id");
     return;
   }
   var overrideLabel = currentScript.getAttribute("data-label");
@@ -65,12 +65,12 @@
     } catch (e) {}
     fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(function () {});
   }
-  // Expose for AR viewer iframe to call
+  // Expose for Try-On viewer iframe to call
   window.__easibieMarkInteract = markInteract;
   window.__easibieEndSession = endSession;
 
   function render(cfg) {
-    var label = overrideLabel || cfg.button_label || "View in AR";
+    var label = overrideLabel || cfg.button_label || "View Try-On";
     var bg = overrideBg || cfg.button_bg_color || "#0284C7";
     var fg = overrideText || cfg.button_text_color || "#FFFFFF";
     var radius = (cfg.button_border_radius != null ? cfg.button_border_radius : 12) + "px";
@@ -80,9 +80,7 @@
 
     var btn = document.createElement("button");
     btn.type = "button";
-    btn.innerHTML =
-      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>' +
-      '<span>' + escapeHtml(label) + '</span>';
+    btn.innerHTML = '<span>' + escapeHtml(label) + '</span>';
     btn.style.cssText = [
       "display:inline-flex", "align-items:center", "justify-content:center",
       "background:" + bg, "color:" + fg, "padding:" + pad, "font-size:" + fs,
@@ -93,11 +91,11 @@
     ].join(";");
     btn.onmouseenter = function () { btn.style.transform = "translateY(-1px)"; };
     btn.onmouseleave = function () { btn.style.transform = "translateY(0)"; };
-    btn.onclick = function () { openAR(productId); };
+    btn.onclick = function () { openTryOn(productId); };
     placeholder.appendChild(btn);
   }
 
-  function openAR(id) {
+  function openTryOn(id) {
     startSession("back");
     var url = origin + "/ar/view/" + encodeURIComponent(id);
     var isMobile = /Mobi|Android|iPhone|iPad/.test(navigator.userAgent);

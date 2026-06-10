@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useParams, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, Save, RotateCcw, Crown, Lock, Smartphone, Monitor, Plus, X, GripVertical } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { ArLivePreview } from "@/components/ArLivePreview";
 import { ColorControl } from "@/components/ColorControl";
@@ -57,7 +57,6 @@ function CustomizePage() {
   const [saving, setSaving] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [thumb, setThumb] = useState<string | null>(null);
-  const [plan, setPlan] = useState<"free" | "starter" | "growth">("free");
   const [previewDevice, setPreviewDevice] = useState<"mobile" | "desktop">("mobile");
 
   // Store button
@@ -100,20 +99,16 @@ function CustomizePage() {
   const [allProducts, setAllProducts] = useState<Array<{ id: string; name: string; image: string | null }>>([]);
   const [showAltPicker, setShowAltPicker] = useState(false);
 
-  const isPaid = plan !== "free";
-
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [{ data: p }, { data: planRow }, { data: branding }, { data: alts }, { data: allP }] = await Promise.all([
+      const [{ data: p }, { data: branding }, { data: alts }, { data: allP }] = await Promise.all([
         supabase.from("ar_products").select("*").eq("id", id).maybeSingle(),
-        supabase.from("user_plans").select("plan").eq("user_id", user.id).maybeSingle(),
         supabase.from("tryon_branding").select("*").eq("user_id", user.id).maybeSingle(),
         supabase.from("product_alternatives" as any).select("alt_product_id, position").eq("product_id", id).order("position"),
         supabase.from("ar_products").select("id, product_name, original_image_url, processed_image_url").eq("user_id", user.id).eq("status", "ready").neq("id", id).limit(50),
       ]);
       if (!p || p.user_id !== user.id) { toast.error("Product not found"); navigate({ to: "/dashboard/products" }); return; }
-      setPlan(((planRow as any)?.plan ?? "free") as any);
       setProduct(p);
 
       setLabel(p.button_label ?? DEFAULTS.label);
@@ -205,11 +200,11 @@ function CustomizePage() {
         button_bg_color: bg,
         button_text_color: fg,
         button_border_radius: radius,
-        use_gradient: isPaid ? useGradient : false,
+        use_gradient: useGradient,
         gradient_from: gradient.stops[0]?.color,
         gradient_to: gradient.stops[gradient.stops.length - 1]?.color,
-        show_branding: isPaid ? showBranding : true,
-        ar_customization: isPaid ? {
+        show_branding: showBranding,
+        ar_customization: {
           page_bg: bgType === "solid" ? bgSolid : bgType === "gradient" ? gradientToCSS(bgGradient) : bgImage,
           font_color: fontColor, accent_color: accent, overlay_color: overlay,
           button_radius: arRadius, custom_button_text: arText,
@@ -217,7 +212,7 @@ function CustomizePage() {
           button_shadow: buttonShadow,
           font_family: fontFamily,
           gradient_data: gradient,
-        } : {},
+        },
       } as any).eq("id", id);
       if (error) throw error;
 
@@ -282,14 +277,14 @@ function CustomizePage() {
   };
 
   if (loading) {
-    return <DashboardShell title="Customize"><div className="h-64 grid place-items-center"><Loader2 className="animate-spin text-primary" /></div></DashboardShell>;
+    return <DashboardShell title="Customize"><div className="h-64 grid place-items-center text-sm text-muted">Loading customization</div></DashboardShell>;
   }
 
   const btnBg = useGradient ? gradientToCSS(gradient) : bg;
 
   return (
     <DashboardShell title={`Customize · ${product.product_name}`}>
-      <Link to="/dashboard/products" className="btn-ghost mb-4 text-xs"><ArrowLeft size={14} /> Back to products</Link>
+      <Link to="/dashboard/products" className="btn-ghost mb-4 text-xs">Back to products</Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Controls */}
@@ -299,9 +294,9 @@ function CustomizePage() {
             <Field label="Button label">
               <input className="input-base" value={label} maxLength={40} onChange={(e) => setLabel(e.target.value)} />
             </Field>
-            <Toggle label="Use gradient background" gated={!isPaid} on={useGradient} onChange={setUseGradient} />
+            <Toggle label="Use gradient background" on={useGradient} onChange={setUseGradient} />
             {!useGradient ? (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <ColorControl label="Background" value={bg} onChange={setBg} />
                 <ColorControl label="Text" value={fg} onChange={setFg} />
               </div>
@@ -317,70 +312,59 @@ function CustomizePage() {
             <Toggle label="Button shadow" on={buttonShadow} onChange={setButtonShadow} />
           </Section>
 
-          {!isPaid ? (
-            <div className="p-4 rounded-xl border" style={{ borderColor: "var(--border)", background: "linear-gradient(135deg, rgba(124,58,237,0.06), rgba(56,189,248,0.06))" }}>
-              <div className="flex items-center gap-2 text-sm font-bold text-ink"><Crown size={14} /> Pro features locked</div>
-              <p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>
-                Upgrade to fully customize the Try-On viewer (typography, gradient backgrounds, watermark, alternative products and more).
-              </p>
+          <Section title="Try-On viewer">
+            <Field label="Header title">
+              <input className="input-base" value={headerTitle} maxLength={60} placeholder="Optional" onChange={(e) => setHeaderTitle(e.target.value)} />
+            </Field>
+            <Field label="Header subtitle">
+              <input className="input-base" value={headerSubtitle} maxLength={120} placeholder="Optional" onChange={(e) => setHeaderSubtitle(e.target.value)} />
+            </Field>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="Font family">
+                <select className="input-base" value={fontFamily} onChange={(e) => setFontFamily(e.target.value)}>
+                  {FONT_OPTIONS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+                </select>
+              </Field>
+              <Field label={`Font size · ${fontSize}px`}>
+                <input type="range" min={12} max={22} value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-sky-500" />
+              </Field>
             </div>
-          ) : (
-            <>
-              {/* Try-On viewer page */}
-              <Section title="Try-On viewer">
-                <Field label="Header title">
-                  <input className="input-base" value={headerTitle} maxLength={60} placeholder="Optional" onChange={(e) => setHeaderTitle(e.target.value)} />
-                </Field>
-                <Field label="Header subtitle">
-                  <input className="input-base" value={headerSubtitle} maxLength={120} placeholder="Optional" onChange={(e) => setHeaderSubtitle(e.target.value)} />
-                </Field>
-                <div className="grid grid-cols-2 gap-3">
-                  <Field label="Font family">
-                    <select className="input-base" value={fontFamily} onChange={(e) => setFontFamily(e.target.value)}>
-                      {FONT_OPTIONS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
-                    </select>
-                  </Field>
-                  <Field label={`Font size · ${fontSize}px`}>
-                    <input type="range" min={12} max={22} value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-sky-500" />
-                  </Field>
-                </div>
 
-                {/* Background */}
-                <Field label="Background">
-                  <div className="grid grid-cols-3 gap-1.5 mb-2">
-                    {(["solid", "gradient", "image"] as const).map((t) => (
-                      <button key={t} onClick={() => setBgType(t)}
-                        className="px-2 py-1.5 rounded-lg text-[11px] font-semibold border capitalize"
-                        style={{
-                          borderColor: bgType === t ? "var(--primary)" : "var(--border)",
-                          background: bgType === t ? "color-mix(in oklab, var(--primary) 10%, white)" : "#fff",
-                          color: bgType === t ? "var(--primary)" : "var(--ink-soft)",
-                        }}>{t}</button>
-                    ))}
-                  </div>
-                  {bgType === "solid" && <ColorControl value={bgSolid} onChange={setBgSolid} />}
-                  {bgType === "gradient" && <GradientBuilder value={bgGradient} onChange={setBgGradient} />}
-                  {bgType === "image" && (
-                    <input className="input-base" placeholder="https://image-url.jpg" value={bgImage} onChange={(e) => setBgImage(e.target.value)} />
-                  )}
-                </Field>
+            <Field label="Background">
+              <div className="grid grid-cols-3 gap-1.5 mb-2">
+                {(["solid", "gradient", "image"] as const).map((t) => (
+                  <button key={t} onClick={() => setBgType(t)}
+                    className="px-2 py-1.5 rounded-lg text-[11px] font-semibold border capitalize"
+                    style={{
+                      borderColor: bgType === t ? "var(--primary)" : "var(--border)",
+                      background: bgType === t ? "color-mix(in oklab, var(--primary) 10%, white)" : "#fff",
+                      color: bgType === t ? "var(--primary)" : "var(--ink-soft)",
+                    }}>{t}</button>
+                ))}
+              </div>
+              {bgType === "solid" && <ColorControl value={bgSolid} onChange={setBgSolid} />}
+              {bgType === "gradient" && <GradientBuilder value={bgGradient} onChange={setBgGradient} />}
+              {bgType === "image" && (
+                <input className="input-base" placeholder="https://image-url.jpg" value={bgImage} onChange={(e) => setBgImage(e.target.value)} />
+              )}
+            </Field>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <ColorControl label="Font color" value={fontColor} onChange={setFontColor} />
-                  <ColorControl label="Accent" value={accent} onChange={setAccent} />
-                  <ColorControl label="Overlay" value={overlay} onChange={setOverlay} allowAlpha />
-                </div>
-                <Field label={`Try-On button radius · ${arRadius}px`}>
-                  <input type="range" min={0} max={32} value={arRadius} onChange={(e) => setArRadius(Number(e.target.value))} className="w-full accent-sky-500" />
-                </Field>
-                <Field label="Try-On button text">
-                  <input className="input-base" value={arText} maxLength={40} onChange={(e) => setArText(e.target.value)} />
-                </Field>
-                <Field label="Badge text">
-                  <input className="input-base" value={arBadge} maxLength={20} placeholder="auto (TRY-ON / PLACE IT)" onChange={(e) => setArBadge(e.target.value)} />
-                </Field>
-                <Toggle label="Show product name" on={showProductName} onChange={setShowProductName} />
-              </Section>
+              <div className="grid grid-cols-1 gap-3">
+              <ColorControl label="Font color" value={fontColor} onChange={setFontColor} />
+              <ColorControl label="Accent" value={accent} onChange={setAccent} />
+              <ColorControl label="Overlay" value={overlay} onChange={setOverlay} allowAlpha />
+            </div>
+            <Field label={`Try-On button radius · ${arRadius}px`}>
+              <input type="range" min={0} max={32} value={arRadius} onChange={(e) => setArRadius(Number(e.target.value))} className="w-full accent-sky-500" />
+            </Field>
+            <Field label="Try-On button text">
+              <input className="input-base" value={arText} maxLength={40} onChange={(e) => setArText(e.target.value)} />
+            </Field>
+            <Field label="Badge text">
+              <input className="input-base" value={arBadge} maxLength={20} placeholder="auto (TRY-ON / PLACE IT)" onChange={(e) => setArBadge(e.target.value)} />
+            </Field>
+            <Toggle label="Show product name" on={showProductName} onChange={setShowProductName} />
+          </Section>
 
               {/* Watermark */}
               <Section title="Watermark">
@@ -411,18 +395,18 @@ function CustomizePage() {
                 <div className="space-y-2">
                   {alternatives.map((a, i) => (
                     <div key={a.id} className="flex items-center gap-2 p-2 rounded-lg border" style={{ borderColor: "var(--border)" }}>
-                      <button onClick={() => moveAlternative(i, -1)} className="text-muted hover:text-ink" disabled={i === 0}><GripVertical size={14} /></button>
+                      <button onClick={() => moveAlternative(i, -1)} className="text-xs text-muted hover:text-ink px-1" disabled={i === 0}>Move</button>
                       <div className="w-10 h-10 rounded bg-soft overflow-hidden">
                         {a.image && <img src={a.image} alt="" className="w-full h-full object-cover" />}
                       </div>
                       <div className="flex-1 text-sm truncate text-ink">{a.name}</div>
-                      <button onClick={() => removeAlternative(i)} className="text-muted hover:text-red-500"><X size={14} /></button>
+                      <button onClick={() => removeAlternative(i)} className="text-xs text-muted hover:text-red-500 px-1">Remove</button>
                     </div>
                   ))}
                 </div>
                 {alternatives.length < 10 && (
                   <button onClick={() => setShowAltPicker(!showAltPicker)} className="btn-ghost w-full justify-center text-sm">
-                    <Plus size={14} /> Add alternative
+                    Add alternative
                   </button>
                 )}
                 {showAltPicker && (
@@ -444,15 +428,12 @@ function CustomizePage() {
               </Section>
 
               <Toggle label='Show "Powered by Ecomify" badge on viewer' on={showBranding} onChange={setShowBranding} />
-            </>
-          )}
 
           <div className="flex gap-2 pt-2 sticky bottom-0 bg-card -mx-6 px-6 pb-2">
             <button onClick={save} disabled={saving} className="btn-primary flex-1 justify-center">
-              {saving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
               {saving ? "Saving…" : "Save changes"}
             </button>
-            <button onClick={reset} className="btn-ghost"><RotateCcw size={14} /> Reset</button>
+            <button onClick={reset} className="btn-ghost">Reset</button>
           </div>
         </div>
 
@@ -467,7 +448,7 @@ function CustomizePage() {
                   background: previewDevice === "mobile" ? "var(--primary)" : "transparent",
                   color: previewDevice === "mobile" ? "#fff" : "var(--ink-soft)",
                 }}>
-                <Smartphone size={11} /> Mobile
+                Mobile
               </button>
               <button onClick={() => setPreviewDevice("desktop")}
                 className="px-2 py-1 rounded-md text-[11px] inline-flex items-center gap-1"
@@ -475,7 +456,7 @@ function CustomizePage() {
                   background: previewDevice === "desktop" ? "var(--primary)" : "transparent",
                   color: previewDevice === "desktop" ? "#fff" : "var(--ink-soft)",
                 }}>
-                <Monitor size={11} /> Desktop
+                Desktop
               </button>
             </div>
           </div>
@@ -486,20 +467,21 @@ function CustomizePage() {
             buttonBg={btnBg}
             buttonFg={fg}
             buttonRadius={radius}
-            pageBg={isPaid ? (bgType === "image" && bgImage ? `url(${bgImage}) center/cover` : (bgType === "gradient" ? gradientToCSS(bgGradient) : bgSolid)) : "#0B1220"}
-            fontColor={isPaid ? fontColor : "#FFFFFF"}
-            accent={isPaid ? accent : bg}
-            overlay={isPaid ? overlay : "rgba(255,255,255,0.14)"}
-            arButtonRadius={isPaid ? arRadius : radius}
-            arButtonText={isPaid ? arText : "View in Your Space"}
-            showBranding={isPaid ? showBranding : true}
-            showProductName={isPaid ? showProductName : true}
+            pageBg={bgType === "image" && bgImage ? `url(${bgImage}) center/cover` : (bgType === "gradient" ? gradientToCSS(bgGradient) : bgSolid)}
+            fontColor={fontColor}
+            accent={accent}
+            overlay={overlay}
+            arButtonRadius={arRadius}
+            arButtonText={arText}
+            showBranding={showBranding}
+            showProductName={showProductName}
             mode={(product.ar_mode ?? "furniture") as any}
-            fontFamily={isPaid ? fontFamily : undefined}
-            headerTitle={isPaid ? headerTitle : ""}
-            headerSubtitle={isPaid ? headerSubtitle : ""}
+            fontFamily={fontFamily}
+            headerTitle={headerTitle}
+            headerSubtitle={headerSubtitle}
             buttonShadow={buttonShadow}
             device={previewDevice}
+            badgeText={arBadge}
           />
         </div>
       </div>
@@ -507,7 +489,7 @@ function CustomizePage() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="space-y-3">
       <h4 className="text-ink text-sm font-bold uppercase tracking-wider" style={{ color: "var(--ink)" }}>{title}</h4>
@@ -526,23 +508,25 @@ function Field({ label, children }: any) {
 }
 function Toggle({ label, on, onChange, gated }: { label: string; on: boolean; onChange: (v: boolean) => void; gated?: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <div className="text-sm text-ink flex items-center gap-2">
-        {label}{gated && <Lock size={12} className="text-muted" />}
+    <div className="flex items-center justify-between gap-4 min-h-11">
+      <div className="text-sm text-ink flex items-center gap-2 leading-snug min-w-0">
+        {label}{gated && <span className="text-xs text-muted">Locked</span>}
       </div>
       <button onClick={() => { if (gated) { toast.info("Pro feature"); return; } onChange(!on); }}
         disabled={gated}
         type="button"
-        className="relative w-12 h-7 rounded-full transition-colors shrink-0 border"
+        role="switch"
+        aria-checked={on}
+        className="relative inline-flex h-8 w-14 shrink-0 items-center rounded-full border p-[3px] transition-colors duration-200"
         style={{
           background: on ? "var(--primary)" : "#e2e8f0",
           borderColor: on ? "var(--primary)" : "#cbd5e1",
           opacity: gated ? 0.5 : 1,
         }}>
         <span
-          className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white transition-transform"
+          className="block h-6 w-6 rounded-full bg-white transition-transform duration-200"
           style={{
-            transform: on ? "translateX(20px)" : "translateX(0px)",
+            transform: on ? "translateX(24px)" : "translateX(0px)",
             boxShadow: "0 2px 6px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.06)",
           }}
         />

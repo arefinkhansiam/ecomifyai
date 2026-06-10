@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Plus, X, Bookmark } from "lucide-react";
 import { ColorControl } from "./ColorControl";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
@@ -143,7 +142,7 @@ export function GradientBuilder({
           <span>Color stops · {g.stops.length}</span>
           <button onClick={addStop} disabled={g.stops.length >= 8}
             className="inline-flex items-center gap-1 text-sky-600 hover:text-sky-700 disabled:opacity-40">
-            <Plus size={10} /> Add
+            Add
           </button>
         </div>
         <div className="space-y-2">
@@ -163,9 +162,9 @@ export function GradientBuilder({
               <button
                 onClick={() => removeStop(i)}
                 disabled={g.stops.length <= 2}
-                className="w-7 h-7 rounded-md grid place-items-center text-muted hover:text-red-500 disabled:opacity-30"
+                className="w-12 h-7 rounded-md grid place-items-center text-[10px] text-muted hover:text-red-500 disabled:opacity-30"
               >
-                <X size={14} />
+                Remove
               </button>
             </div>
           ))}
@@ -177,7 +176,7 @@ export function GradientBuilder({
         <div className="flex items-center justify-between text-[10px] uppercase text-muted mb-1">
           <span>Saved presets</span>
           <button onClick={savePreset} className="inline-flex items-center gap-1 text-sky-600 hover:text-sky-700">
-            <Bookmark size={10} /> Save current
+            Save current
           </button>
         </div>
         {presets.length === 0 ? (
@@ -194,10 +193,10 @@ export function GradientBuilder({
                 />
                 <button
                   onClick={() => deletePreset(p.id)}
-                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white border grid place-items-center opacity-0 group-hover:opacity-100"
+                  className="absolute -top-1 -right-1 w-6 h-4 rounded-full bg-white border grid place-items-center opacity-0 group-hover:opacity-100 text-[8px] text-red-500"
                   style={{ borderColor: "var(--border)" }}
                 >
-                  <X size={9} className="text-red-500" />
+                  Del
                 </button>
               </div>
             ))}

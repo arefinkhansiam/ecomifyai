@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
-import { Bookmark, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { toast } from "sonner";
@@ -131,7 +130,7 @@ export function ColorControl({
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="w-full flex items-center gap-2 border rounded-xl px-2 py-1.5 hover:border-sky-400 transition-colors"
+          className="w-full min-w-0 flex items-center gap-2 border rounded-xl px-2 py-1.5 hover:border-sky-400 transition-colors overflow-hidden"
           style={{ borderColor: "var(--border)", background: "#fff" }}
         >
           <span
@@ -142,11 +141,11 @@ export function ColorControl({
               backgroundImage: alpha < 100 ? `${value}, repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 50% / 10px 10px` : undefined,
             }}
           />
-          <span className="flex-1 text-left text-xs font-mono text-ink truncate">{value}</span>
+          <span className="min-w-0 flex-1 text-left text-xs font-mono text-ink truncate">{value}</span>
         </button>
 
         {open && (
-          <div className="absolute z-50 mt-2 left-0 w-[280px] rounded-2xl border bg-white shadow-2xl p-3 space-y-3"
+          <div className="absolute z-50 mt-2 left-0 w-[min(320px,calc(100vw-48px))] rounded-2xl border bg-white shadow-2xl p-3 space-y-3"
                style={{ borderColor: "var(--border)" }}>
             <HexColorPicker color={hex} onChange={(c) => commit(c, alpha)} style={{ width: "100%", height: 160 }} />
 
@@ -206,7 +205,7 @@ export function ColorControl({
               <div className="flex items-center justify-between text-[10px] uppercase text-muted mb-1">
                 <span>{palette.length > 0 ? "Brand palette" : "Suggested"}</span>
                 <button onClick={saveToPalette} className="inline-flex items-center gap-1 text-[10px] text-sky-600 hover:text-sky-700">
-                  <Bookmark size={10} /> Save
+                  Save
                 </button>
               </div>
               <div className="grid grid-cols-8 gap-1.5">
@@ -220,19 +219,19 @@ export function ColorControl({
                     {palette.includes(c) && (
                       <button
                         onClick={(e) => { e.stopPropagation(); removeFromPalette(c); }}
-                        className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-white border grid place-items-center opacity-0 group-hover:opacity-100"
+                        className="absolute -top-1 -right-1 w-5 h-4 rounded-full bg-white border grid place-items-center opacity-0 group-hover:opacity-100 text-[8px] text-red-500"
                         style={{ borderColor: "var(--border)" }}
                       >
-                        <Trash2 size={8} className="text-red-500" />
+                        Del
                       </button>
                     )}
                   </div>
                 ))}
                 {palette.length === 0 && (
                   <button onClick={saveToPalette}
-                    className="w-full aspect-square rounded-md border border-dashed grid place-items-center hover:border-sky-400"
+                    className="w-full aspect-square rounded-md border border-dashed grid place-items-center hover:border-sky-400 text-[10px] text-muted"
                     style={{ borderColor: "var(--border)" }}>
-                    <Plus size={12} className="text-muted" />
+                    Add
                   </button>
                 )}
               </div>

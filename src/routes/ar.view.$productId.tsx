@@ -1,6 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, X, RefreshCw, Sparkles, SwitchCamera, Loader2, Share2, Aperture, ImagePlus, Download, ThumbsUp, ThumbsDown, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/ar/view/$productId")({
@@ -39,7 +38,6 @@ function NotReady() {
   return (
     <div className="min-h-screen grid place-items-center bg-soft text-center px-6">
       <div>
-        <Sparkles size={48} className="text-primary mx-auto" />
         <h2 className="mt-4 text-ink">Try-on experience not available</h2>
         <p className="mt-2">This product link is invalid or still processing.</p>
         <a href="/" className="btn-primary mt-6">Back to home</a>
@@ -139,7 +137,7 @@ function TopBar({ name, showName, overlay, fontColor, accent, onClose, badge }: 
           {name}
         </div>
       )}
-      <button onClick={onClose} className="w-10 h-10 rounded-full grid place-items-center" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}><X size={18} /></button>
+      <button onClick={onClose} className="h-10 px-3 rounded-full grid place-items-center text-xs font-semibold" style={{ background: overlay, color: fontColor, backdropFilter: "blur(10px)" }}>Close</button>
     </div>
   );
 }
@@ -471,9 +469,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       {(phase === "capturing" || phase === "processing") && (
         <div className="absolute inset-0 z-40 grid place-items-center text-center px-6" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}>
           <div>
-            <div className="w-16 h-16 mx-auto rounded-full grid place-items-center" style={{ background: cust.accent + "33", border: `2px solid ${cust.accent}` }}>
-              <Loader2 className="animate-spin" size={28} style={{ color: cust.accent }} />
-            </div>
+            <div className="w-16 h-16 mx-auto rounded-full animate-pulse" style={{ background: cust.accent + "33", border: `2px solid ${cust.accent}` }} />
             <h3 className="mt-5" style={{ color: cust.fontColor }}>
               {mode === "fashion" ? "Trying it on…" : mode === "makeup" ? "Applying makeup…" : "Placing it in your space…"}
             </h3>
@@ -493,7 +489,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
         <div className="absolute left-0 right-0 z-30 flex flex-col items-center gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 18px)" }}>
           <label className="px-4 py-2 rounded-full text-xs font-semibold inline-flex items-center gap-2 cursor-pointer"
             style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
-            <ImagePlus size={14} /> Upload your photo instead
+            Upload your photo instead
             <input type="file" accept="image/*" hidden onChange={(e) => onPickPhoto(e.target.files?.[0] ?? null)} />
           </label>
           <div className="flex items-center justify-center gap-4">
@@ -501,13 +497,11 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
             <button onClick={capture} aria-label="Capture"
               className="w-20 h-20 rounded-full grid place-items-center transition-transform active:scale-95"
               style={{ background: "#fff", boxShadow: `0 0 0 4px ${cust.accent}, 0 18px 40px -10px rgba(0,0,0,0.5)` }}>
-              <div className="w-16 h-16 rounded-full grid place-items-center" style={{ background: cust.accent }}>
-                <Aperture size={28} color="#fff" />
-              </div>
+              <div className="w-16 h-16 rounded-full" style={{ background: cust.accent }} />
             </button>
             <button onClick={flipCamera} aria-label="Flip camera"
-              className="w-12 h-12 rounded-full grid place-items-center" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
-              <SwitchCamera size={18} />
+              className="h-12 px-3 rounded-full grid place-items-center text-[10px] font-semibold" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
+              Flip
             </button>
           </div>
         </div>
@@ -519,10 +513,10 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
             <div className="px-4 py-2.5 rounded-2xl flex items-center gap-3 text-xs font-semibold animate-in fade-in slide-in-from-bottom-2" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
               <span>How does it look?</span>
               <button onClick={() => submitFeedback(true)} className="px-3 py-1.5 rounded-full inline-flex items-center gap-1" style={{ background: cust.accent, color: "#fff" }}>
-                <ThumbsUp size={12} /> Like
+                Like
               </button>
               <button onClick={() => submitFeedback(false)} className="px-3 py-1.5 rounded-full inline-flex items-center gap-1" style={{ background: "rgba(255,255,255,0.18)", color: cust.fontColor }}>
-                <ThumbsDown size={12} /> Not for me
+                Not for me
               </button>
             </div>
           )}
@@ -552,24 +546,24 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
               <button onClick={saveToWishlist} disabled={savedWishlist}
                 className="px-3 py-1.5 rounded-full inline-flex items-center gap-1"
                 style={{ background: savedWishlist ? "rgba(255,255,255,0.2)" : cust.accent, color: "#fff" }}>
-                <Heart size={12} /> {savedWishlist ? "Saved" : "Save to wishlist"}
+                {savedWishlist ? "Saved" : "Save to wishlist"}
               </button>
               <button onClick={share} className="px-3 py-1.5 rounded-full inline-flex items-center gap-1" style={{ background: "rgba(255,255,255,0.18)", color: cust.fontColor }}>
-                <Share2 size={12} /> Share
+                Share
               </button>
             </div>
           )}
 
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <button onClick={retake} className="px-4 py-2.5 rounded-full font-semibold text-sm" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
-              <RefreshCw size={14} className="inline mr-1.5" /> Retake
+              Retake
             </button>
             <button onClick={download} className="px-4 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.overlay, color: cust.fontColor, backdropFilter: "blur(10px)" }}>
-              <Download size={15} /> Download
+              Download
             </button>
             {feedback !== "liked" && (
               <button onClick={share} className="px-5 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-2" style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius, boxShadow: `0 12px 28px -8px ${cust.accent}88` }}>
-                <Share2 size={15} /> Share
+                Share
               </button>
             )}
           </div>
@@ -579,18 +573,17 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       {(phase === "denied" || phase === "unsupported") && (
         <div className="absolute inset-0 z-40 grid place-items-center p-6 text-center" style={{ background: "rgba(11,18,32,0.95)" }}>
           <div className="max-w-sm">
-            <Camera size={44} className="mx-auto" style={{ color: cust.accent }} />
             <h3 className="mt-4 text-white">{phase === "denied" ? "Camera access needed" : "Camera not supported"}</h3>
             <p className="mt-2 text-white/70 text-sm">
               {phase === "denied" ? "Allow camera permission to continue." : "Open on a mobile browser to use Try-On."}
             </p>
             <div className="mt-6 flex flex-col items-center gap-2">
               {phase === "denied" && (
-                <button onClick={() => startCamera()} className="btn-primary inline-flex"><RefreshCw size={16} /> Retry camera</button>
+                <button onClick={() => startCamera()} className="btn-primary inline-flex">Retry camera</button>
               )}
               <label className="px-5 py-3 rounded-full font-semibold text-sm inline-flex items-center gap-2 cursor-pointer"
                 style={{ background: cust.accent, color: "#fff", borderRadius: cust.btnRadius }}>
-                <ImagePlus size={15} /> Upload a photo instead
+                Upload a photo instead
                 <input type="file" accept="image/*" hidden onChange={(e) => onPickPhoto(e.target.files?.[0] ?? null)} />
               </label>
             </div>
