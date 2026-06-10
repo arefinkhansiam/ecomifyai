@@ -300,7 +300,6 @@ function UploadPage() {
           {modeLocked ? (
             <div className="p-3 rounded-xl flex items-center gap-3"
               style={{ background: "linear-gradient(135deg, rgba(2,132,199,0.08), rgba(56,189,248,0.04))", border: "1px solid rgba(2,132,199,0.18)" }}>
-              {(() => { const I = MODE_INFO[arMode].Icon; return <I size={22} className="text-primary" />; })()}
               <div className="text-sm">
                 <div className="font-semibold text-ink">{MODE_INFO[arMode].label}{subtype ? ` · ${subtype}` : ""}</div>
                 <div className="text-[11px]" style={{ color: "var(--ink-soft)" }}>{MODE_INFO[arMode].desc}</div>
@@ -326,7 +325,6 @@ function UploadPage() {
                         boxShadow: active ? "0 8px 24px -12px rgba(2,132,199,0.45)" : "none",
                       }}
                     >
-                      <info.Icon size={20} style={{ color: active ? "var(--primary)" : "var(--ink-soft)" }} />
                       <div className="mt-2 text-sm font-semibold text-ink">{info.label}</div>
                       <div className="text-[11px] mt-0.5" style={{ color: "var(--ink-soft)" }}>{info.desc}</div>
                     </button>
@@ -367,13 +365,13 @@ function UploadPage() {
                   <div key={src} className="relative w-20 h-20 rounded-xl overflow-hidden border" style={{ borderColor: "var(--border)" }}>
                     <img src={src} alt={`angle ${i + 1}`} className="w-full h-full object-cover" />
                     <button type="button" onClick={() => removeExtra(i)}
-                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black text-white grid place-items-center text-xs">×</button>
+                      className="absolute -top-1 -right-1 h-5 px-1.5 rounded-full bg-black text-white grid place-items-center text-[9px]">Remove</button>
                   </div>
                 ))}
                 {extraFiles.length < 4 && (
                   <label className="w-20 h-20 rounded-xl border-2 border-dashed grid place-items-center cursor-pointer text-primary"
                     style={{ borderColor: "var(--primary)" }}>
-                    <Plus size={20} />
+                    <span className="text-xs font-semibold">Add</span>
                     <input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={(e) => onExtraFiles(e.target.files)} />
                   </label>
                 )}
