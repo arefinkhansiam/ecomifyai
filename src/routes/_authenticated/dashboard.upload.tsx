@@ -496,21 +496,21 @@ function UploadPage() {
               buttonBg={btnBg}
               buttonFg={fg}
               buttonRadius={radius}
-              pageBg={isPaid ? pageBg : "#000000"}
-              fontColor={isPaid ? fontColor : "#FFFFFF"}
-              accent={isPaid ? accentColor : bg}
-              overlay={isPaid ? overlayColor : "rgba(255,255,255,0.14)"}
-              arButtonRadius={isPaid ? arButtonRadius : radius}
-              arButtonText={isPaid ? customButtonText : "View in Your Space"}
-              showBranding={isPaid ? showBranding : true}
-              showProductName={isPaid ? showProductName : true}
+              pageBg={pageBg}
+              fontColor={fontColor}
+              accent={accentColor}
+              overlay={overlayColor}
+              arButtonRadius={arButtonRadius}
+              arButtonText={customButtonText}
+              showBranding={showBranding}
+              showProductName={showProductName}
               mode={arMode}
+              fontFamily={fontFamily}
             />
           </div>
 
 
           <button onClick={upload} disabled={!file || busy || !!createdId} className="btn-primary w-full mt-6">
-            {busy ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
             {busy ? step || "Working..." : createdId ? "Created" : "Create Try-On Product"}
           </button>
 
