@@ -28,18 +28,40 @@ const cols = [
   },
 ];
 
+const paymentBadges = [
+  { label: "VISA", bg: "#1A1F71", text: "#ffffff" },
+  { label: "MASTERCARD", bg: "#EB001B", text: "#ffffff" },
+  { label: "AMEX", bg: "#016FD0", text: "#ffffff" },
+  { label: "PAYPAL", bg: "#003087", text: "#ffffff" },
+  { label: "APPLE PAY", bg: "#000000", text: "#ffffff" },
+  { label: "G PAY", bg: "#ffffff", text: "#000000" },
+];
+
 export function Footer() {
   return (
-    <footer style={{ background: "#07070C", borderTop: "1px solid var(--border)" }} className="pt-20 pb-10">
+    <footer
+      className="pt-20 pb-10"
+      style={{
+        background: "linear-gradient(180deg, #0B1220 0%, #07070C 60%, #020205 100%)",
+        borderTop: "1px solid rgba(56,189,248,0.12)",
+      }}
+    >
       <div className="mx-auto max-w-7xl px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
         <div>
           <Link to="/" className="font-display text-[22px] font-extrabold">
             <span className="text-cyan">E</span><span className="text-white">COMIFY</span>
           </Link>
-          <p className="mt-3 text-sm">AI try-on for modern commerce.</p>
+          <p className="mt-3 text-sm text-white/60">AI try-on for modern commerce.</p>
           <div className="flex gap-2 mt-5">
             {[Instagram, Twitter, Linkedin, Facebook].map((Icon, i) => (
-              <a key={i} href="#" className="w-9 h-9 rounded-full bg-card grid place-items-center hover:bg-[var(--primary)] transition-colors">
+              <a
+                key={i}
+                href="#"
+                className="w-9 h-9 rounded-full grid place-items-center transition-colors"
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.10)" }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--primary)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+              >
                 <Icon size={16} className="text-white" />
               </a>
             ))}
@@ -47,24 +69,44 @@ export function Footer() {
         </div>
         {cols.map((c) => (
           <div key={c.title}>
-            <h4 className="font-display text-[13px] uppercase tracking-[2px] text-muted mb-4">{c.title}</h4>
+            <h4 className="font-display text-[13px] uppercase tracking-[2px] text-white/40 mb-4">{c.title}</h4>
             <ul className="space-y-3">
               {c.links.map((l, i) => (
                 <li key={i}>
-                  <Link to={l.to} className="text-sm text-muted hover:text-white transition-colors">{l.label}</Link>
+                  <Link to={l.to} className="text-sm text-white/60 hover:text-white transition-colors">{l.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
         ))}
       </div>
-      <div className="mx-auto max-w-7xl px-6 mt-14 pt-6 border-t border-[var(--border)] flex flex-col md:flex-row justify-between gap-3 text-[13px] text-muted">
+
+      {/* Payment badges */}
+      <div className="mx-auto max-w-7xl px-6 mt-14">
+        <div className="flex flex-wrap justify-center gap-2.5">
+          {paymentBadges.map((p) => (
+            <span
+              key={p.label}
+              className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider"
+              style={{ background: p.bg, color: p.text, border: p.label === "G PAY" ? "1px solid rgba(255,255,255,0.15)" : "none" }}
+            >
+              {p.label}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div
+        className="mx-auto max-w-7xl px-6 mt-8 pt-6 flex flex-col md:flex-row justify-between gap-3 text-[13px]"
+        style={{ color: "rgba(255,255,255,0.35)", borderTop: "1px solid rgba(255,255,255,0.08)" }}
+      >
         <div>2025 Ecomify. All rights reserved.</div>
         <div className="flex gap-6">
-          <a href="#" className="hover:text-white">Privacy Policy</a>
-          <a href="#" className="hover:text-white">Terms of Service</a>
+          <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+          <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
         </div>
       </div>
     </footer>
   );
 }
+
