@@ -29,7 +29,7 @@ export const generateMarketingReport = createServerFn({ method: "POST" })
     const rows = sessions ?? [];
     const total = rows.length;
     if (total === 0) {
-      return { report: `No customer sessions yet for **${prod.product_name}**. Share your AR link or embed the widget on product pages, then run this report again to get tailored marketing recommendations.` };
+      return { report: `No customer sessions yet for **${prod.product_name}**. Share your Try-On link or embed the widget on product pages, then run this report again to get tailored marketing recommendations.` };
     }
 
     const counts = <T extends string | null | undefined>(key: (r: any) => T) =>
@@ -62,7 +62,7 @@ export const generateMarketingReport = createServerFn({ method: "POST" })
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: "You are a senior e-commerce marketing analyst. Write concise, actionable reports in plain English using markdown. Sections required: Overview, Best-performing times, Top devices, Top countries, Engagement quality score (0-100 with one-line rationale), 3 Actionable Recommendations (numbered list). Keep under 400 words." },
-          { role: "user", content: `Generate a marketing report from these AR engagement metrics:\n\n${JSON.stringify(summary, null, 2)}` },
+          { role: "user", content: `Generate a marketing report from these Try-On engagement metrics:\n\n${JSON.stringify(summary, null, 2)}` },
         ],
       }),
     });

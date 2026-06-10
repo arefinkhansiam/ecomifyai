@@ -394,7 +394,7 @@ export function LiveAROverlay(p: Props) {
           <div className="max-w-sm">
             <Camera size={44} className="mx-auto" style={{ color: p.accent }} />
             <h3 className="mt-4 text-white">{phase === "denied" ? "Camera access needed" : "Camera not supported"}</h3>
-            <p className="mt-2 text-white/70 text-sm">{phase === "denied" ? "Allow camera permission to continue." : "Open on a mobile browser to use AR."}</p>
+            <p className="mt-2 text-white/70 text-sm">{phase === "denied" ? "Allow camera permission to continue." : "Open on a mobile browser to use Try-On."}</p>
             {phase === "denied" && (
               <button onClick={() => startCamera(facing)} className="mt-6 px-5 py-2.5 rounded-full inline-flex items-center gap-2" style={{ background: p.accent, color: "#fff" }}><RefreshCw size={16} /> Retry</button>
             )}

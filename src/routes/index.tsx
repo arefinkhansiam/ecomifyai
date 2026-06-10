@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
       { title: "Ecomify — AI Photo Try-On for E-Commerce" },
       { name: "description", content: "Upload product photos. Shoppers upload their own photo. Our AI generates a photoreal try-on in seconds — fashion, jewellery, furniture and makeup." },
       { property: "og:title", content: "Ecomify — AI Photo Try-On for E-Commerce" },
-      { property: "og:description", content: "Photoreal try-on from a single photo. No AR hardware, no app, no 3D modeling." },
+      { property: "og:description", content: "Photoreal try-on from a single photo. No app, no complex modeling." },
     ],
   }),
   component: Landing,
@@ -46,7 +46,7 @@ function Landing() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.45 }}
             className="mt-6 max-w-2xl mx-auto text-[18px] text-white/80"
           >
-            Upload your product photos. Shoppers upload one of themselves — or their room — and our AI generates a photorealistic try-on in seconds. No camera tracking, no AR headset, no 3D files.
+            Upload your product photos. Shoppers upload one of themselves — or their room — and our AI generates a photorealistic try-on in seconds. No camera tracking, no headset, no model files.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6 }}
@@ -181,13 +181,13 @@ function Landing() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center max-w-2xl mx-auto">
             <h2 className="text-gradient-ocean">Everything You Need to Sell</h2>
-            <p className="mt-4">No 3D pipeline. No specialist. Just upload and share.</p>
+            <p className="mt-4">No complex pipeline. No specialist. Just upload and share.</p>
           </div>
           <div className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FeatureCard icon={UploadCloud} title="Multi-Angle Capture" description="Add as many angles as you have — front, back, side, detail. Our AI uses them all to render an accurate try-on." accent="primary" delay={0} />
             <FeatureCard icon={Wand2} title="AI Photo Composition" description="Powered by Google Gemini. Photorealistic results that preserve the shopper's face, pose, lighting and background." accent="cyan" delay={0.1} />
-            <FeatureCard icon={Smartphone} title="Works On Any Phone" description="No AR headset. No app install. Shoppers upload a photo from any browser and see results in seconds." accent="primary" delay={0.2} />
-            <FeatureCard icon={LinkIcon} title="One Link + QR Per Product" description="Share a try-on link or scan-to-try QR code. Embed the widget on any site or Shopify store." accent="cyan" delay={0.3} />
+            <FeatureCard icon={Smartphone} title="Works On Any Phone" description="No headset. No app install. Shoppers upload a photo from any browser and see results in seconds." accent="primary" delay={0.2} />
+            <FeatureCard icon={LinkIcon} title="One Link + QR Per Product" description="Share a try-on link or scan-to-try QR code. Embed the widget on any online store." accent="cyan" delay={0.3} />
             <FeatureCard icon={BarChart2} title="Try-On Analytics" description="Track sessions, devices, conversions and bounce — see which products move the needle." accent="primary" delay={0.4} />
             <FeatureCard icon={ShieldCheck} title="Private & Secure" description="Shopper photos are processed for the try-on and never used for training. Enterprise-grade storage." accent="cyan" delay={0.5} />
           </div>
@@ -201,15 +201,15 @@ function Landing() {
             style={{ background: "linear-gradient(135deg, #0B1220 0%, #0369A1 55%, #38BDF8 100%)", boxShadow: "0 40px 100px -30px rgba(2,132,199,0.55)" }}>
             <div className="relative">
               <span className="pill" style={{ background: "rgba(255,255,255,0.14)", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)" }}>Why photo try-on wins</span>
-              <h2 className="mt-6 text-white">Better than AR. Easier than a fitting room.</h2>
+              <h2 className="mt-6 text-white">Better than camera filters. Easier than a fitting room.</h2>
               <p className="mt-5 text-white/85 text-[17px] leading-relaxed max-w-3xl">
-                Camera-based AR is fiddly: shoppers have to install apps, stand a certain distance away and hold still. Photo try-on just works — one photo of the shopper, one photo of your product, one shareable result.
+                Camera-based previews are fiddly: shoppers have to install apps, stand a certain distance away and hold still. Photo try-on just works — one photo of the shopper, one photo of your product, one shareable result.
               </p>
               <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
                   { t: "Higher conversion", d: "Shoppers who see themselves wearing a product convert at significantly higher rates." },
                   { t: "Fewer returns", d: "Realistic fit and shade preview cuts wrong-size and wrong-colour returns." },
-                  { t: "Zero friction", d: "No app, no AR support required. If the shopper can upload a photo, they can try on." },
+                  { t: "Zero friction", d: "No app, no special device support required. If the shopper can upload a photo, they can try on." },
                 ].map((f) => (
                   <div key={f.t} className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)", backdropFilter: "blur(8px)" }}>
                     <div className="font-display font-bold text-white">{f.t}</div>

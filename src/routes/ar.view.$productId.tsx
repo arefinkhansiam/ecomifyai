@@ -145,7 +145,7 @@ function TopBar({ name, showName, overlay, fontColor, accent, onClose, badge }: 
 function ARRouter() {
   const { product } = Route.useLoaderData();
   const raw = (product.ar_mode || "furniture") as string;
-  // 3D mode removed — fall back to furniture (scene-based) placement
+  // Legacy model mode removed — fall back to furniture scene placement
   const mode: "fashion" | "furniture" | "makeup" =
     raw === "fashion" ? "fashion" : raw === "makeup" ? "makeup" : "furniture";
   return <CameraComposeView mode={mode} />;

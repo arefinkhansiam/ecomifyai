@@ -34,9 +34,9 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
         <div>
           <Link to="/" className="font-display text-[22px] font-extrabold">
-            <span className="text-cyan">E</span><span className="text-white">ASIBIE</span>
+            <span className="text-cyan">E</span><span className="text-white">COMIFY</span>
           </Link>
-          <p className="mt-3 text-sm">The future of e-commerce is spatial.</p>
+          <p className="mt-3 text-sm">AI try-on for modern commerce.</p>
           <div className="flex gap-2 mt-5">
             {[Instagram, Twitter, Linkedin, Facebook].map((Icon, i) => (
               <a key={i} href="#" className="w-9 h-9 rounded-full bg-card grid place-items-center hover:bg-[var(--primary)] transition-colors">

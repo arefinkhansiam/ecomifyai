@@ -66,8 +66,8 @@
     fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(function () {});
   }
   // Expose for Try-On viewer iframe to call
-  window.__easibieMarkInteract = markInteract;
-  window.__easibieEndSession = endSession;
+  window.__ecomifyMarkInteract = markInteract;
+  window.__ecomifyEndSession = endSession;
 
   function render(cfg) {
     var label = overrideLabel || cfg.button_label || "View Try-On";
@@ -106,7 +106,7 @@
       return;
     }
     var wrap = document.createElement("div");
-    wrap.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(11,18,32,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;animation:easibieFade .25s ease both;";
+    wrap.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(11,18,32,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;animation:ecomifyFade .25s ease both;";
     var inner = document.createElement("div");
     inner.style.cssText = "position:relative;width:min(440px,92vw);height:min(820px,92vh);border-radius:28px;overflow:hidden;box-shadow:0 40px 100px -30px rgba(0,0,0,.6);background:#000";
     var iframe = document.createElement("iframe");
@@ -119,9 +119,9 @@
     close.onclick = function () { endSession(true); wrap.remove(); };
     inner.appendChild(iframe); inner.appendChild(close); wrap.appendChild(inner);
     document.body.appendChild(wrap);
-    if (!document.getElementById("easibie-kf")) {
-      var st = document.createElement("style"); st.id = "easibie-kf";
-      st.textContent = "@keyframes easibieFade{from{opacity:0}to{opacity:1}}";
+    if (!document.getElementById("ecomify-kf")) {
+      var st = document.createElement("style"); st.id = "ecomify-kf";
+      st.textContent = "@keyframes ecomifyFade{from{opacity:0}to{opacity:1}}";
       document.head.appendChild(st);
     }
   }

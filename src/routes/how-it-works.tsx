@@ -17,12 +17,12 @@ const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
 function HowItWorks() {
   const steps = [
     { icon: UploadCloud, title: "Upload your product photos", body: "JPG, PNG or WebP — front, back, side and detail shots. The more angles you upload, the more accurate the AI try-on result." },
-    { icon: ImagePlus, title: "Shopper uploads their own photo", body: "A selfie, full-body shot, or photo of their room. No app install, no AR headset, works on any phone or laptop browser." },
+    { icon: ImagePlus, title: "Shopper uploads their own photo", body: "A selfie, full-body shot, or photo of their room. No app install, works on any phone or laptop browser." },
     { icon: Wand2, title: "AI generates a photoreal try-on", body: "Google Gemini composes a realistic try-on preserving the shopper's face, pose, lighting and background. Usually 10–20 seconds." },
-    { icon: Share2, title: "Share, embed, sell", body: "Every product gets a public try-on link, a downloadable QR code and an embed snippet for Shopify, WooCommerce or any custom site." },
+    { icon: Share2, title: "Share, embed, sell", body: "Every product gets a public try-on link, a downloadable QR code and an embed snippet for any online store." },
   ];
   const perks = [
-    { icon: Smartphone, t: "Works on any phone", d: "Browser-based — no app, no AR support needed." },
+    { icon: Smartphone, t: "Works on any phone", d: "Browser-based — no app or special device support needed." },
     { icon: BarChart2, t: "Built-in analytics", d: "Sessions, conversion, devices and bounce — for every product." },
     { icon: ShieldCheck, t: "Private & secure", d: "Shopper photos are processed for the try-on only — never used for training." },
   ];
@@ -33,7 +33,7 @@ function HowItWorks() {
         <div className="mx-auto max-w-3xl px-6 pt-20 pb-10 text-center">
           <span className="pill"><Sparkles size={14} /> How it works</span>
           <h1 className="mt-5 text-gradient-ocean">From photo to try-on in under a minute.</h1>
-          <p className="mt-5 text-lg" style={{ color: "var(--ink-soft)" }}>No 3D software. No developer. No app downloads for your customers.</p>
+          <p className="mt-5 text-lg" style={{ color: "var(--ink-soft)" }}>No complex software. No developer. No app downloads for your customers.</p>
         </div>
       </section>
 

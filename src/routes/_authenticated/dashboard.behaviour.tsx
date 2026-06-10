@@ -76,7 +76,7 @@ function BehaviourPage() {
     const rows = [["created_at", "session_id", "country", "device_type", "os_type", "time_spent_seconds", "did_interact", "camera_used"], ...sessions.map((s) => [s.created_at, s.session_id, s.country ?? "", s.device_type ?? "", s.os_type ?? "", String(s.time_spent_seconds), String(s.did_interact), s.camera_used ?? ""])];
     const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `ar-sessions-${productId.slice(0, 8)}.csv`; a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `tryon-sessions-${productId.slice(0, 8)}.csv`; a.click();
   };
 
   const runReport = async () => {
@@ -95,8 +95,8 @@ function BehaviourPage() {
     <DashboardShell title="Customer Behaviour">
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-display font-extrabold" style={{ background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>How customers experience your AR</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--ink-soft)" }}>Silent tracking through your embedded AR button. No personal data collected.</p>
+          <h1 className="text-2xl md:text-3xl font-display font-extrabold" style={{ background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>How customers experience your Try-On</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--ink-soft)" }}>Silent tracking through your embedded Try-On button. No personal data collected.</p>
         </div>
         <button onClick={() => setShowInfo(true)} className="btn-ghost text-xs"><Info size={14} /> How tracking works</button>
       </div>
@@ -105,7 +105,7 @@ function BehaviourPage() {
         <div className="rounded-2xl p-8 text-center mb-6" style={{ background: GRAD, color: "#fff" }}>
           <Crown size={36} className="mx-auto" />
           <h2 className="mt-3 text-white">Customer Behaviour is a paid feature</h2>
-          <p className="mt-2 opacity-90">Upgrade to Starter or Growth to start seeing how visitors engage with your AR.</p>
+          <p className="mt-2 opacity-90">Upgrade to Starter or Growth to start seeing how visitors engage with your Try-On.</p>
           <a href="/pricing" className="inline-block mt-5 rounded-full px-6 py-2.5 font-semibold text-ink" style={{ background: "#fff" }}>View plans</a>
         </div>
       )}
@@ -113,8 +113,8 @@ function BehaviourPage() {
       {isStarterPlus && products.length === 0 && (
         <div className="rounded-2xl p-8 text-center" style={{ background: "rgba(255,255,255,0.92)", border: "1px solid rgba(2,132,199,0.18)" }}>
           <Sparkles size={36} className="mx-auto text-primary" />
-          <h3 className="mt-3 text-ink">No AR products yet</h3>
-          <p className="mt-2">Create an AR product, embed it, then come back to see customer behaviour.</p>
+          <h3 className="mt-3 text-ink">No Try-On products yet</h3>
+          <p className="mt-2">Create a Try-On product, embed it, then come back to see customer behaviour.</p>
         </div>
       )}
 
@@ -190,7 +190,7 @@ function BehaviourPage() {
                 <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: GRAD, color: "#fff" }}>
                   <span className="text-[10px] uppercase tracking-wider opacity-80">Coming soon</span>
                   <h4 className="text-white mt-1">Behaviour heatmap</h4>
-                  <p className="text-sm opacity-90 mt-1">Visualize where customers tap, rotate and dwell on your 3D model.</p>
+                  <p className="text-sm opacity-90 mt-1">Visualize where customers tap, compare and dwell inside your Try-On experience.</p>
                 </div>
               </>
             )}
@@ -202,7 +202,7 @@ function BehaviourPage() {
         <div className="fixed inset-0 z-50 grid place-items-center p-6 bg-black/50" onClick={() => setShowInfo(false)}>
           <div className="bg-white rounded-2xl p-6 max-w-lg" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-ink">How customer tracking works</h3>
-            <p className="text-sm mt-3 text-ink">Customer Behaviour Tracking works automatically through your embedded AR button. When a customer clicks your AR button on your website, our widget silently records their session data including device type, time spent in AR, whether they interacted with the 3D model, and where they came from. No personal data is collected. This data helps you understand which products drive the most engagement and where to focus your marketing.</p>
+            <p className="text-sm mt-3 text-ink">Customer Behaviour Tracking works automatically through your embedded Try-On button. When a customer clicks your Try-On button on your website, our widget silently records their session data including device type, time spent in Try-On, whether they interacted with the experience, and where they came from. No personal data is collected. This data helps you understand which products drive the most engagement and where to focus your marketing.</p>
             <button onClick={() => setShowInfo(false)} className="btn-primary mt-5">Got it</button>
           </div>
         </div>

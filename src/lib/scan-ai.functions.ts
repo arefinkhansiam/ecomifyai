@@ -4,20 +4,20 @@ import { z } from "zod";
 
 const Input = z.object({ productId: z.string().uuid() });
 
-const DEFAULT_PROMPT = "Recreate this product as a clean AR-ready hero render: isolate the product, remove the original background and replace it with a soft neutral studio backdrop with a subtle ground shadow, even product lighting, photoreal materials, sharp edges, no people, no text, no watermarks. Keep the exact product shape, proportions, color and details.";
+const DEFAULT_PROMPT = "Recreate this product as a clean Try-On-ready hero render: isolate the product, remove the original background and replace it with a soft neutral studio backdrop with a subtle ground shadow, even product lighting, photoreal materials, sharp edges, no people, no text, no watermarks. Keep the exact product shape, proportions, color and details.";
 
 function promptForCategory(mode?: string | null, subtype?: string | null): string {
   if (mode === "fashion") {
-    if (subtype === "bottom")    return "Isolate the bottom garment (pants / jeans / trousers / skirt / shorts) as a clean front-facing flat-lay style AR-ready cutout on a soft neutral backdrop. Remove the original background, mannequin or person. Keep exact fabric color, pattern, stitching, length and shape. Photoreal, even lighting, subtle ground shadow, no text or watermarks.";
+    if (subtype === "bottom")    return "Isolate the bottom garment (pants / jeans / trousers / skirt / shorts) as a clean front-facing flat-lay style Try-On-ready cutout on a soft neutral backdrop. Remove the original background, mannequin or person. Keep exact fabric color, pattern, stitching, length and shape. Photoreal, even lighting, subtle ground shadow, no text or watermarks.";
     if (subtype === "accessory") return "Isolate this fashion accessory (watch / bag / hat / glasses / shoes / belt) as a clean product render on a soft neutral backdrop. Remove the original background. Keep exact color, material, shape and details. Photoreal, even studio lighting, subtle ground shadow, no text or watermarks.";
     if (subtype === "jewellery") return "Isolate this jewellery piece (necklace / earring / ring / bracelet) as a clean product render on a soft neutral backdrop. Remove the original background. Preserve exact metal finish, gemstone color and sparkle, and proportions. Photoreal, soft studio lighting, sharp details, no text or watermarks.";
-    return "Isolate the top garment (shirt / t-shirt / blouse / jacket / dress) as a clean front-facing flat-lay style AR-ready cutout on a soft neutral backdrop. Remove any mannequin, person or background. Keep exact fabric color, pattern, stitching and shape. Photoreal, even lighting, subtle ground shadow, no text or watermarks.";
+    return "Isolate the top garment (shirt / t-shirt / blouse / jacket / dress) as a clean front-facing flat-lay style Try-On-ready cutout on a soft neutral backdrop. Remove any mannequin, person or background. Keep exact fabric color, pattern, stitching and shape. Photoreal, even lighting, subtle ground shadow, no text or watermarks.";
   }
   if (mode === "makeup") {
-    return "Recreate this makeup product as a clean studio AR-ready hero render on a soft neutral backdrop. Remove the original background. Keep the exact shade, finish (matte / glossy / shimmer), packaging color and label. Photoreal, soft lighting, subtle ground shadow, no people, no extra text.";
+    return "Recreate this makeup product as a clean studio Try-On-ready hero render on a soft neutral backdrop. Remove the original background. Keep the exact shade, finish (matte / glossy / shimmer), packaging color and label. Photoreal, soft lighting, subtle ground shadow, no people, no extra text.";
   }
   if (mode === "furniture") {
-    return "Isolate this furniture / decor item as a clean AR-ready product render on a soft neutral backdrop, ready to be placed in a room. Remove the original background and any people. Keep exact shape, material, color and proportions. Photoreal, even lighting, subtle ground shadow, no text or watermarks.";
+    return "Isolate this furniture / decor item as a clean Try-On-ready product render on a soft neutral backdrop, ready to be placed in a room. Remove the original background and any people. Keep exact shape, material, color and proportions. Photoreal, even lighting, subtle ground shadow, no text or watermarks.";
   }
   return DEFAULT_PROMPT;
 }
@@ -79,11 +79,11 @@ async function storagePathToDataUrl(supabase: any, path: string, fallbackMime = 
 
 /**
  * Picks the middle frame from a scan, runs it through Lovable AI Gateway
- * (Gemini image edit) to produce a clean studio "3D-style" hero preview,
+ * (Gemini image edit) to produce a clean studio hero preview,
  * uploads the result to storage, and updates models_3d + ar_products.
  *
  * NOTE: This produces an AI preview image, not a real GLB. Swap the inner
- * call for TripoSR / Meshy / CSM when a paid 3D service is connected — the
+ * call for a dedicated product visualization service when connected — the
  * rest of the pipeline (storage path, models_3d row, status flow) stays.
  */
 export const generate3dPreview = createServerFn({ method: "POST" })
@@ -118,7 +118,7 @@ export const generate3dPreview = createServerFn({ method: "POST" })
       const chosenFrames = pickAngleFrames(frames);
       const dataUrls = await Promise.all(chosenFrames.map((frame) => storagePathToDataUrl(supabase, frame.frame_url)));
 
-      const { mime, bytes } = await callGeminiHero(dataUrls, `${promptForCategory((product as any).ar_mode, (product as any).ar_subtype)} Use all supplied scan angles as reference views for one accurate front-facing AR-ready mockup.`);
+      const { mime, bytes } = await callGeminiHero(dataUrls, `${promptForCategory((product as any).ar_mode, (product as any).ar_subtype)} Use all supplied scan angles as reference views for one accurate front-facing Try-On-ready mockup.`);
       const ext = mime === "image/jpeg" ? "jpg" : "png";
 
       const path = `${userId}/${productId}/preview.${ext}`;
@@ -164,7 +164,7 @@ export const generate3dPreview = createServerFn({ method: "POST" })
 
 /**
  * Generate the same AI hero render from a single uploaded product image.
- * Used by the upload page so plain photos become AR-ready like scans.
+ * Used by the upload page so plain photos become Try-On-ready like scans.
  * On failure, returns ok:false but does NOT mark the product failed — the
  * caller keeps the raw image as a graceful fallback.
  */
