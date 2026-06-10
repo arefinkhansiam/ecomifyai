@@ -40,7 +40,7 @@ function EmbedPage() {
 
   const url = selected ? `${origin}/ar/view/${selected}` : "";
   const embedCode = `<iframe src="${url}" width="100%" height="640" style="border:0;border-radius:16px" allow="xr-spatial-tracking; camera"></iframe>`;
-  const shopify = `{% comment %} Ecomify Try-On {% endcomment %}\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
+  const platformSnippet = `<!-- Ecomify Try-On -->\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
 
   const copy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -93,10 +93,10 @@ function EmbedPage() {
             </div>
           </div>
           <div>
-            <h3 className="text-white">Shopify snippet</h3>
+            <h3 className="text-white">Store platform snippet</h3>
             <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
-              <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{shopify}</code>
-              <button onClick={() => copy(shopify, "Snippet")} className="text-muted hover:text-white"><Copy size={14} /></button>
+              <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{platformSnippet}</code>
+              <button onClick={() => copy(platformSnippet, "Snippet")} className="text-muted hover:text-white"><Copy size={14} /></button>
             </div>
           </div>
         </div>
