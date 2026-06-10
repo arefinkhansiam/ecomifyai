@@ -1,14 +1,12 @@
 import { useRef, useState } from "react";
-import { UploadCloud, Sparkles, Loader2, RefreshCw, Download, Share2, Shirt, Sofa, Brush } from "lucide-react";
+import { UploadCloud, Sparkles, Loader2, RefreshCw, Download, Share2, Shirt, Sofa } from "lucide-react";
 import tshirtAsset from "@/assets/demo-tshirt.jpg.asset.json";
 import chairAsset from "@/assets/demo-chair.jpg.asset.json";
-import lipstickAsset from "@/assets/demo-lipstick.jpg.asset.json";
 
-type DemoKey = "tshirt" | "chair" | "lipstick";
+type DemoKey = "tshirt" | "chair";
 const DEMOS: Record<DemoKey, { label: string; img: string; icon: any; hint: string }> = {
   tshirt: { label: "Sky Blue T-Shirt", img: tshirtAsset.url, icon: Shirt, hint: "Upload a photo of yourself (upper body, front-facing)" },
   chair: { label: "Boucle Armchair", img: chairAsset.url, icon: Sofa, hint: "Upload a photo of the room where you'd like to place it" },
-  lipstick: { label: "Crimson Lipstick", img: lipstickAsset.url, icon: Brush, hint: "Upload a selfie of your face" },
 };
 
 async function downscale(file: File, maxDim = 1280): Promise<string> {
