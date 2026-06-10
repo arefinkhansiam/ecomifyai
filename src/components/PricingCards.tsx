@@ -32,7 +32,7 @@ export const PLANS: Plan[] = [
       "10 Try-On products",
       "Basic button colour customizer",
       "Remove “Powered by Ecomify” branding",
-      "Embed code + Shopify snippet",
+      "Embed code + store platform snippet",
       "Analytics dashboard",
       "Priority support",
     ],
