@@ -557,6 +557,30 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
   );
 }
 
+function Toggle({ label, checked, onChange, hint }: { label: string; checked: boolean; onChange: (v: boolean) => void; hint?: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 min-h-11">
+      <div className="min-w-0">
+        <div className="text-sm text-ink leading-snug">{label}</div>
+        {hint && <div className="text-xs mt-0.5" style={{ color: "var(--ink-soft)" }}>{hint}</div>}
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className="relative inline-flex h-8 w-14 shrink-0 items-center rounded-full border p-[3px] transition-colors duration-200"
+        style={{ background: checked ? "var(--primary)" : "#e2e8f0", borderColor: checked ? "var(--primary)" : "#cbd5e1" }}
+      >
+        <span
+          className="block h-6 w-6 rounded-full bg-white transition-transform duration-200"
+          style={{ transform: checked ? "translateX(24px)" : "translateX(0px)", boxShadow: "0 2px 6px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.06)" }}
+        />
+      </button>
+    </div>
+  );
+}
+
 function UploadTimeline({ steps }: { steps: TimelineStep[] }) {
   return (
     <div className="rounded-2xl p-4 bg-soft" style={{ border: "1px solid var(--border)" }}>
