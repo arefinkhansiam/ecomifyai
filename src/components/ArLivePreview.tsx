@@ -1,5 +1,3 @@
-import { Sparkles, X, Camera, ThumbsUp, ThumbsDown } from "lucide-react";
-
 type Props = {
   productImage: string | null;
   productName: string;
@@ -22,13 +20,14 @@ type Props = {
   headerSubtitle?: string;
   buttonShadow?: boolean;
   device?: "mobile" | "desktop";
+  badgeText?: string;
 };
 
 /**
  * Miniature WYSIWYG mock of the public Try-On viewer page.
  */
 export function ArLivePreview(p: Props) {
-  const badge = p.mode === "fashion" ? "TRY-ON" : p.mode === "makeup" ? "MAKEUP" : "PLACE IT";
+  const badge = p.badgeText || (p.mode === "fashion" ? "TRY-ON" : p.mode === "makeup" ? "MAKEUP" : "PLACE IT");
   const fontStack = p.fontFamily ? `'${p.fontFamily}', system-ui, sans-serif` : undefined;
   const shadow = p.buttonShadow === false ? "none" : "0 10px 28px -8px rgba(2,132,199,0.5)";
   const isDesktop = p.device === "desktop";
@@ -50,7 +49,7 @@ export function ArLivePreview(p: Props) {
             boxShadow: shadow,
             display: "inline-flex", alignItems: "center", gap: 8,
           }}>
-          <Sparkles size={16} /> {p.buttonLabel}
+          {p.buttonLabel}
         </button>
         {p.showBranding && (
           <div className="mt-3 text-[10px] uppercase tracking-wider text-muted">Powered by Ecomify</div>
@@ -113,7 +112,7 @@ export function ArLivePreview(p: Props) {
             )}
             <span className="w-5 h-5 rounded-full grid place-items-center"
                   style={{ background: p.overlay, color: p.fontColor }}>
-              <X size={10} />
+              <span className="text-[9px] leading-none">Close</span>
             </span>
           </div>
 
@@ -121,7 +120,7 @@ export function ArLivePreview(p: Props) {
           <div className="absolute left-1/2 -translate-x-1/2 w-14 h-14 rounded-full grid place-items-center"
                style={{ bottom: isDesktop ? 18 : 24, background: "#fff", boxShadow: `0 0 0 3px ${p.accent}` }}>
             <div className="w-11 h-11 rounded-full grid place-items-center" style={{ background: p.accent }}>
-              <Camera size={16} color="#fff" />
+              <span className="w-5 h-5 rounded-full bg-white/90" />
             </div>
           </div>
 
@@ -133,7 +132,7 @@ export function ArLivePreview(p: Props) {
                    background: p.accent, color: "#fff", borderRadius: p.arButtonRadius,
                    boxShadow: shadow,
                  }}>
-              <Sparkles size={11} /> {p.arButtonText}
+              {p.arButtonText}
             </div>
           </div>
 
@@ -142,11 +141,11 @@ export function ArLivePreview(p: Props) {
                style={{ bottom: isDesktop ? 50 : 56 }}>
             <span className="px-2 py-1 rounded-full text-[8px] font-semibold inline-flex items-center gap-1"
                   style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(8px)" }}>
-              <ThumbsUp size={9} /> Like
+              Like
             </span>
             <span className="px-2 py-1 rounded-full text-[8px] font-semibold inline-flex items-center gap-1"
                   style={{ background: p.overlay, color: p.fontColor, backdropFilter: "blur(8px)" }}>
-              <ThumbsDown size={9} /> Not for me
+              Not for me
             </span>
           </div>
 
