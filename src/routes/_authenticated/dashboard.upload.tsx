@@ -486,7 +486,7 @@ function UploadPage() {
           </div>
 
           <div className="mt-6">
-            <div className="text-[11px] uppercase tracking-wider text-muted mb-3 text-center">Live AR preview</div>
+            <div className="text-[11px] uppercase tracking-wider text-muted mb-3 text-center">Live Try-On preview</div>
             <ArLivePreview
               productImage={preview}
               productName={name || "Your product"}
@@ -617,7 +617,7 @@ function CodeBlock({ title, code, onCopy, copied }: { title: string; code: strin
       <div className="px-4 py-2.5 flex items-center justify-between text-xs uppercase tracking-wider text-white/60 border-b border-white/10">
         <span>{title}</span>
         <button onClick={onCopy} className="inline-flex items-center gap-1 text-white hover:text-sky-300">
-          {copied ? <><Check size={13} /> Copied</> : <><Copy size={13} /> Copy</>}
+          {copied ? "Copied" : "Copy"}
         </button>
       </div>
       <pre className="px-4 py-4 text-[12.5px] leading-relaxed overflow-x-auto font-mono whitespace-pre-wrap break-all">{code}</pre>
