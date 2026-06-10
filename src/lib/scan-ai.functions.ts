@@ -79,11 +79,11 @@ async function storagePathToDataUrl(supabase: any, path: string, fallbackMime = 
 
 /**
  * Picks the middle frame from a scan, runs it through Lovable AI Gateway
- * (Gemini image edit) to produce a clean studio "3D-style" hero preview,
+ * (Gemini image edit) to produce a clean studio hero preview,
  * uploads the result to storage, and updates models_3d + ar_products.
  *
  * NOTE: This produces an AI preview image, not a real GLB. Swap the inner
- * call for TripoSR / Meshy / CSM when a paid 3D service is connected — the
+ * call for a dedicated product visualization service when connected — the
  * rest of the pipeline (storage path, models_3d row, status flow) stays.
  */
 export const generate3dPreview = createServerFn({ method: "POST" })
@@ -118,7 +118,7 @@ export const generate3dPreview = createServerFn({ method: "POST" })
       const chosenFrames = pickAngleFrames(frames);
       const dataUrls = await Promise.all(chosenFrames.map((frame) => storagePathToDataUrl(supabase, frame.frame_url)));
 
-      const { mime, bytes } = await callGeminiHero(dataUrls, `${promptForCategory((product as any).ar_mode, (product as any).ar_subtype)} Use all supplied scan angles as reference views for one accurate front-facing AR-ready mockup.`);
+      const { mime, bytes } = await callGeminiHero(dataUrls, `${promptForCategory((product as any).ar_mode, (product as any).ar_subtype)} Use all supplied scan angles as reference views for one accurate front-facing Try-On-ready mockup.`);
       const ext = mime === "image/jpeg" ? "jpg" : "png";
 
       const path = `${userId}/${productId}/preview.${ext}`;
@@ -164,7 +164,7 @@ export const generate3dPreview = createServerFn({ method: "POST" })
 
 /**
  * Generate the same AI hero render from a single uploaded product image.
- * Used by the upload page so plain photos become AR-ready like scans.
+ * Used by the upload page so plain photos become Try-On-ready like scans.
  * On failure, returns ok:false but does NOT mark the product failed — the
  * caller keeps the raw image as a graceful fallback.
  */
