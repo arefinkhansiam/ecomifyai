@@ -17,7 +17,7 @@ const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
 function About() {
   const values = [
     { icon: Zap, t: "Photoreal, not gimmicky", d: "Try-on quality is the product. We obsess over face preservation, lighting, fit and shadow." },
-    { icon: Globe, t: "Built for every store", d: "From a 1-product Etsy shop to a 10,000-SKU Shopify brand. Same simple flow. Same fair price." },
+    { icon: Globe, t: "Built for every store", d: "From a 1-product shop to a 10,000-SKU brand. Same simple flow. Same fair price." },
     { icon: Heart, t: "Shopper-first", d: "No app installs, no tracking, no shady data deals. Photos are processed for the try-on and discarded." },
   ];
   return (
@@ -28,7 +28,7 @@ function About() {
           <span className="pill"><Sparkles size={14} /> About Ecomify</span>
           <h1 className="mt-5 text-gradient-ocean">AI try-on, for every store.</h1>
           <p className="mt-6 text-lg" style={{ color: "var(--ink-soft)" }}>
-            Ecomify was founded with a simple belief: every online shopper deserves to see themselves with the product before they buy. We made that possible from a single photo — no AR headsets, no 3D modelling, no developer team.
+            Ecomify was founded with a simple belief: every online shopper deserves to see themselves with the product before they buy. We made that possible from a single photo — no headsets, no complex modelling, no developer team.
           </p>
         </div>
       </section>
