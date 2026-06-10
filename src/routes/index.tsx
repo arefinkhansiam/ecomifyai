@@ -104,8 +104,7 @@ function Landing() {
       <section id="demo" className="py-20" style={{ background: "linear-gradient(180deg, transparent, rgba(2,132,199,0.08), transparent)" }}>
         <div className="mx-auto max-w-5xl px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="pill"><Sparkles size={12} /> Live demo · no signup needed</span>
-            <h2 className="mt-5 text-gradient-ocean">Try It Yourself, Right Here.</h2>
+          <h2 className="mt-5 text-gradient-ocean">Try It Yourself, Right Here.</h2>
             <p className="mt-4">Pick a sample product, upload one photo of yourself or your room — see the AI result in seconds.</p>
           </div>
           <InlineTryOnDemo />
