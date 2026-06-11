@@ -13,15 +13,15 @@ const reviews = [
 
 const GRAD = "linear-gradient(135deg, #0369A1 0%, #38BDF8 100%)";
 
-export function ReviewCarousel() {
-  const items = [...reviews, ...reviews];
+function Row({ items, reverse = false }: { items: typeof reviews; reverse?: boolean }) {
+  const loop = [...items, ...items];
   return (
     <div className="overflow-hidden">
-      <div className="flex scroll-x gap-4 sm:gap-5" style={{ width: "max-content" }}>
-        {items.map((r, i) => (
+      <div className={`flex ${reverse ? "scroll-x-reverse" : "scroll-x"} gap-4 sm:gap-5`} style={{ width: "max-content" }}>
+        {loop.map((r, i) => (
           <div
             key={i}
-            className="rounded-2xl p-5 sm:p-6 shrink-0 w-[78vw] sm:w-[360px] flex flex-col"
+            className="rounded-2xl p-5 shrink-0 w-[78vw] sm:w-[340px] flex flex-col"
             style={{
               background: "rgba(15,23,42,0.85)",
               border: "1px solid rgba(56,189,248,0.18)",
@@ -33,13 +33,13 @@ export function ReviewCarousel() {
                 <Star key={s} size={14} style={{ color: s < r.stars ? "#38BDF8" : "rgba(255,255,255,0.18)" }} fill="currentColor" />
               ))}
             </div>
-            <div className="font-display font-bold text-white text-[16px] mb-2">{r.title}</div>
-            <p className="text-[14px] leading-relaxed mb-5 text-white/70 flex-1">{r.text}</p>
-            <div className="flex items-center gap-3 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-              <div className="w-8 h-8 rounded-full grid place-items-center text-[11px] font-bold text-white shrink-0" style={{ background: GRAD }}>
+            <div className="font-display font-bold text-white text-[15px] mb-2">{r.title}</div>
+            <p className="text-[13px] leading-relaxed mb-4 text-white/70 flex-1">{r.text}</p>
+            <div className="flex items-center gap-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="w-7 h-7 rounded-full grid place-items-center text-[10px] font-bold text-white shrink-0" style={{ background: GRAD }}>
                 {r.initials}
               </div>
-              <div className="text-sm font-semibold text-white/90 truncate">{r.name}</div>
+              <div className="text-xs font-semibold text-white/90 truncate">{r.name}</div>
             </div>
           </div>
         ))}
@@ -47,3 +47,16 @@ export function ReviewCarousel() {
     </div>
   );
 }
+
+export function ReviewCarousel() {
+  const half = Math.ceil(reviews.length / 2);
+  const row1 = reviews.slice(0, half);
+  const row2 = reviews.slice(half);
+  return (
+    <div className="flex flex-col gap-5">
+      <Row items={row1} />
+      <Row items={row2} reverse />
+    </div>
+  );
+}
+
