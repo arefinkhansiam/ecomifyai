@@ -117,13 +117,13 @@ function AnalyticsPage() {
     <DashboardShell title="Analytics">
       <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
         <div>
-          <h1 className="text-[22px] font-semibold tracking-tight" style={{ color: "#0B1220" }}>Performance</h1>
+          <h1 className="text-[22px] font-semibold tracking-tight" style={{ color: "#1A1A1A" }}>Performance</h1>
           <p className="text-[13px] mt-1" style={{ color: "#6B7280" }}>Shopper behaviour, try-on funnel, and product winners.</p>
         </div>
-        <div className="inline-flex rounded-lg overflow-hidden" style={{ background: "#fff", border: "1px solid #E2E8F0" }}>
+        <div className="inline-flex rounded-md overflow-hidden" style={{ background: "#fff", border: "1px solid #E1E3E5" }}>
           {RANGES.map((r) => (
             <button key={r.key} onClick={() => setRange(r)} className="text-[12px] px-3 py-1.5 font-semibold transition"
-              style={{ background: range.key === r.key ? "linear-gradient(135deg,#0369A1,#38BDF8)" : "transparent", color: range.key === r.key ? "#fff" : "#475569" }}>
+              style={{ background: range.key === r.key ? "#1A1A1A" : "transparent", color: range.key === r.key ? "#fff" : "#4A4A4A" }}>
               {r.label}
             </button>
           ))}
@@ -131,15 +131,16 @@ function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Kpi label="Total views" value={totalViews} icon={Eye} gradient="linear-gradient(135deg,#0369A1,#38BDF8)" />
-        <Kpi label="Try-ons completed" value={totalTryons} hint={`${tryonRate}% of views`} icon={MousePointerClick} gradient="linear-gradient(135deg,#0EA5E9,#22D3EE)" />
-        <Kpi label="Likes" value={totalLikes} hint={`${likeRate}% like-rate`} icon={Heart} gradient="linear-gradient(135deg,#7C3AED,#A855F7)" />
-        <Kpi label="Shares" value={totalShares} icon={Share2} gradient="linear-gradient(135deg,#10B981,#22C55E)" />
-        <Kpi label="Avg session" value={`${avgTimeSec}s`} icon={Clock} gradient="linear-gradient(135deg,#F59E0B,#FB923C)" />
-        <Kpi label="Interaction rate" value={`${interactRate}%`} icon={Activity} gradient="linear-gradient(135deg,#EC4899,#F472B6)" />
-        <Kpi label="Wishlist saves" value={totalWishlist} icon={Star} gradient="linear-gradient(135deg,#06B6D4,#22D3EE)" />
-        <Kpi label="Alt-picks" value={altPicks} hint="Recommended product chosen" icon={ShoppingBag} gradient="linear-gradient(135deg,#0B1220,#1E293B)" />
+        <Kpi label="Total views" value={totalViews} icon={Eye} />
+        <Kpi label="Try-ons completed" value={totalTryons} hint={`${tryonRate}% of views`} icon={MousePointerClick} />
+        <Kpi label="Likes" value={totalLikes} hint={`${likeRate}% like-rate`} icon={Heart} />
+        <Kpi label="Shares" value={totalShares} icon={Share2} />
+        <Kpi label="Avg session" value={`${avgTimeSec}s`} icon={Clock} />
+        <Kpi label="Interaction rate" value={`${interactRate}%`} icon={Activity} />
+        <Kpi label="Wishlist saves" value={totalWishlist} icon={Star} />
+        <Kpi label="Alt-picks" value={altPicks} hint="Recommended product chosen" icon={ShoppingBag} />
       </div>
+
 
       <Card title="Engagement trend" subtitle={`Views, try-ons, likes & shares over the last ${range.label}`} className="mt-4">
         <div className="h-72">
@@ -296,36 +297,34 @@ function AnalyticsPage() {
   );
 }
 
-function Kpi({ label, value, hint, icon: Icon, gradient }: { label: string; value: number | string; hint?: string; icon: any; gradient: string }) {
+function Kpi({ label, value, hint, icon: Icon }: { label: string; value: number | string; hint?: string; icon: any }) {
   return (
-    <div className="relative p-4 rounded-xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-      <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full opacity-15" style={{ background: gradient }} />
-      <div className="flex items-center justify-between relative">
-        <span className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: "#64748B" }}>{label}</span>
-        <div className="w-7 h-7 rounded-lg grid place-items-center text-white" style={{ background: gradient }}>
-          <Icon size={13} />
-        </div>
+    <div className="p-4 rounded-xl" style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+      <div className="flex items-center justify-between">
+        <span className="text-[12px] font-medium" style={{ color: "#6B7280" }}>{label}</span>
+        <Icon size={14} style={{ color: "#9CA3AF" }} />
       </div>
-      <div className="mt-2 text-[26px] font-bold tracking-tight" style={{ color: "#0B1220" }}>{typeof value === "number" ? value.toLocaleString() : value}</div>
-      {hint && <div className="text-[11px] mt-0.5" style={{ color: "#64748B" }}>{hint}</div>}
+      <div className="mt-2 text-[24px] font-semibold tracking-tight" style={{ color: "#1A1A1A" }}>{typeof value === "number" ? value.toLocaleString() : value}</div>
+      {hint && <div className="text-[11px] mt-0.5" style={{ color: "#9CA3AF" }}>{hint}</div>}
     </div>
   );
 }
 
 function Card({ title, subtitle, icon: Icon, children, className = "" }: { title: string; subtitle?: string; icon?: any; children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-xl p-5 ${className}`} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-      <div className="flex items-start gap-2">
-        {Icon && <div className="w-7 h-7 rounded-lg grid place-items-center text-white flex-shrink-0" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}><Icon size={13} /></div>}
+    <div className={`rounded-xl ${className}`} style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+      <div className="px-5 py-4 flex items-start gap-2" style={{ borderBottom: "1px solid #F1F2F4" }}>
+        {Icon && <Icon size={15} style={{ color: "#6B7280" }} className="mt-0.5" />}
         <div className="flex-1">
-          <h3 className="text-[14px] font-semibold m-0" style={{ color: "#0B1220" }}>{title}</h3>
-          {subtitle && <p className="text-[12px] m-0 mt-0.5" style={{ color: "#64748B" }}>{subtitle}</p>}
+          <h3 className="text-[14px] font-semibold m-0" style={{ color: "#1A1A1A" }}>{title}</h3>
+          {subtitle && <p className="text-[12px] m-0 mt-0.5" style={{ color: "#6B7280" }}>{subtitle}</p>}
         </div>
       </div>
-      {children}
+      <div className="p-5">{children}</div>
     </div>
   );
 }
+
 
 function Empty({ msg }: { msg: string }) {
   return <p className="text-[12px] mt-4 text-center py-6" style={{ color: "#94A3B8" }}>{msg}</p>;
