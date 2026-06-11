@@ -38,10 +38,12 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Account created. Welcome to Ecomify.");
+        if (search.redirect) { window.location.href = search.redirect; return; }
         navigate({ to: "/dashboard" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        if (search.redirect) { window.location.href = search.redirect; return; }
         navigate({ to: "/dashboard" });
       }
     } catch (err: any) {
