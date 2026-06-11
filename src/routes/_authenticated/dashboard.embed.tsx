@@ -40,7 +40,9 @@ function EmbedPage() {
 
   const url = selected ? `${origin}/ar/view/${selected}` : "";
   const embedCode = `<iframe src="${url}" width="100%" height="640" style="border:0;border-radius:16px" allow="xr-spatial-tracking; camera"></iframe>`;
-  const platformSnippet = `<!-- Ecomify Try-On -->\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
+  const widgetSnippet = `<!-- Ecomify Try-On button — paste anywhere on your website -->\n<script src="${origin}/widget.js" data-product-id="${selected}" async></script>`;
+  const shopifyLiquid = `{% comment %} Ecomify Try-On button — Shopify {% endcomment %}\n{% comment %} Paste in your product template (e.g. sections/main-product.liquid) {% endcomment %}\n<div class="ecomify-tryon" style="margin-top:12px;">\n  <script src="${origin}/widget.js" data-product-id="${selected}" async></script>\n</div>`;
+  const platformSnippet = `<!-- Ecomify Try-On link -->\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
 
   const copy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
