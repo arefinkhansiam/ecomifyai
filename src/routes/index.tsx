@@ -231,23 +231,26 @@ function Landing() {
         </div>
       </section>
 
-      {/* PRICING */}
-      <section id="pricing" className="py-24">
-        <div className="mx-auto max-w-6xl px-6">
+      {/* PRICING — dark */}
+      <section id="pricing" className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 50%, #02060c 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 0%, rgba(56,189,248,0.15), transparent 70%)" }} />
+        <div className="mx-auto max-w-7xl px-6 relative">
           <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-gradient-ocean">Simple, Transparent Pricing</h2>
-            <p className="mt-4">Start free. Upgrade when you are ready to scale.</p>
+            <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl" style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Pick Your Plan</h2>
+            <p className="mt-4 text-white/65">Start free. Upgrade when you are ready to scale.</p>
           </div>
           <PricingCards />
-          <p className="text-center text-sm text-muted mt-8">All plans include a 7-day free trial. No credit card required to start.</p>
+          <p className="text-center text-sm text-white/50 mt-10">All plans include a 7-day free trial. No credit card required.</p>
         </div>
       </section>
 
-      {/* REVIEWS — compact */}
-      <section className="py-14">
-        <div className="mx-auto max-w-6xl px-6 mb-6 text-center">
-          <h2 className="text-gradient-ocean text-3xl md:text-4xl">Loved by Store Owners</h2>
-          <p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>Real results from real Ecomify users.</p>
+      {/* REVIEWS — dark Higgsfield-style */}
+      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 100%)" }}>
+        <div className="mx-auto max-w-6xl px-6 mb-10 text-center">
+          <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl text-white leading-[1.05]">
+            Community of <span style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>10,000+ </span>stores
+          </h2>
+          <p className="mt-3 text-sm text-white/60">Real results from real Ecomify users.</p>
         </div>
         <ReviewCarousel />
       </section>
