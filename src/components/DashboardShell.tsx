@@ -1,7 +1,7 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Box, BarChart2, Link as LinkIcon, CreditCard, Settings, LogOut, Bell, HelpCircle, Crown, Activity, Upload, Search, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Box, BarChart2, Link as LinkIcon, CreditCard, Settings, LogOut, Bell, HelpCircle, Crown, Activity, Upload, ChevronDown, User, Sparkles, BookOpen, MessageCircleQuestion } from "lucide-react";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 
@@ -21,12 +21,23 @@ const NAV_SALES = [
 
 const ALL_NAV = [...NAV_MAIN, ...NAV_SALES];
 
+const FAQ_ITEMS = [
+  { q: "How do I add try-on to my Shopify store?", a: "Open Embed & Share, copy the Shopify Liquid snippet, and paste it into sections/main-product.liquid." },
+  { q: "Why is my product stuck on processing?", a: "Processing usually completes in 30–90 seconds. If it stays longer, re-upload the image with a clean background." },
+  { q: "Can I customize the Try-On button look?", a: "Yes — open any product, hit Edit, and use the Store button section to change color, gradient, radius, and glow." },
+  { q: "How are analytics tracked?", a: "Every try-on session, view, interaction and dwell-time is recorded automatically from the widget." },
+];
+
 export function DashboardShell({ title, children }: { title: string; children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user } = useAuth();
   const [plan, setPlan] = useState<string>("free");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [storeName, setStoreName] = useState<string>("My Store");
+  const [fullName, setFullName] = useState<string>("");
+
+  const [openMenu, setOpenMenu] = useState<null | "profile" | "bell" | "help">(null);
+  const popRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -37,6 +48,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
       const path = data?.avatar_url;
       const name = data?.business_name || data?.store_name || data?.full_name;
       if (name) setStoreName(name);
+      if (data?.full_name) setFullName(data.full_name);
       if (path) {
         const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 3600);
         setAvatarUrl(signed?.signedUrl ?? null);
@@ -44,10 +56,19 @@ export function DashboardShell({ title, children }: { title: string; children: R
     });
   }, [user]);
 
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (popRef.current && !popRef.current.contains(e.target as Node)) setOpenMenu(null);
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
+
   const signOut = async () => { await supabase.auth.signOut(); window.location.href = "/"; };
   const isActive = (to: string, exact?: boolean) => exact ? pathname === to : pathname.startsWith(to);
   const isPaid = plan !== "free";
-  const initial = (storeName?.[0] ?? user?.email?.[0] ?? "?").toUpperCase();
+  const displayName = fullName || storeName || user?.email?.split("@")[0] || "Account";
+  const initial = (displayName?.[0] ?? "?").toUpperCase();
 
   return (
     <div className="min-h-screen flex" style={{ background: "#F1F5F9" }}>
@@ -55,7 +76,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
       <aside className="hidden md:flex w-60 flex-col fixed left-0 top-0 bottom-0 z-30"
         style={{ background: "linear-gradient(180deg,#0B1220 0%,#0C2A4A 45%,#0369A1 100%)", borderRight: "1px solid rgba(56,189,248,0.15)" }}>
         {/* Store switcher */}
-        <div className="px-3 pt-3 pb-2">
+        <div className="px-3 pt-4 pb-3">
           <button className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white/5 transition" style={{ color: "#E3E3E3" }}>
             <div className="w-7 h-7 rounded-md grid place-items-center text-[11px] font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#38BDF8,#0EA5E9)", color: "#fff", boxShadow: "0 4px 12px -4px rgba(14,165,233,0.6)" }}>
               {initial}
@@ -66,15 +87,6 @@ export function DashboardShell({ title, children }: { title: string; children: R
             </div>
             <ChevronDown size={14} className="opacity-60" />
           </button>
-        </div>
-
-        {/* Search */}
-        <div className="px-3 pb-3">
-          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <Search size={13} style={{ color: "#9CA3AF" }} />
-            <input placeholder="Search" className="bg-transparent text-[13px] outline-none flex-1 min-w-0" style={{ color: "#E3E3E3" }} />
-            <kbd className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.08)", color: "#9CA3AF" }}>⌘K</kbd>
-          </div>
         </div>
 
         {/* Nav */}
@@ -114,9 +126,6 @@ export function DashboardShell({ title, children }: { title: string; children: R
               <span style={{ color: "#7DD3FC" }}>→</span>
             </Link>
           )}
-          <button onClick={signOut} className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[12px] font-medium hover:bg-white/5 transition" style={{ color: "#9CA3AF" }}>
-            <LogOut size={13} /> Sign out
-          </button>
         </div>
       </aside>
 
@@ -126,16 +135,81 @@ export function DashboardShell({ title, children }: { title: string; children: R
         <header className="px-4 sm:px-6 md:px-8 h-14 flex items-center justify-between sticky top-0 z-20"
           style={{ background: "#FFFFFF", borderBottom: "1px solid #E1E3E5" }}>
           <h2 className="text-[15px] font-semibold" style={{ color: "#1A1A1A", letterSpacing: "-0.01em" }}>{title}</h2>
-          <div className="flex items-center gap-2">
-            <button className="w-8 h-8 rounded-md grid place-items-center hover:bg-[#F1F2F4] transition" title="Notifications">
-              <Bell size={15} style={{ color: "#4A4A4A" }} />
+          <div className="flex items-center gap-1.5 relative" ref={popRef}>
+            {/* Notifications */}
+            <button onClick={() => setOpenMenu(openMenu === "bell" ? null : "bell")} className="w-9 h-9 rounded-md grid place-items-center hover:bg-[#F1F2F4] transition relative" title="Notifications">
+              <Bell size={16} style={{ color: "#4A4A4A" }} />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full" style={{ background: "#0EA5E9" }} />
             </button>
-            <button className="w-8 h-8 rounded-md grid place-items-center hover:bg-[#F1F2F4] transition" title="Help">
-              <HelpCircle size={15} style={{ color: "#4A4A4A" }} />
+            {/* FAQ / Help */}
+            <button onClick={() => setOpenMenu(openMenu === "help" ? null : "help")} className="w-9 h-9 rounded-md grid place-items-center hover:bg-[#F1F2F4] transition" title="FAQ & Help">
+              <HelpCircle size={16} style={{ color: "#4A4A4A" }} />
             </button>
-            <Link to="/dashboard/settings" className="w-8 h-8 rounded-full overflow-hidden grid place-items-center text-[12px] font-semibold ml-1" style={{ background: "#0284C7", color: "#fff" }}>
-              {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" /> : initial}
-            </Link>
+
+            {/* Profile chip with name (desktop) */}
+            <button onClick={() => setOpenMenu(openMenu === "profile" ? null : "profile")} className="ml-1 flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-[#F1F2F4] transition">
+              <span className="w-7 h-7 rounded-full overflow-hidden grid place-items-center text-[11px] font-semibold" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", color: "#fff" }}>
+                {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" /> : initial}
+              </span>
+              <span className="hidden sm:inline text-[13px] font-semibold max-w-[140px] truncate" style={{ color: "#1A1A1A" }}>{displayName}</span>
+              <ChevronDown size={13} className="hidden sm:inline" style={{ color: "#6B7280" }} />
+            </button>
+
+            {/* Popovers */}
+            {openMenu === "bell" && (
+              <div className="absolute right-0 top-12 w-80 rounded-xl overflow-hidden z-50" style={{ background: "#fff", border: "1px solid #E1E3E5", boxShadow: "0 20px 50px -20px rgba(2,132,199,0.35)" }}>
+                <div className="px-4 py-3 text-[13px] font-semibold" style={{ background: "linear-gradient(135deg,#0B1220,#0369A1)", color: "#fff" }}>Notifications</div>
+                <div className="divide-y" style={{ borderColor: "#F1F2F4" }}>
+                  <NotifItem title="Welcome to Ecomify" body="Upload your first product to start tracking try-ons." />
+                  <NotifItem title="Tip: Glowing button" body="Turn on the glowing CTA in product customize for higher CTR." />
+                  <NotifItem title="Analytics live" body="Customer engagement is now being tracked in real time." />
+                </div>
+                <div className="px-4 py-2 text-center text-[11px]" style={{ color: "#6B7280", background: "#F8FAFC" }}>You're all caught up.</div>
+              </div>
+            )}
+            {openMenu === "help" && (
+              <div className="absolute right-0 top-12 w-96 max-w-[92vw] rounded-xl overflow-hidden z-50" style={{ background: "#fff", border: "1px solid #E1E3E5", boxShadow: "0 20px 50px -20px rgba(2,132,199,0.35)" }}>
+                <div className="px-4 py-3 flex items-center gap-2 text-[13px] font-semibold" style={{ background: "linear-gradient(135deg,#0B1220,#0369A1)", color: "#fff" }}>
+                  <MessageCircleQuestion size={14} /> FAQ &amp; Help
+                </div>
+                <div className="max-h-80 overflow-y-auto p-2">
+                  {FAQ_ITEMS.map((f) => (
+                    <details key={f.q} className="rounded-lg p-2 hover:bg-[#F8FAFC]">
+                      <summary className="cursor-pointer text-[12.5px] font-semibold list-none flex items-start gap-2" style={{ color: "#0B1220" }}>
+                        <BookOpen size={13} className="mt-0.5 flex-shrink-0" style={{ color: "#0EA5E9" }} /> {f.q}
+                      </summary>
+                      <p className="mt-1.5 pl-5 text-[12px] leading-relaxed" style={{ color: "#475569" }}>{f.a}</p>
+                    </details>
+                  ))}
+                </div>
+                <a href="mailto:support@ecomify.app" className="block px-4 py-2.5 text-center text-[12px] font-semibold" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", color: "#fff" }}>Contact support</a>
+              </div>
+            )}
+            {openMenu === "profile" && (
+              <div className="absolute right-0 top-12 w-64 rounded-xl overflow-hidden z-50" style={{ background: "#fff", border: "1px solid #E1E3E5", boxShadow: "0 20px 50px -20px rgba(2,132,199,0.35)" }}>
+                <div className="px-4 py-3 flex items-center gap-3" style={{ background: "linear-gradient(135deg,#0B1220,#0369A1)", color: "#fff" }}>
+                  <span className="w-10 h-10 rounded-full overflow-hidden grid place-items-center text-[14px] font-bold" style={{ background: "linear-gradient(135deg,#38BDF8,#0EA5E9)" }}>
+                    {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" /> : initial}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-semibold truncate">{displayName}</div>
+                    <div className="text-[11px] truncate" style={{ color: "rgba(255,255,255,0.65)" }}>{user?.email}</div>
+                  </div>
+                </div>
+                <div className="py-1">
+                  <Link to="/dashboard/billing" onClick={() => setOpenMenu(null)} className="flex items-center gap-2.5 px-4 py-2 text-[13px] hover:bg-[#F8FAFC]" style={{ color: "#0B1220" }}>
+                    <Sparkles size={14} style={{ color: "#FBBF24" }} /> Plan upgrade
+                    {!isPaid && <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", color: "#fff" }}>FREE</span>}
+                  </Link>
+                  <Link to="/dashboard/settings" onClick={() => setOpenMenu(null)} className="flex items-center gap-2.5 px-4 py-2 text-[13px] hover:bg-[#F8FAFC]" style={{ color: "#0B1220" }}>
+                    <User size={14} style={{ color: "#0EA5E9" }} /> Profile update
+                  </Link>
+                  <button onClick={signOut} className="w-full flex items-center gap-2.5 px-4 py-2 text-[13px] hover:bg-[#FEF2F2]" style={{ color: "#DC2626" }}>
+                    <LogOut size={14} /> Log out
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </header>
 
@@ -158,6 +232,15 @@ export function DashboardShell({ title, children }: { title: string; children: R
           })}
         </nav>
       </div>
+    </div>
+  );
+}
+
+function NotifItem({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="px-4 py-2.5 hover:bg-[#F8FAFC]">
+      <div className="text-[12.5px] font-semibold" style={{ color: "#0B1220" }}>{title}</div>
+      <div className="text-[11.5px] mt-0.5" style={{ color: "#64748B" }}>{body}</div>
     </div>
   );
 }
