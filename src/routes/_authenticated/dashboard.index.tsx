@@ -3,13 +3,11 @@ import { useEffect, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Box, Eye, Code, Upload, ArrowUpRight, Sparkles, TrendingUp, Crown } from "lucide-react";
+import { Box, Eye, Upload, ArrowRight, TrendingUp, Crown, ArrowUpRight, MoreHorizontal } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: Dashboard,
 });
-
-const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
 
 function Dashboard() {
   const { user } = useAuth();
@@ -22,84 +20,131 @@ function Dashboard() {
     });
   }, [user]);
 
-  const cards = [
-    { label: "Total Products", value: stats?.total_products ?? 0, icon: Box, accent: "#0369A1" },
-    { label: "Ready for try-on", value: stats?.ready_products ?? 0, icon: Sparkles, accent: "#0369A1" },
-    { label: "Try-on views", value: stats?.total_views ?? 0, icon: Eye, accent: "#0369A1" },
-    { label: "Sessions this month", value: stats?.sessions_this_month ?? 0, icon: TrendingUp, accent: "#0369A1" },
-  ];
-
   const plan = stats?.plan ?? "free";
   const isPaid = plan !== "free";
   const slotsUsed = stats?.ar_slots_used ?? 0;
   const slotLimit = stats?.plan_limit ?? 1;
   const pct = Math.min(100, (slotsUsed / Math.max(1, slotLimit)) * 100);
 
+  const metrics = [
+    { label: "Total try-ons", value: stats?.total_products ?? 0, delta: "+0%", icon: Box },
+    { label: "Ready", value: stats?.ready_products ?? 0, delta: "Live", icon: TrendingUp },
+    { label: "Try-on views", value: stats?.total_views ?? 0, delta: "+0%", icon: Eye },
+    { label: "Sessions this month", value: stats?.sessions_this_month ?? 0, delta: "+0%", icon: TrendingUp },
+  ];
+
+  const firstName = user?.user_metadata?.full_name?.split(" ")[0];
+
   return (
-    <DashboardShell title="Dashboard">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <DashboardShell title="Home">
+      {/* Greeting + primary CTA */}
+      <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
         <div>
-          <span className="pill"><Sparkles size={12} /> Command center</span>
-          <h1 className="mt-3 text-3xl md:text-4xl font-display font-extrabold leading-tight" style={{ background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
-            Welcome back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name.split(" ")[0]}` : ""}.
+          <h1 className="text-[22px] font-semibold tracking-tight" style={{ color: "#1A1A1A" }}>
+            Good to see you{firstName ? `, ${firstName}` : ""}
           </h1>
-          <p className="mt-2 text-base" style={{ color: "var(--ink-soft)" }}>Upload a product, share the link, watch the views roll in.</p>
+          <p className="text-[13px] mt-1" style={{ color: "#6B7280" }}>Here's what's happening with your store today.</p>
         </div>
-        <Link to="/dashboard/upload" className="btn-primary"><Upload size={16} /> New Try-On Product</Link>
+        <Link to="/dashboard/upload" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-semibold transition hover:opacity-90"
+          style={{ background: "#1A1A1A", color: "#fff", boxShadow: "0 1px 0 rgba(0,0,0,0.05), inset 0 -1px 0 rgba(255,255,255,0.10)" }}>
+          <Upload size={14} /> New try-on
+        </Link>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-        {cards.map((c) => (
-          <div key={c.label} className="rounded-2xl p-5 relative overflow-hidden"
-            style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(14px)", border: "1px solid rgba(2,132,199,0.15)", boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)" }}>
-            <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20" style={{ background: `radial-gradient(circle, ${c.accent}, transparent 70%)` }} />
-            <div className="w-11 h-11 rounded-xl grid place-items-center text-white" style={{ background: `linear-gradient(135deg, ${c.accent}, #38BDF8)`, boxShadow: `0 10px 24px -10px ${c.accent}aa` }}>
-              <c.icon size={18} />
+      {/* Metric tiles */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {metrics.map((m) => (
+          <div key={m.label} className="p-4 rounded-xl"
+            style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] font-medium" style={{ color: "#6B7280" }}>{m.label}</span>
+              <m.icon size={14} style={{ color: "#9CA3AF" }} />
             </div>
-            <div className="font-display font-extrabold text-3xl mt-4" style={{ background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>{c.value.toLocaleString()}</div>
-            <div className="text-xs mt-1 font-medium" style={{ color: "var(--muted)" }}>{c.label}</div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-[24px] font-semibold tracking-tight" style={{ color: "#1A1A1A" }}>{m.value.toLocaleString()}</span>
+              <span className="text-[11px] font-medium" style={{ color: "#008060" }}>{m.delta}</span>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
+      {/* Two column: tasks + plan */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-4">
+        <div className="lg:col-span-2 rounded-xl" style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+          <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #E1E3E5" }}>
+            <div>
+              <h3 className="text-[14px] font-semibold m-0" style={{ color: "#1A1A1A" }}>Setup guide</h3>
+              <p className="text-[12px] m-0 mt-0.5" style={{ color: "#6B7280" }}>Use this personalised guide to get your store up and running.</p>
+            </div>
+            <button className="w-7 h-7 rounded-md grid place-items-center hover:bg-[#F1F2F4]"><MoreHorizontal size={15} style={{ color: "#6B7280" }} /></button>
+          </div>
+          <ul>
+            {[
+              { to: "/dashboard/upload", title: "Upload your first product", body: "Add product photos from every angle." },
+              { to: "/dashboard/products", title: "Customize your try-on", body: "Edit name, colors, and branding." },
+              { to: "/dashboard/embed", title: "Add the widget to your store", body: "Copy the Shopify or universal embed code." },
+              { to: "/dashboard/analytics", title: "Track shopper behaviour", body: "See views, sessions, and recommendations." },
+            ].map((s, i) => (
+              <li key={s.to}>
+                <Link to={s.to} className="flex items-start gap-3 px-5 py-3 hover:bg-[#FAFBFB] transition"
+                  style={{ borderBottom: i < 3 ? "1px solid #F1F2F4" : "none" }}>
+                  <span className="mt-0.5 w-5 h-5 rounded-full grid place-items-center text-[10px] font-semibold flex-shrink-0"
+                    style={{ background: "#FFFFFF", border: "1.5px dashed #C9CCD1", color: "#6B7280" }}>{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-semibold" style={{ color: "#1A1A1A" }}>{s.title}</div>
+                    <div className="text-[12px]" style={{ color: "#6B7280" }}>{s.body}</div>
+                  </div>
+                  <ArrowRight size={14} style={{ color: "#9CA3AF" }} className="mt-1" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Plan card */}
+        <div className="rounded-xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+          <div className="px-5 py-4" style={{ borderBottom: "1px solid #E1E3E5" }}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[14px] font-semibold m-0" style={{ color: "#1A1A1A" }}>Your plan</h3>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider"
+                style={{ background: isPaid ? "#E3F1DF" : "#F1F2F4", color: isPaid ? "#0C5132" : "#4A4A4A" }}>
+                {isPaid && <Crown size={9} />} {plan}
+              </span>
+            </div>
+          </div>
+          <div className="px-5 py-4">
+            <div className="text-[12px]" style={{ color: "#6B7280" }}>Try-on slots used</div>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-[22px] font-semibold" style={{ color: "#1A1A1A" }}>{slotsUsed}</span>
+              <span className="text-[12px]" style={{ color: "#6B7280" }}>of {slotLimit}</span>
+            </div>
+            <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: "#F1F2F4" }}>
+              <div className="h-full rounded-full" style={{ width: `${pct}%`, background: "#1A1A1A" }} />
+            </div>
+            <p className="text-[11px] mt-3" style={{ color: "#9CA3AF" }}>Slots are permanent — deleting a product does not give a slot back.</p>
+            <Link to="/dashboard/billing" className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold" style={{ color: "#005BD3" }}>
+              {isPaid ? "Manage plan" : "Upgrade plan"} <ArrowUpRight size={12} />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom row: quick links */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
         {[
-          { to: "/dashboard/upload", icon: Upload, title: "Upload a product", body: "Add product photos from every angle — shoppers try it on from their own photo." },
-          { to: "/dashboard/products", icon: Box, title: "Manage products", body: "View, edit and share your try-on products." },
-          { to: "/dashboard/behaviour", icon: TrendingUp, title: "Customer behaviour", body: "See how visitors engage with your try-ons." },
+          { to: "/dashboard/products", title: "Try-on products", body: "Manage and edit your try-on catalog." },
+          { to: "/dashboard/analytics", title: "Analytics", body: "Sessions, views, conversions, recommendations." },
+          { to: "/dashboard/embed", title: "Embed & share", body: "Shopify Liquid, universal script, iframe." },
         ].map((q) => (
-          <Link key={q.to} to={q.to} className="rounded-2xl p-6 transition-transform hover:-translate-y-1 group"
-            style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(14px)", border: "1px solid rgba(2,132,199,0.15)", boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)" }}>
-            <div className="w-12 h-12 rounded-2xl grid place-items-center text-white" style={{ background: GRAD }}>
-              <q.icon size={20} />
-            </div>
-            <h3 className="text-ink mt-4">{q.title}</h3>
-            <p className="text-sm mt-2">{q.body}</p>
-            <div className="mt-4 text-sm font-semibold inline-flex items-center gap-1" style={{ background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
-              Open <ArrowUpRight size={14} className="text-primary" />
+          <Link key={q.to} to={q.to} className="p-4 rounded-xl transition hover:border-[#1A1A1A]"
+            style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+            <h4 className="text-[13px] font-semibold m-0" style={{ color: "#1A1A1A" }}>{q.title}</h4>
+            <p className="text-[12px] m-0 mt-1" style={{ color: "#6B7280" }}>{q.body}</p>
+            <div className="mt-3 text-[12px] font-semibold inline-flex items-center gap-1" style={{ color: "#005BD3" }}>
+              Open <ArrowRight size={12} />
             </div>
           </Link>
         ))}
-      </div>
-
-      <div className="mt-8 rounded-2xl p-6 relative overflow-hidden" style={{ background: GRAD, color: "#fff", boxShadow: "0 25px 60px -25px rgba(2,132,199,0.6)" }}>
-        <div className="flex justify-between items-center flex-wrap gap-4">
-          <div>
-            <div className="text-xs uppercase tracking-wider opacity-80 flex items-center gap-2">
-              {isPaid && <Crown size={12} />} Try-on slots · {plan}
-            </div>
-            <div className="font-display text-2xl md:text-3xl font-extrabold mt-1" title="Deleting a product does not recover your slot. Each plan allows a fixed number of try-on creations total.">
-              {slotsUsed} of {slotLimit} try-on slots used
-            </div>
-            <div className="text-xs mt-1 opacity-80">Slots are permanent — deleting a product does not give a slot back.</div>
-          </div>
-          <Link to="/dashboard/billing" className="rounded-full px-5 py-2.5 text-sm font-semibold text-ink" style={{ background: "#fff" }}>
-            {isPaid ? "Manage" : "Upgrade"} →
-          </Link>
-        </div>
-        <div className="mt-4 h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.2)" }}>
-          <div className="h-full" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#38BDF8,#fff)" }} />
-        </div>
       </div>
     </DashboardShell>
   );
