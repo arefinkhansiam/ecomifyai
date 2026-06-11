@@ -297,36 +297,34 @@ function AnalyticsPage() {
   );
 }
 
-function Kpi({ label, value, hint, icon: Icon, gradient }: { label: string; value: number | string; hint?: string; icon: any; gradient: string }) {
+function Kpi({ label, value, hint, icon: Icon }: { label: string; value: number | string; hint?: string; icon: any }) {
   return (
-    <div className="relative p-4 rounded-xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-      <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full opacity-15" style={{ background: gradient }} />
-      <div className="flex items-center justify-between relative">
-        <span className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: "#64748B" }}>{label}</span>
-        <div className="w-7 h-7 rounded-lg grid place-items-center text-white" style={{ background: gradient }}>
-          <Icon size={13} />
-        </div>
+    <div className="p-4 rounded-xl" style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+      <div className="flex items-center justify-between">
+        <span className="text-[12px] font-medium" style={{ color: "#6B7280" }}>{label}</span>
+        <Icon size={14} style={{ color: "#9CA3AF" }} />
       </div>
-      <div className="mt-2 text-[26px] font-bold tracking-tight" style={{ color: "#0B1220" }}>{typeof value === "number" ? value.toLocaleString() : value}</div>
-      {hint && <div className="text-[11px] mt-0.5" style={{ color: "#64748B" }}>{hint}</div>}
+      <div className="mt-2 text-[24px] font-semibold tracking-tight" style={{ color: "#1A1A1A" }}>{typeof value === "number" ? value.toLocaleString() : value}</div>
+      {hint && <div className="text-[11px] mt-0.5" style={{ color: "#9CA3AF" }}>{hint}</div>}
     </div>
   );
 }
 
 function Card({ title, subtitle, icon: Icon, children, className = "" }: { title: string; subtitle?: string; icon?: any; children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-xl p-5 ${className}`} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-      <div className="flex items-start gap-2">
-        {Icon && <div className="w-7 h-7 rounded-lg grid place-items-center text-white flex-shrink-0" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}><Icon size={13} /></div>}
+    <div className={`rounded-xl ${className}`} style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+      <div className="px-5 py-4 flex items-start gap-2" style={{ borderBottom: "1px solid #F1F2F4" }}>
+        {Icon && <Icon size={15} style={{ color: "#6B7280" }} className="mt-0.5" />}
         <div className="flex-1">
-          <h3 className="text-[14px] font-semibold m-0" style={{ color: "#0B1220" }}>{title}</h3>
-          {subtitle && <p className="text-[12px] m-0 mt-0.5" style={{ color: "#64748B" }}>{subtitle}</p>}
+          <h3 className="text-[14px] font-semibold m-0" style={{ color: "#1A1A1A" }}>{title}</h3>
+          {subtitle && <p className="text-[12px] m-0 mt-0.5" style={{ color: "#6B7280" }}>{subtitle}</p>}
         </div>
       </div>
-      {children}
+      <div className="p-5">{children}</div>
     </div>
   );
 }
+
 
 function Empty({ msg }: { msg: string }) {
   return <p className="text-[12px] mt-4 text-center py-6" style={{ color: "#94A3B8" }}>{msg}</p>;
