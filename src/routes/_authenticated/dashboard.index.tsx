@@ -12,11 +12,15 @@ export const Route = createFileRoute("/_authenticated/dashboard/")({
 function Dashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState<{ total_products: number; ready_products: number; total_views: number; total_embeds: number; plan: string; plan_limit: number; ar_slots_used: number; sessions_this_month: number } | null>(null);
+  const [customizedCount, setCustomizedCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
     supabase.rpc("get_user_dashboard_stats", { uid: user.id }).then(({ data }) => {
       if (data) setStats(data as any);
+    });
+    supabase.from("tryon_branding").select("id", { count: "exact", head: true }).eq("vendor_id", user.id).then(({ count }) => {
+      setCustomizedCount(count ?? 0);
     });
   }, [user]);
 
