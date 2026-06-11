@@ -40,10 +40,19 @@ function Landing() {
       <section className="relative min-h-[calc(100vh-72px)] flex items-center overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 40%, #07111f 100%)" }}>
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 900px 600px at 50% 0%, rgba(56,189,248,0.22), transparent 70%)" }} />
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 600px 400px at 80% 80%, rgba(3,105,161,0.25), transparent 70%)" }} />
-        <div className="mx-auto max-w-6xl px-6 py-20 text-center relative w-full">
+        <div className="mx-auto max-w-6xl px-6 pt-32 md:pt-36 pb-20 text-center relative w-full">
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.05 }}
+            className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[44px] sm:text-[68px] md:text-[88px] order-1"
+            style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}
+          >
+            Try It On.<br/>From One Photo.
+          </motion.h1>
+
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7 }}
-            className="mx-auto mb-12 relative rounded-3xl overflow-hidden max-w-2xl"
+            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }}
+            className="mx-auto mt-12 relative rounded-3xl overflow-hidden max-w-2xl"
             style={{ boxShadow: "0 60px 120px -30px rgba(56,189,248,0.5)", border: "1px solid rgba(56,189,248,0.25)" }}
           >
             <div className="grid grid-cols-2">
@@ -54,17 +63,9 @@ function Landing() {
             <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-white" style={{ background: GRAD }}>After</div>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[44px] sm:text-[68px] md:text-[88px]"
-            style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}
-          >
-            Try It On.<br/>From One Photo.
-          </motion.h1>
           <motion.p
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.45 }}
-            className="mt-6 max-w-2xl mx-auto text-[16px] sm:text-[18px] text-white/65"
+            className="mt-8 max-w-2xl mx-auto text-[16px] sm:text-[18px] text-white/65"
           >
             The best AI try-on for e-commerce — turn product photos into photoreal try-ons your shoppers can see on themselves in seconds.
           </motion.p>
@@ -97,6 +98,7 @@ function Landing() {
             <div className="flex gap-1">{[0,1,2,3,4].map(i => <Star key={i} size={14} style={{ color: "#38BDF8" }} fill="currentColor" />)}</div>
           </div>
         </div>
+
       </section>
 
       {/* STATS */}
