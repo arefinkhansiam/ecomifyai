@@ -46,9 +46,6 @@ function Landing() {
             </div>
             <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-white" style={{ background: "rgba(2,6,12,0.7)", backdropFilter: "blur(8px)" }}>Before</div>
             <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-white" style={{ background: GRAD }}>After</div>
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full text-xs font-semibold text-white flex items-center gap-2" style={{ background: "rgba(2,6,12,0.85)", backdropFilter: "blur(8px)", border: "1px solid rgba(56,189,248,0.3)" }}>
-              <Sparkles size={12} style={{ color: "#38BDF8" }} /> Powered by Gemini 2.5
-            </div>
           </motion.div>
 
           <motion.h1
