@@ -230,24 +230,19 @@ function Landing() {
         </div>
       </section>
 
-      {/* PRICING — refined dark layout with promo countdown */}
-      <section id="pricing" className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 50%, #02060c 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 900px 600px at 50% 0%, rgba(56,189,248,0.22), transparent 70%)" }} />
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 600px 400px at 50% 100%, rgba(3,105,161,0.18), transparent 70%)" }} />
-        <div className="mx-auto max-w-2xl px-6 relative">
-          <div className="text-center">
-            <h2 className="font-display font-extrabold uppercase tracking-[-0.02em] text-4xl sm:text-6xl leading-[0.95]" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Pick Your Plan</h2>
-            <p className="mt-5 text-base sm:text-lg max-w-md mx-auto leading-relaxed" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
-              Start free. Upgrade when you are ready to scale.
-            </p>
+      {/* PRICING — white→ocean blue→black gradient */}
+      <section id="pricing" className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #f1f5f9 0%, #0369A1 45%, #050d1a 90%, #02060c 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 30%, rgba(56,189,248,0.20), transparent 70%)" }} />
+        <div className="mx-auto max-w-7xl px-6 relative">
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl" style={{ backgroundImage: "linear-gradient(180deg, #0a1929 0%, #ffffff 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Pick Your Plan</h2>
+            <p className="mt-4 text-white/80">Start free. Upgrade when you are ready to scale.</p>
           </div>
-
-          <PromoTicket />
-
           <PricingCards />
-          <p className="text-center text-xs text-white/55 mt-8 tracking-wide">All paid plans include a 7-day free trial · Sign in required to purchase</p>
+          <p className="text-center text-sm text-white/60 mt-10">All paid plans include a 7-day free trial. Sign in required to purchase.</p>
         </div>
       </section>
+
 
 
       {/* UNLOCK FULL TRY-ON CAPABILITIES — comparison table */}
