@@ -67,6 +67,7 @@ function CustomizePage() {
   const [fg, setFg] = useState(DEFAULTS.fg);
   const [radius, setRadius] = useState(DEFAULTS.radius);
   const [buttonShadow, setButtonShadow] = useState(true);
+  const [buttonGlow, setButtonGlow] = useState(true);
 
   // Try-On page
   const [pageBg, setPageBg] = useState(DEFAULTS.pageBg);
