@@ -77,17 +77,48 @@ export function DashboardShell({ title, children }: { title: string; children: R
       <aside className="hidden md:flex w-60 flex-col fixed left-0 top-0 bottom-0 z-30"
         style={{ background: "linear-gradient(180deg,#0B1220 0%,#0C2A4A 45%,#0369A1 100%)", borderRight: "1px solid rgba(56,189,248,0.15)" }}>
         {/* Store switcher */}
-        <div className="px-3 pt-4 pb-3">
-          <button className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white/5 transition" style={{ color: "#E3E3E3" }}>
+        <div className="px-3 pt-4 pb-3 relative">
+          <button
+            onClick={() => setStoreMenuOpen((v) => !v)}
+            className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white/5 transition"
+            style={{ color: "#E3E3E3" }}
+          >
             <div className="w-7 h-7 rounded-md grid place-items-center text-[11px] font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#38BDF8,#0EA5E9)", color: "#fff", boxShadow: "0 4px 12px -4px rgba(14,165,233,0.6)" }}>
               {initial}
             </div>
             <div className="min-w-0 flex-1 text-left">
-              <div className="text-[13px] font-semibold truncate">{storeName}</div>
+              <div className="text-[13px] font-semibold truncate">{displayName}</div>
               <div className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.5)" }}>Ecomify Studio</div>
             </div>
-            <ChevronDown size={14} className="opacity-60" />
+            <ChevronDown size={14} className="opacity-60" style={{ transform: storeMenuOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
           </button>
+          {storeMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setStoreMenuOpen(false)} />
+              <div className="absolute left-3 right-3 top-[68px] z-50 rounded-lg overflow-hidden shadow-2xl"
+                style={{ background: "#0F1B2D", border: "1px solid rgba(56,189,248,0.25)" }}>
+                <div className="px-3 py-2.5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  <div className="text-[12px] font-semibold" style={{ color: "#E0F2FE" }}>{displayName}</div>
+                  <div className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.5)" }}>{user?.email}</div>
+                </div>
+                <div className="py-1">
+                  <Link to="/dashboard/settings" onClick={() => setStoreMenuOpen(false)} className="block px-3 py-2 text-[12px] hover:bg-white/5" style={{ color: "#E0F2FE" }}>Profile settings</Link>
+                  <Link to="/dashboard/billing" onClick={() => setStoreMenuOpen(false)} className="block px-3 py-2 text-[12px] hover:bg-white/5" style={{ color: "#E0F2FE" }}>Plan & billing</Link>
+                  <Link to="/dashboard/embed" onClick={() => setStoreMenuOpen(false)} className="block px-3 py-2 text-[12px] hover:bg-white/5" style={{ color: "#E0F2FE" }}>Embed & share</Link>
+                  <Link to="/dashboard" onClick={() => setStoreMenuOpen(false)} className="block px-3 py-2 text-[12px] hover:bg-white/5" style={{ color: "#E0F2FE" }}>Switch store</Link>
+                </div>
+                <div className="border-t py-1" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  <button
+                    onClick={async () => { setStoreMenuOpen(false); await supabase.auth.signOut(); window.location.href = "/"; }}
+                    className="w-full text-left px-3 py-2 text-[12px] hover:bg-white/5"
+                    style={{ color: "#FCA5A5" }}
+                  >
+                    Log out
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Nav */}
