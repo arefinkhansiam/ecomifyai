@@ -86,6 +86,13 @@ function FeatureIcon({ kind, active }: { kind: "check" | "infinity" | "x"; activ
   return <Check size={16} style={{ color }} strokeWidth={3} />;
 }
 
+function FeatureIconRed({ kind, active, accent }: { kind: "check" | "infinity" | "x"; active: boolean; accent: string }) {
+  const color = active ? accent : "rgba(255,255,255,0.55)";
+  if (kind === "infinity") return <InfinityIcon size={16} style={{ color }} strokeWidth={2.5} />;
+  if (kind === "x") return <X size={16} className="text-white/35" strokeWidth={2.5} />;
+  return <Check size={16} style={{ color }} strokeWidth={3} />;
+}
+
 export function PricingCards() {
   const [selected, setSelected] = useState<string>("starter");
   const current = PLANS.find((p) => p.id === selected) ?? PLANS[1];
