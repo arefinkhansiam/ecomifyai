@@ -35,6 +35,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
   const [plan, setPlan] = useState<string>("free");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [storeName, setStoreName] = useState<string>("My Store");
+  const [storeMenuOpen, setStoreMenuOpen] = useState<boolean>(false);
   const [fullName, setFullName] = useState<string>("");
 
   const [openMenu, setOpenMenu] = useState<null | "profile" | "bell" | "help">(null);
