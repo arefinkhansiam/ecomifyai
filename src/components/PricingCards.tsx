@@ -199,7 +199,7 @@ export function PricingCards() {
       <a
         href={current.href}
         onClick={handleCta}
-        className="mt-7 w-full inline-flex items-center justify-center gap-3 rounded-2xl font-bold text-base py-4 px-6 transition-transform hover:-translate-y-0.5"
+        className="mt-8 lg:mt-10 w-full lg:max-w-md lg:mx-auto inline-flex items-center justify-center gap-3 rounded-2xl font-bold text-base py-4 px-6 transition-transform hover:-translate-y-0.5"
         style={{
           background: GRAD,
           color: "#fff",
