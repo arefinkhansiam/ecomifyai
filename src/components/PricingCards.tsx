@@ -86,6 +86,13 @@ function FeatureIcon({ kind, active }: { kind: "check" | "infinity" | "x"; activ
   return <Check size={16} style={{ color }} strokeWidth={3} />;
 }
 
+function FeatureIconRed({ kind, active, accent }: { kind: "check" | "infinity" | "x"; active: boolean; accent: string }) {
+  const color = active ? accent : "rgba(255,255,255,0.55)";
+  if (kind === "infinity") return <InfinityIcon size={16} style={{ color }} strokeWidth={2.5} />;
+  if (kind === "x") return <X size={16} className="text-white/35" strokeWidth={2.5} />;
+  return <Check size={16} style={{ color }} strokeWidth={3} />;
+}
+
 export function PricingCards() {
   const [selected, setSelected] = useState<string>("starter");
   const current = PLANS.find((p) => p.id === selected) ?? PLANS[1];
@@ -112,6 +119,13 @@ export function PricingCards() {
           const isSelected = selected === p.id;
           const bestValue = !!p.bestValue;
           const hasHeader = p.badge || bestValue;
+          const isPro = p.id === "pro";
+          const RED_GRAD = "linear-gradient(135deg, #7f1d1d 0%, #dc2626 55%, #ef4444 100%)";
+          const accent = isPro ? "#ef4444" : "#38BDF8";
+          const accentSoft = isPro ? "rgba(239,68,68,0.55)" : "rgba(56,189,248,0.55)";
+          const accentTint = isPro ? "rgba(127,29,29,0.45)" : "rgba(3,105,161,0.30)";
+          const headerGrad = isPro ? RED_GRAD : GRAD;
+          const priceGrad = isPro ? RED_GRAD : GRAD;
           return (
             <button
               type="button"
@@ -120,15 +134,15 @@ export function PricingCards() {
               className="relative text-left pt-3 group focus:outline-none"
             >
               {hasHeader && (
-                <div className="rounded-t-2xl px-5 pt-2.5 pb-3 -mb-3 text-center text-[12px] font-bold flex items-center justify-center gap-2"
+                <div className="rounded-t-2xl px-5 pt-2.5 pb-3 -mb-3 text-center text-[11px] font-bold uppercase tracking-[0.18em] flex items-center justify-center gap-2"
                   style={{
-                    background: GRAD,
-                    boxShadow: "0 0 40px -10px rgba(56,189,248,0.6)",
+                    background: headerGrad,
+                    boxShadow: `0 0 40px -10px ${accentSoft}`,
                     color: "#fff",
                   }}>
                   {p.badge ?? "Best Value"}
                   {p.discount && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold" style={{ background: "#ef4444", color: "#fff", boxShadow: "0 0 12px rgba(239,68,68,0.6)" }}>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold tracking-normal" style={{ background: "rgba(0,0,0,0.35)", color: "#fde047" }}>
                       {p.discount}
                     </span>
                   )}
@@ -138,35 +152,36 @@ export function PricingCards() {
                 className="rounded-2xl p-5 sm:p-6 relative transition-all"
                 style={{
                   background: isSelected
-                    ? "linear-gradient(180deg, rgba(3,105,161,0.30) 0%, rgba(10,16,28,0.95) 100%)"
+                    ? `linear-gradient(180deg, ${accentTint} 0%, rgba(10,16,28,0.96) 100%)`
                     : "rgba(10,16,28,0.95)",
                   border: "none",
                   boxShadow: isSelected
-                    ? "0 0 60px -10px rgba(56,189,248,0.55), inset 0 0 40px rgba(56,189,248,0.10)"
+                    ? `0 0 60px -10px ${accentSoft}, inset 0 0 40px ${isPro ? "rgba(239,68,68,0.10)" : "rgba(56,189,248,0.10)"}`
                     : "0 20px 50px -25px rgba(0,0,0,0.6)",
                 }}
               >
                 <div className="flex items-start gap-3">
                   <div className="shrink-0 mt-1 w-5 h-5 rounded-full flex items-center justify-center transition-all"
                     style={{
-                      background: isSelected ? GRAD : "rgba(255,255,255,0.08)",
+                      background: isSelected ? headerGrad : "rgba(255,255,255,0.08)",
                     }}>
                     {isSelected && <Check size={11} strokeWidth={4} color="#fff" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-display font-extrabold text-white text-xl sm:text-2xl leading-tight">{p.name}</div>
-                    <div className="text-xs sm:text-sm text-white/55 mt-1">{p.billed}</div>
+                    <div className="font-display font-extrabold text-white text-[22px] sm:text-[26px] leading-[1.05] tracking-tight">{p.name}</div>
+                    <div className="text-[12px] sm:text-[13px] text-white/55 mt-1.5 tracking-wide">{p.billed}</div>
                   </div>
                   <div className="shrink-0 text-center px-4 py-3 rounded-xl"
                     style={{
-                      background: isSelected ? GRAD : "linear-gradient(180deg, rgba(30,41,59,0.9), rgba(15,23,42,0.9))",
-                      minWidth: 96,
+                      background: isSelected ? priceGrad : "linear-gradient(180deg, rgba(30,41,59,0.9), rgba(15,23,42,0.9))",
+                      minWidth: 100,
+                      boxShadow: isSelected ? `0 10px 30px -10px ${accentSoft}` : "none",
                     }}>
                     {p.oldPerDay && (
                       <div className="text-[11px] leading-none mb-1 line-through" style={{ color: isSelected ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.5)" }}>{p.oldPerDay}</div>
                     )}
-                    <div className="font-display font-extrabold text-2xl leading-none text-white">{p.perDay}</div>
-                    <div className="text-[10px] mt-1 uppercase tracking-wider" style={{ color: isSelected ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.6)" }}>per day</div>
+                    <div className="font-display font-extrabold text-[26px] leading-none text-white tracking-tight">{p.perDay}</div>
+                    <div className="text-[10px] mt-1.5 uppercase tracking-[0.18em]" style={{ color: isSelected ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.6)" }}>per day</div>
                   </div>
                 </div>
 
@@ -174,8 +189,8 @@ export function PricingCards() {
 
                 <ul className="space-y-2.5">
                   {p.features.map((f, i) => (
-                    <li key={i} className="flex items-center gap-3 text-[14px] text-white/85">
-                      <FeatureIcon kind={f.icon} active={isSelected} />
+                    <li key={i} className="flex items-center gap-3 text-[13.5px] text-white/85 leading-snug">
+                      <FeatureIconRed kind={f.icon} active={isSelected} accent={accent} />
                       <span>{f.text}</span>
                     </li>
                   ))}
@@ -186,19 +201,21 @@ export function PricingCards() {
         })}
       </div>
 
+
       {/* Single CTA */}
       <a
         href={current.href}
         onClick={handleCta}
-        className="mt-7 w-full inline-flex items-center justify-center gap-3 rounded-2xl font-bold text-base py-4 px-6 transition-transform hover:-translate-y-0.5"
+        className="mt-7 w-full inline-flex items-center justify-center gap-3 rounded-2xl font-bold text-base py-4 px-6 transition-transform hover:-translate-y-0.5 uppercase tracking-[0.12em]"
         style={{
-          background: GRAD,
+          background: current.id === "pro" ? "linear-gradient(135deg, #7f1d1d 0%, #dc2626 55%, #ef4444 100%)" : GRAD,
           color: "#fff",
-          boxShadow: "0 25px 60px -15px rgba(56,189,248,0.7)",
+          boxShadow: current.id === "pro" ? "0 25px 60px -15px rgba(239,68,68,0.7)" : "0 25px 60px -15px rgba(56,189,248,0.7)",
         }}
       >
-        {user || current.id === "free" ? current.cta : `Log in to ${current.cta}`} <ArrowRight size={18} />
+        {user || current.id === "free" ? current.cta : `Sign in to ${current.cta}`} <ArrowRight size={18} />
       </a>
+
       {!user && current.id !== "free" && (
         <p className="text-center text-xs text-white/55 mt-3">You'll need to sign in or create an account to purchase a plan.</p>
       )}

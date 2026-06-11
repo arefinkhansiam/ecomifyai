@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { Tag, Check as CheckIcon } from "lucide-react";
 import {
   Sparkles, Play, Star, UploadCloud, ImagePlus, Wand2, Share2,
   Shirt, Sofa, Gem, Brush, Smartphone, BarChart2, Link as LinkIcon, ShieldCheck,
@@ -228,18 +230,25 @@ function Landing() {
         </div>
       </section>
 
-      {/* PRICING — white→ocean blue→black gradient */}
-      <section id="pricing" className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #f1f5f9 0%, #0369A1 45%, #050d1a 90%, #02060c 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 30%, rgba(56,189,248,0.20), transparent 70%)" }} />
-        <div className="mx-auto max-w-7xl px-6 relative">
-          <div className="text-center max-w-2xl mx-auto">
-            <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl" style={{ backgroundImage: "linear-gradient(180deg, #0a1929 0%, #ffffff 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Pick Your Plan</h2>
-            <p className="mt-4 text-white/80">Start free. Upgrade when you are ready to scale.</p>
+      {/* PRICING — refined dark layout with promo countdown */}
+      <section id="pricing" className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 50%, #02060c 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 900px 600px at 50% 0%, rgba(56,189,248,0.22), transparent 70%)" }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 600px 400px at 50% 100%, rgba(3,105,161,0.18), transparent 70%)" }} />
+        <div className="mx-auto max-w-2xl px-6 relative">
+          <div className="text-center">
+            <h2 className="font-display font-extrabold uppercase tracking-[-0.02em] text-4xl sm:text-6xl leading-[0.95]" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Pick Your Plan</h2>
+            <p className="mt-5 text-base sm:text-lg max-w-md mx-auto leading-relaxed" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+              Start free. Upgrade when you are ready to scale.
+            </p>
           </div>
+
+          <PromoTicket />
+
           <PricingCards />
-          <p className="text-center text-sm text-white/60 mt-10">All paid plans include a 7-day free trial. Sign in required to purchase.</p>
+          <p className="text-center text-xs text-white/55 mt-8 tracking-wide">All paid plans include a 7-day free trial · Sign in required to purchase</p>
         </div>
       </section>
+
 
       {/* UNLOCK FULL TRY-ON CAPABILITIES — comparison table */}
       <section className="py-20 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 100%)" }}>
@@ -404,3 +413,49 @@ function Landing() {
     </MarketingShell>
   );
 }
+
+function PromoTicket() {
+  const [s, setS] = useState(15 * 60);
+  useEffect(() => {
+    const id = setInterval(() => setS((v) => (v > 0 ? v - 1 : 15 * 60)), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const m = Math.floor(s / 60).toString().padStart(2, "0");
+  const sec = (s % 60).toString().padStart(2, "0");
+
+  return (
+    <div className="mt-10 mx-auto max-w-xl relative">
+      {/* perforated ticket */}
+      <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full" style={{ background: "#02060c" }} />
+      <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full" style={{ background: "#02060c" }} />
+      <div
+        className="rounded-2xl overflow-hidden relative"
+        style={{
+          background: "linear-gradient(135deg, #7f1d1d 0%, #dc2626 55%, #ef4444 100%)",
+          boxShadow: "0 30px 70px -20px rgba(239,68,68,0.55), 0 0 0 1px rgba(255,255,255,0.08)",
+        }}
+      >
+        <div className="py-3 text-center text-[12px] sm:text-[13px] font-bold tracking-wide flex items-center justify-center gap-2"
+          style={{ background: "rgba(0,0,0,0.25)", color: "#fde047" }}>
+          <CheckIcon size={14} strokeWidth={3} /> <span className="text-white/90"><span style={{ color: "#fde047" }} className="font-extrabold">ecomify_promo</span> is applied</span>
+        </div>
+        <div className="grid grid-cols-2 relative">
+          <div className="absolute left-1/2 top-2 bottom-2 border-l-2 border-dashed" style={{ borderColor: "rgba(255,255,255,0.35)" }} />
+          <div className="py-6 sm:py-7 text-center">
+            <div className="font-display font-extrabold text-3xl sm:text-4xl tracking-tight" style={{ color: "#fde047", textShadow: "0 2px 18px rgba(253,224,71,0.45)" }}>21% OFF</div>
+            <div className="mt-1 text-[11px] text-white/75">With limited-offer promocode</div>
+          </div>
+          <div className="py-6 sm:py-7 text-center">
+            <div className="font-display font-extrabold text-3xl sm:text-4xl text-white tabular-nums tracking-tight">
+              {m} <span className="text-white/60">:</span> {sec}
+            </div>
+            <div className="mt-1 flex items-center justify-center gap-6 text-[10px] uppercase tracking-[0.18em] text-white/70">
+              <span>minutes</span><span>seconds</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
