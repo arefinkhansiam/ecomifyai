@@ -19,7 +19,7 @@ function Dashboard() {
     supabase.rpc("get_user_dashboard_stats", { uid: user.id }).then(({ data }) => {
       if (data) setStats(data as any);
     });
-    supabase.from("tryon_branding").select("id", { count: "exact", head: true }).eq("vendor_id", user.id).then(({ count }) => {
+    supabase.from("tryon_branding").select("id", { count: "exact", head: true }).eq("user_id", user.id).then(({ count }) => {
       setCustomizedCount(count ?? 0);
     });
   }, [user]);
