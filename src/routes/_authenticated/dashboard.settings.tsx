@@ -205,7 +205,7 @@ function ProfilePage() {
             <span className="px-3 py-1 rounded-full text-xs font-bold text-white uppercase tracking-wide" style={{ background: isPaid ? GRAD : "#64748B" }}>
               {plan}
             </span>
-            {plan !== "growth" && <Link to="/pricing" className="btn-primary text-xs">Upgrade plan</Link>}
+            {plan !== "growth" && <Link to="/dashboard/billing" className="btn-primary text-xs">Upgrade plan</Link>}
           </div>
           <div className="mt-5">
             <div className="text-xs text-muted uppercase tracking-wide">Try-On slots used (permanent)</div>
@@ -246,13 +246,10 @@ function ProfilePage() {
         {/* E — Integrations */}
         <Card title="Integrations" icon={Plug}>
           <div className="space-y-3">
-            <Integration name="Store platform" desc="Embed Try-On buttons directly in product templates." />
-            <Integration name="Website widget" desc="Drop-in widget on any commerce site." />
-            <div>
-              <div className="text-xs uppercase tracking-wide text-muted">Custom embed snippet</div>
-              <pre className="mt-2 p-3 rounded-xl text-xs font-mono overflow-x-auto" style={{ background: "#0B1220", color: "#E0F2FE" }}>{widgetSnippet}</pre>
-              <button onClick={() => { navigator.clipboard.writeText(widgetSnippet); toast.success("Copied"); }} className="btn-ghost text-xs mt-2"><Copy size={12} /> Copy snippet</button>
-            </div>
+            <Integration name="Shopify" desc="Auto-insert Try-On button on product pages via Liquid snippet." />
+            <Integration name="WooCommerce" desc="Drop-in widget for any WordPress + WooCommerce store." />
+            <Integration name="Wix / Squarespace / Webflow" desc="Paste the universal script into any HTML / code block." />
+            <Integration name="Custom website" desc="Use the one-line script tag on any HTML page." />
           </div>
         </Card>
 
