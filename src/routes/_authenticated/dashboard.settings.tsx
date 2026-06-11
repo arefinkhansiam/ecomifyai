@@ -149,7 +149,7 @@ function ProfilePage() {
   const isPaid = plan !== "free";
   const initial = (fullName || user?.email || "?")[0].toUpperCase();
   const referralLink = typeof window !== "undefined" ? `${window.location.origin}/auth?mode=signup&ref=${user?.id?.slice(0, 8)}` : "";
-  const widgetSnippet = `<script src="${typeof window !== "undefined" ? window.location.origin : ""}/widget.js" data-product-id="YOUR_PRODUCT_ID"></script>`;
+  
 
   return (
     <DashboardShell title="Profile">
