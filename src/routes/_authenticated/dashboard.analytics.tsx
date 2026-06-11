@@ -117,13 +117,13 @@ function AnalyticsPage() {
     <DashboardShell title="Analytics">
       <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
         <div>
-          <h1 className="text-[22px] font-semibold tracking-tight" style={{ color: "#0B1220" }}>Performance</h1>
+          <h1 className="text-[22px] font-semibold tracking-tight" style={{ color: "#1A1A1A" }}>Performance</h1>
           <p className="text-[13px] mt-1" style={{ color: "#6B7280" }}>Shopper behaviour, try-on funnel, and product winners.</p>
         </div>
-        <div className="inline-flex rounded-lg overflow-hidden" style={{ background: "#fff", border: "1px solid #E2E8F0" }}>
+        <div className="inline-flex rounded-md overflow-hidden" style={{ background: "#fff", border: "1px solid #E1E3E5" }}>
           {RANGES.map((r) => (
             <button key={r.key} onClick={() => setRange(r)} className="text-[12px] px-3 py-1.5 font-semibold transition"
-              style={{ background: range.key === r.key ? "linear-gradient(135deg,#0369A1,#38BDF8)" : "transparent", color: range.key === r.key ? "#fff" : "#475569" }}>
+              style={{ background: range.key === r.key ? "#1A1A1A" : "transparent", color: range.key === r.key ? "#fff" : "#4A4A4A" }}>
               {r.label}
             </button>
           ))}
@@ -131,15 +131,16 @@ function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Kpi label="Total views" value={totalViews} icon={Eye} gradient="linear-gradient(135deg,#0369A1,#38BDF8)" />
-        <Kpi label="Try-ons completed" value={totalTryons} hint={`${tryonRate}% of views`} icon={MousePointerClick} gradient="linear-gradient(135deg,#0EA5E9,#22D3EE)" />
-        <Kpi label="Likes" value={totalLikes} hint={`${likeRate}% like-rate`} icon={Heart} gradient="linear-gradient(135deg,#7C3AED,#A855F7)" />
-        <Kpi label="Shares" value={totalShares} icon={Share2} gradient="linear-gradient(135deg,#10B981,#22C55E)" />
-        <Kpi label="Avg session" value={`${avgTimeSec}s`} icon={Clock} gradient="linear-gradient(135deg,#F59E0B,#FB923C)" />
-        <Kpi label="Interaction rate" value={`${interactRate}%`} icon={Activity} gradient="linear-gradient(135deg,#EC4899,#F472B6)" />
-        <Kpi label="Wishlist saves" value={totalWishlist} icon={Star} gradient="linear-gradient(135deg,#06B6D4,#22D3EE)" />
-        <Kpi label="Alt-picks" value={altPicks} hint="Recommended product chosen" icon={ShoppingBag} gradient="linear-gradient(135deg,#0B1220,#1E293B)" />
+        <Kpi label="Total views" value={totalViews} icon={Eye} />
+        <Kpi label="Try-ons completed" value={totalTryons} hint={`${tryonRate}% of views`} icon={MousePointerClick} />
+        <Kpi label="Likes" value={totalLikes} hint={`${likeRate}% like-rate`} icon={Heart} />
+        <Kpi label="Shares" value={totalShares} icon={Share2} />
+        <Kpi label="Avg session" value={`${avgTimeSec}s`} icon={Clock} />
+        <Kpi label="Interaction rate" value={`${interactRate}%`} icon={Activity} />
+        <Kpi label="Wishlist saves" value={totalWishlist} icon={Star} />
+        <Kpi label="Alt-picks" value={altPicks} hint="Recommended product chosen" icon={ShoppingBag} />
       </div>
+
 
       <Card title="Engagement trend" subtitle={`Views, try-ons, likes & shares over the last ${range.label}`} className="mt-4">
         <div className="h-72">
