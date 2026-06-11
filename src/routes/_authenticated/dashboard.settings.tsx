@@ -17,9 +17,9 @@ const TIMEZONES = ["UTC", "America/New_York", "America/Los_Angeles", "Europe/Lon
 
 function Card({ title, icon: Icon, children, accent }: { title: string; icon: any; children: React.ReactNode; accent?: string }) {
   return (
-    <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(14px)", border: "1px solid rgba(2,132,199,0.18)", boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)" }}>
-      <div className="flex items-center gap-2"><Icon size={18} style={{ color: accent || "var(--primary)" }} /><h4 className="text-ink m-0">{title}</h4></div>
-      <div className="mt-4">{children}</div>
+    <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.96)", backdropFilter: "blur(14px)", border: "1px solid rgba(2,132,199,0.15)", boxShadow: "0 8px 24px -18px rgba(2,132,199,0.3)" }}>
+      <div className="flex items-center gap-2"><Icon size={15} style={{ color: accent || "var(--primary)" }} /><h5 className="text-ink m-0 text-sm font-bold">{title}</h5></div>
+      <div className="mt-3">{children}</div>
     </div>
   );
 }
@@ -153,24 +153,24 @@ function ProfilePage() {
 
   return (
     <DashboardShell title="Profile">
-      <div className="max-w-4xl space-y-6">
+      <div className="max-w-3xl space-y-4">
         {/* A — Account */}
         <Card title="Account information" icon={UserIcon}>
-          <div className="flex items-center gap-5 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full overflow-hidden grid place-items-center text-white font-display font-extrabold text-3xl" style={{ background: GRAD }}>
+              <div className="w-14 h-14 rounded-full overflow-hidden grid place-items-center text-white font-display font-extrabold text-lg" style={{ background: GRAD }}>
                 {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" /> : initial}
               </div>
               <button onClick={() => fileRef.current?.click()} disabled={uploading}
-                className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full grid place-items-center text-white shadow-lg" style={{ background: GRAD }}>
-                {uploading ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
+                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full grid place-items-center text-white shadow" style={{ background: GRAD }}>
+                {uploading ? <Loader2 size={10} className="animate-spin" /> : <Camera size={10} />}
               </button>
               <input ref={fileRef} type="file" hidden accept="image/jpeg,image/png,image/webp" onChange={(e) => onAvatar(e.target.files?.[0] ?? null)} />
             </div>
-            <div>
-              <div className="font-display font-bold text-ink text-lg">{fullName || user?.email}</div>
-              <div className="text-sm" style={{ color: "var(--ink-soft)" }}>{user?.email}</div>
-              <button onClick={() => fileRef.current?.click()} className="mt-2 text-xs font-semibold text-primary">Change photo</button>
+            <div className="min-w-0 flex-1">
+              <div className="font-display font-bold text-ink text-sm truncate">{fullName || user?.email}</div>
+              <div className="text-xs truncate" style={{ color: "var(--ink-soft)" }}>{user?.email}</div>
+              <button onClick={() => fileRef.current?.click()} className="mt-1 text-[11px] font-semibold text-primary">Change photo</button>
             </div>
           </div>
 
