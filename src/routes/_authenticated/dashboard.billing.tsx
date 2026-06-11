@@ -37,8 +37,8 @@ function BillingPage() {
           </div>
           <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-2">
             {current.features.map((f) => (
-              <li key={f} className="flex items-center gap-2 text-sm text-white">
-                <CheckCircle2 size={16} className="text-[var(--success)]" /> {f}
+              <li key={f.text} className="flex items-center gap-2 text-sm text-white">
+                <CheckCircle2 size={16} className="text-[var(--success)]" /> {f.text}
               </li>
             ))}
           </ul>
