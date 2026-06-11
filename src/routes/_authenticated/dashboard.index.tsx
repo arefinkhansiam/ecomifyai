@@ -82,27 +82,45 @@ function Dashboard() {
             </div>
             <button className="w-7 h-7 rounded-md grid place-items-center hover:bg-[#F1F2F4]"><MoreHorizontal size={15} style={{ color: "#6B7280" }} /></button>
           </div>
-          <ul>
-            {[
-              { to: "/dashboard/upload", title: "Upload your first product", body: "Add product photos from every angle." },
-              { to: "/dashboard/products", title: "Customize your try-on", body: "Edit name, colors, and branding." },
-              { to: "/dashboard/embed", title: "Add the widget to your store", body: "Copy the Shopify or universal embed code." },
-              { to: "/dashboard/analytics", title: "Track shopper behaviour", body: "See views, sessions, and recommendations." },
-            ].map((s, i) => (
-              <li key={s.to}>
-                <Link to={s.to} className="flex items-start gap-3 px-5 py-3 hover:bg-[#FAFBFB] transition"
-                  style={{ borderBottom: i < 3 ? "1px solid #F1F2F4" : "none" }}>
-                  <span className="mt-0.5 w-5 h-5 rounded-full grid place-items-center text-[10px] font-semibold flex-shrink-0"
-                    style={{ background: "#FFFFFF", border: "1.5px dashed #C9CCD1", color: "#6B7280" }}>{i + 1}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[13px] font-semibold" style={{ color: "#1A1A1A" }}>{s.title}</div>
-                    <div className="text-[12px]" style={{ color: "#6B7280" }}>{s.body}</div>
+          {(() => {
+            const steps = [
+              { to: "/dashboard/upload", title: "Upload your first product", body: "Add product photos from every angle.", done: (stats?.total_products ?? 0) > 0 },
+              { to: "/dashboard/products", title: "Customize your try-on", body: "Edit name, colors, and branding.", done: customizedCount > 0 },
+              { to: "/dashboard/embed", title: "Add the widget to your store", body: "Copy the Shopify or universal embed code.", done: (stats?.total_views ?? 0) > 0 },
+              { to: "/dashboard/analytics", title: "Track shopper behaviour", body: "See views, sessions, and recommendations.", done: (stats?.sessions_this_month ?? 0) > 0 },
+            ];
+            const doneCount = steps.filter((s) => s.done).length;
+            return (
+              <>
+                <div className="px-5 py-2.5 flex items-center gap-3" style={{ borderBottom: "1px solid #F1F2F4", background: "#FAFBFB" }}>
+                  <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "#E1E3E5" }}>
+                    <div className="h-full rounded-full transition-all" style={{ width: `${(doneCount / steps.length) * 100}%`, background: "#008060" }} />
                   </div>
-                  <ArrowRight size={14} style={{ color: "#9CA3AF" }} className="mt-1" />
-                </Link>
-              </li>
-            ))}
-          </ul>
+                  <span className="text-[11px] font-semibold" style={{ color: "#6B7280" }}>{doneCount} / {steps.length} done</span>
+                </div>
+                <ul>
+                  {steps.map((s, i) => (
+                    <li key={s.to}>
+                      <Link to={s.to} className="flex items-start gap-3 px-5 py-3 hover:bg-[#FAFBFB] transition"
+                        style={{ borderBottom: i < steps.length - 1 ? "1px solid #F1F2F4" : "none" }}>
+                        <span className="mt-0.5 w-5 h-5 rounded-full grid place-items-center text-[10px] font-semibold flex-shrink-0"
+                          style={s.done
+                            ? { background: "#008060", border: "1.5px solid #008060", color: "#fff" }
+                            : { background: "#FFFFFF", border: "1.5px dashed #C9CCD1", color: "#6B7280" }}>
+                          {s.done ? <Check size={11} strokeWidth={3} /> : i + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[13px] font-semibold" style={{ color: "#1A1A1A", textDecoration: s.done ? "line-through" : "none", opacity: s.done ? 0.65 : 1 }}>{s.title}</div>
+                          <div className="text-[12px]" style={{ color: "#6B7280" }}>{s.done ? "Completed" : s.body}</div>
+                        </div>
+                        <ArrowRight size={14} style={{ color: "#9CA3AF" }} className="mt-1" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            );
+          })()}
         </div>
 
         {/* Plan card */}
