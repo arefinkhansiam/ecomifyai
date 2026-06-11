@@ -181,8 +181,10 @@
   @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
   .float { animation: float 3s ease-in-out infinite; }
   @keyframes scroll-x { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-  .scroll-x { animation: scroll-x 30s linear infinite; }
-  .scroll-x:hover { animation-play-state: paused; }
+  @keyframes scroll-x-reverse { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+  .scroll-x { animation: scroll-x 40s linear infinite; }
+  .scroll-x-reverse { animation: scroll-x-reverse 40s linear infinite; }
+  .scroll-x:hover, .scroll-x-reverse:hover { animation-play-state: paused; }
   @keyframes scan-line { 0% { top: 0%; opacity: 1; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
   .ar-scan-line { animation: scan-line 2.2s ease-in-out infinite; }
   @keyframes pop-in { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }

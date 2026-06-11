@@ -46,9 +46,6 @@ function Landing() {
             </div>
             <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-white" style={{ background: "rgba(2,6,12,0.7)", backdropFilter: "blur(8px)" }}>Before</div>
             <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-white" style={{ background: GRAD }}>After</div>
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full text-xs font-semibold text-white flex items-center gap-2" style={{ background: "rgba(2,6,12,0.85)", backdropFilter: "blur(8px)", border: "1px solid rgba(56,189,248,0.3)" }}>
-              <Sparkles size={12} style={{ color: "#38BDF8" }} /> Powered by Gemini 2.5
-            </div>
           </motion.div>
 
           <motion.h1
@@ -243,6 +240,37 @@ function Landing() {
           <p className="text-center text-sm text-white/50 mt-10">All plans include a 7-day free trial. No credit card required.</p>
         </div>
       </section>
+
+      {/* BEST PRICES IN INDUSTRY */}
+      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #051226 50%, #02060c 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 700px 500px at 50% 50%, rgba(56,189,248,0.28), transparent 70%)" }} />
+        <div className="mx-auto max-w-4xl px-6 relative">
+          <div className="relative mx-auto w-[300px] h-[280px] mb-10">
+            {/* stacked translucent card behind */}
+            <div className="absolute inset-0 rounded-3xl" style={{ background: "rgba(56,189,248,0.22)", transform: "translate(20px, 16px) rotate(-2deg)", backdropFilter: "blur(20px)", border: "1px solid rgba(56,189,248,0.3)" }} />
+            <div className="absolute inset-0 rounded-3xl p-5 grid grid-cols-2 grid-rows-2 gap-3" style={{ background: "rgba(56,189,248,0.35)", backdropFilter: "blur(24px)", border: "1px solid rgba(125,211,252,0.45)", boxShadow: "0 30px 80px -20px rgba(56,189,248,0.6)" }}>
+              {[
+                { n: "Pro", v: "$1 = 33 credits" },
+                { n: "Growth", v: "$1 = 23 credits" },
+                { n: "Starter", v: "$1 = 20 credits" },
+                { n: "Free", v: "$1 = 14 credits" },
+              ].map((c) => (
+                <div key={c.n} className="rounded-2xl flex flex-col items-center justify-center text-center p-3" style={{ background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.25)" }}>
+                  <Sparkles size={18} className="text-white mb-1" />
+                  <div className="font-display font-bold text-white text-sm">{c.n}</div>
+                  <div className="mt-2 px-2 py-1 rounded-full text-[10px] text-white" style={{ background: "rgba(255,255,255,0.15)" }}>{c.v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]">
+            <span className="block" style={{ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.15) 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Best Prices</span>
+            <span className="block text-white">In Try-On Industry</span>
+          </h2>
+          <p className="mt-4 text-center text-white/70">Create more with the lowest cost per try-on.</p>
+        </div>
+      </section>
+
 
       {/* REVIEWS — dark Higgsfield-style */}
       <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 100%)" }}>
