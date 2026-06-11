@@ -34,14 +34,20 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed top-3 md:top-0 left-0 right-0 z-50 px-3 md:px-12 pointer-events-none">
+      {/* Desktop: subtle gradient overlay at the very top so page starts with brand gradient */}
+      <div
+        className="hidden md:block fixed top-0 left-0 right-0 z-40 pointer-events-none h-32"
+        style={{ background: "linear-gradient(180deg, rgba(2,132,199,0.32) 0%, rgba(56,189,248,0.16) 40%, rgba(56,189,248,0) 100%)" }}
+      />
+      <header className="fixed top-3 md:top-4 left-0 right-0 z-50 px-3 md:px-10 pointer-events-none">
         <div
-          className="pointer-events-auto mx-auto max-w-[1400px] grid grid-cols-3 md:flex items-center md:justify-between px-4 md:px-2 h-14 md:h-24 rounded-full md:rounded-none transition-all bg-white/90 md:bg-transparent border border-white/85 md:border-0 shadow-[0_14px_40px_-18px_rgba(2,132,199,0.3)] md:shadow-none"
+          className="pointer-events-auto mx-auto max-w-[1400px] grid grid-cols-3 md:flex items-center md:justify-between px-4 md:px-7 h-14 md:h-20 rounded-full transition-all bg-white/90 md:bg-white/15 border border-white/85 md:border-white/30 shadow-[0_14px_40px_-18px_rgba(2,132,199,0.3)] md:shadow-[0_18px_50px_-22px_rgba(2,132,199,0.45)]"
           style={{
             backdropFilter: "blur(22px) saturate(180%)",
             WebkitBackdropFilter: "blur(22px) saturate(180%)",
           }}
         >
+
 
 
           {/* Mobile: left spacer for centering */}
