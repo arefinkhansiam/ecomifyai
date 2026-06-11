@@ -34,23 +34,20 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed top-3 md:top-5 left-0 right-0 z-50 px-3 md:px-6 pointer-events-none">
+      <header className="fixed top-3 md:top-0 left-0 right-0 z-50 px-3 md:px-12 pointer-events-none">
         <div
-          className="pointer-events-auto mx-auto max-w-6xl grid grid-cols-3 md:flex items-center md:justify-between px-4 md:px-6 h-14 md:h-16 rounded-full transition-all"
+          className="pointer-events-auto mx-auto max-w-[1400px] grid grid-cols-3 md:flex items-center md:justify-between px-4 md:px-2 h-14 md:h-24 rounded-full md:rounded-none transition-all bg-white/90 md:bg-transparent border border-white/85 md:border-0 shadow-[0_14px_40px_-18px_rgba(2,132,199,0.3)] md:shadow-none"
           style={{
-            background: scrolled ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.92)",
             backdropFilter: "blur(22px) saturate(180%)",
             WebkitBackdropFilter: "blur(22px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.85)",
-            boxShadow: scrolled
-              ? "0 20px 50px -20px rgba(2,132,199,0.35), inset 0 1px 0 rgba(255,255,255,0.9)"
-              : "0 14px 40px -18px rgba(2,132,199,0.3), inset 0 1px 0 rgba(255,255,255,0.85)",
           }}
         >
+
+
           {/* Mobile: left spacer for centering */}
           <div className="md:hidden justify-self-start" />
 
-          <Link to="/" className="flex items-center justify-self-center md:justify-self-auto font-display font-extrabold tracking-tight text-[22px] md:text-[24px] leading-none">
+          <Link to="/" className="flex items-center justify-self-center md:justify-self-auto font-display font-extrabold tracking-tight text-[22px] md:text-[30px] leading-none">
             <span
               style={{
                 backgroundImage: "linear-gradient(135deg, #0B1220 0%, #0369A1 45%, #38BDF8 100%)",
@@ -63,12 +60,12 @@ export function Navbar() {
               ECOMIFY
             </span>
           </Link>
-          <nav className="hidden md:flex items-center gap-7">
+          <nav className="hidden md:flex items-center gap-10">
             {links.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className="text-[16px] font-semibold transition-colors hover:text-primary"
                 style={{
                   color: pathname === l.to
                     ? "var(--primary)"
@@ -109,12 +106,12 @@ export function Navbar() {
                 <Link
                   to="/auth"
                   search={{ mode: "signin" }}
-                  className="text-sm font-medium hover:text-primary transition-colors"
+                  className="text-[15px] font-semibold hover:text-primary transition-colors"
                   style={{ color: "var(--ink-soft)" }}
                 >
                   Sign In
                 </Link>
-                <Link to="/auth" search={{ mode: "signup" }} className="px-5 py-2 rounded-full bg-[var(--primary)] text-white text-sm font-semibold hover:brightness-110 transition shadow-lg shadow-sky-500/30">
+                <Link to="/auth" search={{ mode: "signup" }} className="px-6 py-2.5 rounded-full bg-[var(--primary)] text-white text-[15px] font-semibold hover:brightness-110 transition shadow-lg shadow-sky-500/30">
                   Get Started
                 </Link>
               </>

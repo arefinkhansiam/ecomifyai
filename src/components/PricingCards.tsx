@@ -113,8 +113,8 @@ export function PricingCards() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10">
-      <div className="flex flex-col gap-5">
+    <div className="max-w-2xl lg:max-w-6xl mx-auto mt-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
         {PLANS.map((p) => {
           const isSelected = selected === p.id;
           const bestValue = !!p.bestValue;
@@ -199,7 +199,7 @@ export function PricingCards() {
       <a
         href={current.href}
         onClick={handleCta}
-        className="mt-7 w-full inline-flex items-center justify-center gap-3 rounded-2xl font-bold text-base py-4 px-6 transition-transform hover:-translate-y-0.5"
+        className="mt-8 lg:mt-10 w-full lg:max-w-md lg:mx-auto inline-flex items-center justify-center gap-3 rounded-2xl font-bold text-base py-4 px-6 transition-transform hover:-translate-y-0.5"
         style={{
           background: GRAD,
           color: "#fff",
