@@ -106,12 +106,12 @@ export function Navbar() {
                 <Link
                   to="/auth"
                   search={{ mode: "signin" }}
-                  className="text-sm font-medium hover:text-primary transition-colors"
+                  className="text-[15px] font-semibold hover:text-primary transition-colors"
                   style={{ color: "var(--ink-soft)" }}
                 >
                   Sign In
                 </Link>
-                <Link to="/auth" search={{ mode: "signup" }} className="px-5 py-2 rounded-full bg-[var(--primary)] text-white text-sm font-semibold hover:brightness-110 transition shadow-lg shadow-sky-500/30">
+                <Link to="/auth" search={{ mode: "signup" }} className="px-6 py-2.5 rounded-full bg-[var(--primary)] text-white text-[15px] font-semibold hover:brightness-110 transition shadow-lg shadow-sky-500/30">
                   Get Started
                 </Link>
               </>
