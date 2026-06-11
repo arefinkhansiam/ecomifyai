@@ -199,15 +199,16 @@ export function PricingCards() {
       <a
         href={current.href}
         onClick={handleCta}
-        className="mt-7 w-full inline-flex items-center justify-center gap-3 rounded-2xl font-bold text-base py-4 px-6 transition-transform hover:-translate-y-0.5 uppercase tracking-[0.12em]"
+        className="mt-7 w-full inline-flex items-center justify-center gap-3 rounded-2xl font-bold text-base py-4 px-6 transition-transform hover:-translate-y-0.5"
         style={{
-          background: current.id === "pro" ? "linear-gradient(135deg, #7f1d1d 0%, #dc2626 55%, #ef4444 100%)" : GRAD,
+          background: GRAD,
           color: "#fff",
-          boxShadow: current.id === "pro" ? "0 25px 60px -15px rgba(239,68,68,0.7)" : "0 25px 60px -15px rgba(56,189,248,0.7)",
+          boxShadow: "0 25px 60px -15px rgba(56,189,248,0.7)",
         }}
       >
-        {user || current.id === "free" ? current.cta : `Sign in to ${current.cta}`} <ArrowRight size={18} />
+        {user || current.id === "free" ? current.cta : `Log in to ${current.cta}`} <ArrowRight size={18} />
       </a>
+
 
       {!user && current.id !== "free" && (
         <p className="text-center text-xs text-white/55 mt-3">You'll need to sign in or create an account to purchase a plan.</p>
