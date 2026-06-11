@@ -15,14 +15,13 @@ function ResolveAndRedirect() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    const m = product.match(/-([a-f0-9]{6,})$/i);
-    const shortId = m?.[1];
-    if (!shortId) { setNotFound(true); return; }
+    const uuidMatch = product.match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i);
+    if (!uuidMatch) { setNotFound(true); return; }
+    const fullId = uuidMatch[1];
     supabase
       .from("ar_products")
       .select("id")
-      .ilike("id", `${shortId}%`)
-      .limit(1)
+      .eq("id", fullId)
       .maybeSingle()
       .then(({ data }) => {
         if (!data?.id) setNotFound(true);
