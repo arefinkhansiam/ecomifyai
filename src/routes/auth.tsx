@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { MarketingShell } from "@/components/MarketingShell";
 import { supabase } from "@/integrations/supabase/client";
 
-const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional() });
+const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional(), redirect: z.string().optional() });
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
@@ -38,10 +38,12 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Account created. Welcome to Ecomify.");
+        if (search.redirect) { window.location.href = search.redirect; return; }
         navigate({ to: "/dashboard" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        if (search.redirect) { window.location.href = search.redirect; return; }
         navigate({ to: "/dashboard" });
       }
     } catch (err: any) {

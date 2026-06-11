@@ -24,7 +24,7 @@ function Row({ items, reverse = false }: { items: typeof reviews; reverse?: bool
             className="rounded-xl p-3.5 shrink-0 w-[240px] sm:w-[260px] flex flex-col"
             style={{
               background: "rgba(15,23,42,0.85)",
-              border: "1px solid rgba(56,189,248,0.18)",
+              border: "none",
               boxShadow: "0 14px 30px -18px rgba(2,132,199,0.45)",
             }}
           >
