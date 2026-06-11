@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/use-auth";
 import { Tag, Check as CheckIcon } from "lucide-react";
 import {
   Sparkles, Play, Star, UploadCloud, ImagePlus, Wand2, Share2,
@@ -30,6 +31,9 @@ export const Route = createFileRoute("/")({
 const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
 
 function Landing() {
+  const { user, loading } = useAuth();
+  // Signed-in users land directly in the dashboard
+  if (!loading && user) return <Navigate to="/dashboard" replace />;
   return (
     <MarketingShell>
       {/* HERO — bold dark Higgsfield-style with cyan gradient */}

@@ -40,7 +40,9 @@ function EmbedPage() {
 
   const url = selected ? `${origin}/ar/view/${selected}` : "";
   const embedCode = `<iframe src="${url}" width="100%" height="640" style="border:0;border-radius:16px" allow="xr-spatial-tracking; camera"></iframe>`;
-  const platformSnippet = `<!-- Ecomify Try-On -->\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
+  const widgetSnippet = `<!-- Ecomify Try-On button — paste anywhere on your website -->\n<script src="${origin}/widget.js" data-product-id="${selected}" async></script>`;
+  const shopifyLiquid = `{% comment %} Ecomify Try-On button — Shopify {% endcomment %}\n{% comment %} Paste in your product template (e.g. sections/main-product.liquid) {% endcomment %}\n<div class="ecomify-tryon" style="margin-top:12px;">\n  <script src="${origin}/widget.js" data-product-id="${selected}" async></script>\n</div>`;
+  const platformSnippet = `<!-- Ecomify Try-On link -->\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
 
   const copy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -86,14 +88,30 @@ function EmbedPage() {
             </div>
           </div>
           <div>
-            <h3 className="text-white">Embed code</h3>
+            <h3 className="text-white">Your website (no Shopify needed)</h3>
+            <p className="text-xs text-muted mt-1">Paste this script on any website — it renders your branded Try-On button automatically.</p>
+            <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
+              <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{widgetSnippet}</code>
+              <button onClick={() => copy(widgetSnippet, "Website snippet")} className="text-muted hover:text-white"><Copy size={14} /></button>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-white">Shopify (Liquid)</h3>
+            <p className="text-xs text-muted mt-1">Paste into your product template, e.g. sections/main-product.liquid.</p>
+            <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
+              <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{shopifyLiquid}</code>
+              <button onClick={() => copy(shopifyLiquid, "Shopify code")} className="text-muted hover:text-white"><Copy size={14} /></button>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-white">Embed code (iframe)</h3>
             <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
               <code className="text-xs text-muted flex-1 break-all">{embedCode}</code>
               <button onClick={() => copy(embedCode, "Embed code")} className="text-muted hover:text-white"><Copy size={14} /></button>
             </div>
           </div>
           <div>
-            <h3 className="text-white">Store platform snippet</h3>
+            <h3 className="text-white">Simple link</h3>
             <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
               <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{platformSnippet}</code>
               <button onClick={() => copy(platformSnippet, "Snippet")} className="text-muted hover:text-white"><Copy size={14} /></button>

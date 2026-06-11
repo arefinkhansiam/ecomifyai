@@ -34,6 +34,7 @@ import { Route as AuthenticatedDashboardEmbedRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardBehaviourRouteImport } from './routes/_authenticated/dashboard.behaviour'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
+import { Route as AuthenticatedDashboardProductsIndexRouteImport } from './routes/_authenticated/dashboard.products.index'
 import { Route as AuthenticatedDashboardProductsIdCustomizeRouteImport } from './routes/_authenticated/dashboard.products.$id.customize'
 
 const TryArRoute = TryArRouteImport.update({
@@ -168,6 +169,12 @@ const AuthenticatedDashboardAnalyticsRoute =
     path: '/dashboard/analytics',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardProductsIndexRoute =
+  AuthenticatedDashboardProductsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardProductsRoute,
+  } as any)
 const AuthenticatedDashboardProductsIdCustomizeRoute =
   AuthenticatedDashboardProductsIdCustomizeRouteImport.update({
     id: '/$id/customize',
@@ -200,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/ar/$store/$product': typeof ArStoreProductRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/products/': typeof AuthenticatedDashboardProductsIndexRoute
   '/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
 }
 export interface FileRoutesByTo {
@@ -215,7 +223,6 @@ export interface FileRoutesByTo {
   '/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
-  '/dashboard/products': typeof AuthenticatedDashboardProductsRouteWithChildren
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/ar/$store/$product': typeof ArStoreProductRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/products': typeof AuthenticatedDashboardProductsIndexRoute
   '/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
 }
 export interface FileRoutesById {
@@ -256,6 +264,7 @@ export interface FileRoutesById {
   '/ar/$store/$product': typeof ArStoreProductRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/products/': typeof AuthenticatedDashboardProductsIndexRoute
   '/_authenticated/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
 }
 export interface FileRouteTypes {
@@ -285,6 +294,7 @@ export interface FileRouteTypes {
     | '/ar/$store/$product'
     | '/ar/view/$productId'
     | '/dashboard/'
+    | '/dashboard/products/'
     | '/dashboard/products/$id/customize'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -300,7 +310,6 @@ export interface FileRouteTypes {
     | '/dashboard/behaviour'
     | '/dashboard/billing'
     | '/dashboard/embed'
-    | '/dashboard/products'
     | '/dashboard/settings'
     | '/dashboard/upload'
     | '/api/public/ar-compose'
@@ -312,6 +321,7 @@ export interface FileRouteTypes {
     | '/ar/$store/$product'
     | '/ar/view/$productId'
     | '/dashboard'
+    | '/dashboard/products'
     | '/dashboard/products/$id/customize'
   id:
     | '__root__'
@@ -340,6 +350,7 @@ export interface FileRouteTypes {
     | '/ar/$store/$product'
     | '/ar/view/$productId'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/products/'
     | '/_authenticated/dashboard/products/$id/customize'
   fileRoutesById: FileRoutesById
 }
@@ -540,6 +551,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/products/': {
+      id: '/_authenticated/dashboard/products/'
+      path: '/'
+      fullPath: '/dashboard/products/'
+      preLoaderRoute: typeof AuthenticatedDashboardProductsIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardProductsRoute
+    }
     '/_authenticated/dashboard/products/$id/customize': {
       id: '/_authenticated/dashboard/products/$id/customize'
       path: '/$id/customize'
@@ -551,11 +569,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedDashboardProductsRouteChildren {
+  AuthenticatedDashboardProductsIndexRoute: typeof AuthenticatedDashboardProductsIndexRoute
   AuthenticatedDashboardProductsIdCustomizeRoute: typeof AuthenticatedDashboardProductsIdCustomizeRoute
 }
 
 const AuthenticatedDashboardProductsRouteChildren: AuthenticatedDashboardProductsRouteChildren =
   {
+    AuthenticatedDashboardProductsIndexRoute:
+      AuthenticatedDashboardProductsIndexRoute,
     AuthenticatedDashboardProductsIdCustomizeRoute:
       AuthenticatedDashboardProductsIdCustomizeRoute,
   }
