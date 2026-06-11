@@ -129,13 +129,15 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
       <div className="p-3">
         <h5 className="text-ink truncate text-sm font-semibold m-0">{p.product_name}</h5>
         <div className="text-[10px] text-muted mt-0.5">{(p.view_count ?? p.views_count ?? 0).toLocaleString()} views</div>
-        <div className="flex gap-1 mt-2.5">
-          <Link to="/dashboard/products/$id/customize" params={{ id: p.id }} className="flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold text-white" style={{ background: "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)" }} title="Edit">
+        {p.status === "ready" && (
+          <a href={viewerUrl} target="_blank" rel="noreferrer" className="mt-2 flex items-center justify-center gap-1 w-full px-2 py-1.5 rounded-lg text-[10px] font-semibold text-white" style={{ background: "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)" }}>
+            <ExternalLink size={11} /> Preview Try-On
+          </a>
+        )}
+        <div className="flex gap-1 mt-1.5">
+          <Link to="/dashboard/products/$id/customize" params={{ id: p.id }} className="flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold" style={{ border: "1px solid rgba(2,132,199,0.25)", color: "var(--ink)" }}>
             <Settings2 size={11} /> Edit
           </Link>
-          {p.status === "ready" && (
-            <a href={viewerUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center w-8 h-8 rounded-lg" style={{ border: "1px solid rgba(2,132,199,0.2)", color: "var(--ink-soft)" }} title="Preview"><ExternalLink size={12} /></a>
-          )}
           {p.status === "ready" && (
             <button onClick={copyEmbed} className="inline-flex items-center justify-center w-8 h-8 rounded-lg" style={{ border: "1px solid rgba(2,132,199,0.2)", color: "var(--ink-soft)" }} title="Embed">
               {copied ? <Check size={12} /> : <Copy size={12} />}
