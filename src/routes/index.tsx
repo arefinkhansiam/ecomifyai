@@ -230,8 +230,8 @@ function Landing() {
         </div>
       </section>
 
-      {/* PRICING — white→ocean blue→black gradient */}
-      <section id="pricing" className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #f1f5f9 0%, #0369A1 45%, #050d1a 90%, #02060c 100%)" }}>
+      {/* PRICING — ocean blue→black gradient */}
+      <section id="pricing" className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #0c4a6e 0%, #0369A1 30%, #050d1a 80%, #02060c 100%)" }}>
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 30%, rgba(56,189,248,0.20), transparent 70%)" }} />
         <div className="mx-auto max-w-7xl px-6 relative">
           <div className="text-center max-w-2xl mx-auto">
