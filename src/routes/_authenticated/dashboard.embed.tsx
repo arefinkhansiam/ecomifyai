@@ -88,14 +88,30 @@ function EmbedPage() {
             </div>
           </div>
           <div>
-            <h3 className="text-white">Embed code</h3>
+            <h3 className="text-white">Your website (no Shopify needed)</h3>
+            <p className="text-xs text-muted mt-1">Paste this script on any website — it renders your branded Try-On button automatically.</p>
+            <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
+              <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{widgetSnippet}</code>
+              <button onClick={() => copy(widgetSnippet, "Website snippet")} className="text-muted hover:text-white"><Copy size={14} /></button>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-white">Shopify (Liquid)</h3>
+            <p className="text-xs text-muted mt-1">Paste into your product template, e.g. sections/main-product.liquid.</p>
+            <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
+              <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{shopifyLiquid}</code>
+              <button onClick={() => copy(shopifyLiquid, "Shopify code")} className="text-muted hover:text-white"><Copy size={14} /></button>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-white">Embed code (iframe)</h3>
             <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
               <code className="text-xs text-muted flex-1 break-all">{embedCode}</code>
               <button onClick={() => copy(embedCode, "Embed code")} className="text-muted hover:text-white"><Copy size={14} /></button>
             </div>
           </div>
           <div>
-            <h3 className="text-white">Store platform snippet</h3>
+            <h3 className="text-white">Simple link</h3>
             <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
               <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{platformSnippet}</code>
               <button onClick={() => copy(platformSnippet, "Snippet")} className="text-muted hover:text-white"><Copy size={14} /></button>
