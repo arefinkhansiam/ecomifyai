@@ -212,6 +212,7 @@ function CustomizePage() {
           button_radius: arRadius, custom_button_text: arText,
           show_product_name: showProductName, ar_badge_text: arBadge || undefined,
           button_shadow: buttonShadow,
+          button_glow: buttonGlow,
           font_family: fontFamily,
           gradient_data: gradient,
         },
