@@ -50,18 +50,19 @@ export function DashboardShell({ title, children }: { title: string; children: R
   const initial = (storeName?.[0] ?? user?.email?.[0] ?? "?").toUpperCase();
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#F1F2F4" }}>
-      {/* Sidebar - Shopify Polaris style */}
+    <div className="min-h-screen flex" style={{ background: "#F1F5F9" }}>
+      {/* Sidebar - ocean gradient */}
       <aside className="hidden md:flex w-60 flex-col fixed left-0 top-0 bottom-0 z-30"
-        style={{ background: "#1A1A1A", borderRight: "1px solid #2A2A2A" }}>
+        style={{ background: "linear-gradient(180deg,#0B1220 0%,#0C2A4A 45%,#0369A1 100%)", borderRight: "1px solid rgba(56,189,248,0.15)" }}>
         {/* Store switcher */}
         <div className="px-3 pt-3 pb-2">
           <button className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white/5 transition" style={{ color: "#E3E3E3" }}>
-            <div className="w-7 h-7 rounded-md grid place-items-center text-[11px] font-bold flex-shrink-0" style={{ background: "#0284C7", color: "#fff" }}>
+            <div className="w-7 h-7 rounded-md grid place-items-center text-[11px] font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#38BDF8,#0EA5E9)", color: "#fff", boxShadow: "0 4px 12px -4px rgba(14,165,233,0.6)" }}>
               {initial}
             </div>
             <div className="min-w-0 flex-1 text-left">
               <div className="text-[13px] font-semibold truncate">{storeName}</div>
+              <div className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.5)" }}>Ecomify Studio</div>
             </div>
             <ChevronDown size={14} className="opacity-60" />
           </button>
@@ -106,11 +107,11 @@ export function DashboardShell({ title, children }: { title: string; children: R
         </nav>
 
         {/* Footer / plan */}
-        <div className="px-3 py-3 border-t" style={{ borderColor: "#2A2A2A" }}>
+        <div className="px-3 py-3 border-t" style={{ borderColor: "rgba(56,189,248,0.18)" }}>
           {!isPaid && (
-            <Link to="/dashboard/billing" className="flex items-center justify-between px-2.5 py-2 rounded-md mb-2 text-[12px] font-medium hover:bg-white/5 transition" style={{ color: "#E3E3E3" }}>
+            <Link to="/dashboard/billing" className="flex items-center justify-between px-2.5 py-2 rounded-md mb-2 text-[12px] font-medium transition" style={{ color: "#fff", background: "linear-gradient(135deg,rgba(56,189,248,0.18),rgba(14,165,233,0.10))", border: "1px solid rgba(56,189,248,0.3)" }}>
               <span className="flex items-center gap-2"><Crown size={13} style={{ color: "#FBBF24" }} /> Upgrade plan</span>
-              <span style={{ color: "#9CA3AF" }}>→</span>
+              <span style={{ color: "#7DD3FC" }}>→</span>
             </Link>
           )}
           <button onClick={signOut} className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[12px] font-medium hover:bg-white/5 transition" style={{ color: "#9CA3AF" }}>
