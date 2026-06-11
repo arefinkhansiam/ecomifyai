@@ -34,19 +34,15 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed top-3 md:top-6 left-0 right-0 z-50 px-3 md:px-10 pointer-events-none">
+      <header className="fixed top-3 md:top-0 left-0 right-0 z-50 px-3 md:px-12 pointer-events-none">
         <div
-          className="pointer-events-auto mx-auto max-w-[1400px] grid grid-cols-3 md:flex items-center md:justify-between px-4 md:px-2 h-14 md:h-20 rounded-full md:rounded-none transition-all"
+          className="pointer-events-auto mx-auto max-w-[1400px] grid grid-cols-3 md:flex items-center md:justify-between px-4 md:px-2 h-14 md:h-24 rounded-full md:rounded-none transition-all bg-white/90 md:bg-transparent border border-white/85 md:border-0 shadow-[0_14px_40px_-18px_rgba(2,132,199,0.3)] md:shadow-none"
           style={{
-            background: "rgba(255,255,255,0.92)",
             backdropFilter: "blur(22px) saturate(180%)",
             WebkitBackdropFilter: "blur(22px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.85)",
-            boxShadow: scrolled
-              ? "0 20px 50px -20px rgba(2,132,199,0.35), inset 0 1px 0 rgba(255,255,255,0.9)"
-              : "0 14px 40px -18px rgba(2,132,199,0.3), inset 0 1px 0 rgba(255,255,255,0.85)",
           }}
         >
+
 
           {/* Mobile: left spacer for centering */}
           <div className="md:hidden justify-self-start" />
