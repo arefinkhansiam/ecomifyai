@@ -70,55 +70,38 @@ function EmbedPage() {
         </select>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card rounded-2xl p-6">
-          <h3 className="text-white">QR code</h3>
+        <div className="rounded-2xl p-6" style={{ background: "#fff", border: "1px solid rgba(2,132,199,0.18)", boxShadow: "0 10px 30px -18px rgba(2,132,199,0.45)" }}>
+          <h3 className="text-base font-semibold m-0" style={{ background: "linear-gradient(135deg,#0B1220,#0369A1,#0EA5E9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>QR code</h3>
           {qrData ? (
             <>
-              <img src={qrData} alt="QR" className="mt-4 w-56 h-56 rounded-xl bg-[var(--bg)] p-3" />
-              <a href={qrData} download={`ecomify-qr.png`} className="btn-ghost text-xs mt-4 inline-flex"><Download size={12} /> Download PNG</a>
+              <img src={qrData} alt="QR" className="mt-4 w-56 h-56 rounded-xl p-3" style={{ background: "linear-gradient(135deg,#0B1220,#0369A1)" }} />
+              <a href={qrData} download={`ecomify-qr.png`} className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}><Download size={12} /> Download PNG</a>
             </>
-          ) : <div className="mt-4 w-56 h-56 rounded-xl bg-[var(--bg)] animate-pulse" />}
+          ) : <div className="mt-4 w-56 h-56 rounded-xl bg-slate-100 animate-pulse" />}
         </div>
-        <div className="bg-card rounded-2xl p-6 space-y-5">
-          <div>
-            <h3 className="text-white">Direct link</h3>
-            <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-center gap-2">
-              <code className="text-xs text-cyan truncate flex-1">{url}</code>
-              <button onClick={() => copy(url, "Link")} className="text-muted hover:text-white"><Copy size={14} /></button>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-white">Your website (no Shopify needed)</h3>
-            <p className="text-xs text-muted mt-1">Paste this script on any website — it renders your branded Try-On button automatically.</p>
-            <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
-              <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{widgetSnippet}</code>
-              <button onClick={() => copy(widgetSnippet, "Website snippet")} className="text-muted hover:text-white"><Copy size={14} /></button>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-white">Shopify (Liquid)</h3>
-            <p className="text-xs text-muted mt-1">Paste into your product template, e.g. sections/main-product.liquid.</p>
-            <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
-              <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{shopifyLiquid}</code>
-              <button onClick={() => copy(shopifyLiquid, "Shopify code")} className="text-muted hover:text-white"><Copy size={14} /></button>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-white">Embed code (iframe)</h3>
-            <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
-              <code className="text-xs text-muted flex-1 break-all">{embedCode}</code>
-              <button onClick={() => copy(embedCode, "Embed code")} className="text-muted hover:text-white"><Copy size={14} /></button>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-white">Simple link</h3>
-            <div className="mt-2 bg-[var(--bg)] rounded-lg p-3 flex items-start gap-2">
-              <code className="text-xs text-muted flex-1 break-all whitespace-pre-wrap">{platformSnippet}</code>
-              <button onClick={() => copy(platformSnippet, "Snippet")} className="text-muted hover:text-white"><Copy size={14} /></button>
-            </div>
-          </div>
+        <div className="rounded-2xl p-6 space-y-5" style={{ background: "#fff", border: "1px solid rgba(2,132,199,0.18)", boxShadow: "0 10px 30px -18px rgba(2,132,199,0.45)" }}>
+          <Block title="Direct link" value={url} onCopy={() => copy(url, "Link")} />
+          <Block title="Your website (no Shopify needed)" hint="Paste this script on any website — it renders your branded Try-On button automatically." value={widgetSnippet} onCopy={() => copy(widgetSnippet, "Website snippet")} multiline />
+          <Block title="Shopify (Liquid)" hint="Paste into your product template, e.g. sections/main-product.liquid." value={shopifyLiquid} onCopy={() => copy(shopifyLiquid, "Shopify code")} multiline />
+          <Block title="Embed code (iframe)" value={embedCode} onCopy={() => copy(embedCode, "Embed code")} multiline />
+          <Block title="Simple link" value={platformSnippet} onCopy={() => copy(platformSnippet, "Snippet")} multiline />
         </div>
       </div>
     </DashboardShell>
+  );
+}
+
+function Block({ title, hint, value, onCopy, multiline }: { title: string; hint?: string; value: string; onCopy: () => void; multiline?: boolean }) {
+  return (
+    <div>
+      <h3 className="text-[13px] font-bold m-0" style={{ background: "linear-gradient(135deg,#0B1220,#0369A1,#0EA5E9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{title}</h3>
+      {hint && <p className="text-[11px] mt-1" style={{ color: "#64748B" }}>{hint}</p>}
+      <div className="mt-2 rounded-lg p-3 flex items-start gap-2" style={{ background: "linear-gradient(135deg,#0B1220 0%,#0C2A4A 60%,#0369A1 100%)", border: "1px solid rgba(56,189,248,0.25)" }}>
+        <code className={`text-[11.5px] font-mono flex-1 ${multiline ? "whitespace-pre-wrap break-all" : "truncate"}`} style={{ color: "#E0F2FE" }}>{value}</code>
+        <button onClick={onCopy} className="flex-shrink-0 w-7 h-7 grid place-items-center rounded" style={{ background: "linear-gradient(135deg,#0EA5E9,#38BDF8)", color: "#fff" }} title="Copy">
+          <Copy size={12} />
+        </button>
+      </div>
+    </div>
   );
 }

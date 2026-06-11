@@ -67,6 +67,7 @@ function CustomizePage() {
   const [fg, setFg] = useState(DEFAULTS.fg);
   const [radius, setRadius] = useState(DEFAULTS.radius);
   const [buttonShadow, setButtonShadow] = useState(true);
+  const [buttonGlow, setButtonGlow] = useState(true);
 
   // Try-On page
   const [pageBg, setPageBg] = useState(DEFAULTS.pageBg);
@@ -132,6 +133,7 @@ function CustomizePage() {
       setShowBranding(p.show_branding !== false);
       setShowProductName(c.show_product_name !== false);
       setButtonShadow(c.button_shadow !== false);
+      setButtonGlow(c.button_glow !== false);
 
       // Branding-level
       const b = (branding as any) ?? {};
@@ -210,6 +212,7 @@ function CustomizePage() {
           button_radius: arRadius, custom_button_text: arText,
           show_product_name: showProductName, ar_badge_text: arBadge || undefined,
           button_shadow: buttonShadow,
+          button_glow: buttonGlow,
           font_family: fontFamily,
           gradient_data: gradient,
         },
@@ -310,6 +313,7 @@ function CustomizePage() {
               <input type="range" min={0} max={30} value={radius} onChange={(e) => setRadius(Number(e.target.value))} className="w-full accent-sky-500" />
             </Field>
             <Toggle label="Button shadow" on={buttonShadow} onChange={setButtonShadow} />
+            <Toggle label="Glowing button (animated halo)" on={buttonGlow} onChange={setButtonGlow} />
           </Section>
 
           <Section title="Try-On viewer">

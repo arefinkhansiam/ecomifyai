@@ -19,8 +19,9 @@
   var overrideText = currentScript.getAttribute("data-text-color");
   var origin = new URL(currentScript.src).origin;
 
-  var placeholder = document.createElement("span");
-  placeholder.style.display = "inline-block";
+  // Center-aligned wrapper so the button always sits in the middle of its container
+  var placeholder = document.createElement("div");
+  placeholder.style.cssText = "display:flex;justify-content:center;align-items:center;width:100%;margin:14px 0;";
   currentScript.parentNode.insertBefore(placeholder, currentScript);
 
   // ----- Session tracking -----
@@ -65,7 +66,6 @@
     } catch (e) {}
     fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(function () {});
   }
-  // Expose for Try-On viewer iframe to call
   window.__ecomifyMarkInteract = markInteract;
   window.__ecomifyEndSession = endSession;
 
@@ -73,26 +73,54 @@
     var label = overrideLabel || cfg.button_label || "View Try-On";
     var bg = overrideBg || cfg.button_bg_color || "#0284C7";
     var fg = overrideText || cfg.button_text_color || "#FFFFFF";
-    var radius = (cfg.button_border_radius != null ? cfg.button_border_radius : 12) + "px";
+    var radius = (cfg.button_border_radius != null ? cfg.button_border_radius : 14) + "px";
     var size = cfg.button_size || "medium";
-    var pad = size === "small" ? "10px 18px" : size === "large" ? "18px 36px" : "14px 28px";
+    var pad = size === "small" ? "10px 22px" : size === "large" ? "18px 40px" : "14px 32px";
     var fs = size === "small" ? "13px" : size === "large" ? "17px" : "15px";
+    var glow = !!(cfg.ar_customization && cfg.ar_customization.button_glow);
+    var accent = (cfg.ar_customization && cfg.ar_customization.accent_color) || bg;
+    var useGradient = !!cfg.use_gradient;
+    var bgCss = useGradient && cfg.gradient_from && cfg.gradient_to
+      ? "linear-gradient(135deg," + cfg.gradient_from + " 0%," + cfg.gradient_to + " 100%)"
+      : bg;
 
     var btn = document.createElement("button");
     btn.type = "button";
-    btn.innerHTML = '<span>' + escapeHtml(label) + '</span>';
+    btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;">' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="' + fg + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>' +
+      escapeHtml(label) + '</span>';
     btn.style.cssText = [
       "display:inline-flex", "align-items:center", "justify-content:center",
-      "background:" + bg, "color:" + fg, "padding:" + pad, "font-size:" + fs,
-      "border:none", "border-radius:" + radius, "font-weight:600", "cursor:pointer",
+      "background:" + bgCss, "color:" + fg, "padding:" + pad, "font-size:" + fs,
+      "border:0", "border-radius:" + radius, "font-weight:700", "cursor:pointer",
       "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
-      "box-shadow:0 6px 20px -6px rgba(2,132,199,0.55)", "transition:transform .15s ease, box-shadow .15s ease",
-      "letter-spacing:.2px"
+      "transition:transform .2s ease, box-shadow .2s ease, filter .2s ease",
+      "letter-spacing:.3px",
+      "position:relative",
+      glow
+        ? "box-shadow:0 0 0 0 " + accent + "33, 0 8px 28px -6px " + accent + "88, 0 0 24px " + accent + "66"
+        : "box-shadow:0 6px 20px -6px rgba(2,132,199,0.45)",
+      glow ? "animation:ecomifyGlow 2.4s ease-in-out infinite" : ""
     ].join(";");
-    btn.onmouseenter = function () { btn.style.transform = "translateY(-1px)"; };
-    btn.onmouseleave = function () { btn.style.transform = "translateY(0)"; };
+    btn.onmouseenter = function () {
+      btn.style.transform = "translateY(-2px) scale(1.02)";
+      if (glow) btn.style.filter = "brightness(1.08)";
+    };
+    btn.onmouseleave = function () {
+      btn.style.transform = "translateY(0) scale(1)";
+      btn.style.filter = "";
+    };
     btn.onclick = function () { openTryOn(productId); };
     placeholder.appendChild(btn);
+
+    if (glow && !document.getElementById("ecomify-glow-kf")) {
+      var s = document.createElement("style"); s.id = "ecomify-glow-kf";
+      s.textContent = "@keyframes ecomifyGlow{" +
+        "0%,100%{box-shadow:0 8px 28px -6px " + accent + "88,0 0 18px " + accent + "55}" +
+        "50%{box-shadow:0 10px 36px -6px " + accent + "cc,0 0 36px " + accent + "aa}" +
+        "}";
+      document.head.appendChild(s);
+    }
   }
 
   function openTryOn(id) {
@@ -100,7 +128,6 @@
     var url = origin + "/ar/view/" + encodeURIComponent(id);
     var isMobile = /Mobi|Android|iPhone|iPad/.test(navigator.userAgent);
     if (isMobile) {
-      // Send session on unload before redirect
       window.addEventListener("pagehide", function () { endSession(false); }, { once: true });
       window.location.href = url;
       return;
@@ -133,7 +160,7 @@
   }
 
   fetch(SUPABASE_URL + "/rest/v1/ar_products?id=eq." + encodeURIComponent(productId) +
-    "&select=button_label,button_bg_color,button_text_color,button_border_radius,button_size", {
+    "&select=button_label,button_bg_color,button_text_color,button_border_radius,button_size,use_gradient,gradient_from,gradient_to,ar_customization", {
     headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY },
   })
     .then(function (r) { return r.ok ? r.json() : []; })
