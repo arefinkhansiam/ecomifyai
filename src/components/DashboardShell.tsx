@@ -106,7 +106,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
                   <Link to="/dashboard/settings" onClick={() => setStoreMenuOpen(false)} className="block px-3 py-2 text-[12px] hover:bg-white/5" style={{ color: "#E0F2FE" }}>Profile settings</Link>
                   <Link to="/dashboard/billing" onClick={() => setStoreMenuOpen(false)} className="block px-3 py-2 text-[12px] hover:bg-white/5" style={{ color: "#E0F2FE" }}>Plan & billing</Link>
                   <Link to="/dashboard/embed" onClick={() => setStoreMenuOpen(false)} className="block px-3 py-2 text-[12px] hover:bg-white/5" style={{ color: "#E0F2FE" }}>Embed & share</Link>
-                  <Link to="/dashboard" onClick={() => setStoreMenuOpen(false)} className="block px-3 py-2 text-[12px] hover:bg-white/5" style={{ color: "#E0F2FE" }}>Switch store</Link>
+                  
                 </div>
                 <div className="border-t py-1" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                   <button
