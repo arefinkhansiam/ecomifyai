@@ -254,10 +254,10 @@ function Landing() {
 
           <div className="mt-12 grid grid-cols-2 gap-4">
             {[
-              { icon: "∞", value: "Unlimited", label: "Try-On products on Pro" },
-              { icon: <Sparkles size={20} />, value: "120+", label: "Supported product categories" },
-              { icon: <ShieldCheck size={20} />, value: "24/7", label: "Priority support" },
-              { icon: <BarChart2 size={20} />, value: "#1", label: "Conversion lift in category" },
+              { Icon: null as any, prefix: "∞", value: "Unlimited", label: "Try-On products on Pro" },
+              { Icon: Sparkles, prefix: "", value: "120+", label: "Supported product categories" },
+              { Icon: ShieldCheck, prefix: "", value: "24/7", label: "Priority support" },
+              { Icon: BarChart2, prefix: "#", value: "1", label: "Conversion lift in category" },
             ].map((s, i) => (
               <div key={i} className="rounded-2xl p-5 text-center"
                 style={{
@@ -266,8 +266,10 @@ function Landing() {
                   backdropFilter: "blur(10px)",
                 }}>
                 <div className="flex items-center justify-center gap-2">
+                  {s.Icon && <s.Icon size={22} style={{ color: "#38BDF8" }} />}
+                  {s.prefix && !s.Icon && <span className="font-display font-extrabold text-2xl sm:text-3xl" style={{ color: "#38BDF8" }}>{s.prefix}</span>}
                   <span className="font-display font-extrabold text-2xl sm:text-3xl" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
-                    {typeof s.icon === "string" ? s.icon : s.icon} {s.value}
+                    {s.Icon ? `${s.prefix}${s.value}` : s.value}
                   </span>
                 </div>
                 <p className="mt-2 text-xs sm:text-sm text-white/70">{s.label}</p>
