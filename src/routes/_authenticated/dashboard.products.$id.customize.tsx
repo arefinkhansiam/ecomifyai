@@ -133,6 +133,7 @@ function CustomizePage() {
       setShowBranding(p.show_branding !== false);
       setShowProductName(c.show_product_name !== false);
       setButtonShadow(c.button_shadow !== false);
+      setButtonGlow(c.button_glow !== false);
 
       // Branding-level
       const b = (branding as any) ?? {};
