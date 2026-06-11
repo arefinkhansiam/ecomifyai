@@ -30,32 +30,55 @@ const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
 function Landing() {
   return (
     <MarketingShell>
-      {/* HERO */}
-      <section className="relative min-h-[calc(100vh-72px)] flex items-center overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(180deg, #02060c 0%, #0a1929 18%, #0f3050 38%, #15649e 58%, #38bdf8 75%, #e0f2fe 92%, #f6fafe 100%)' }} />
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 900px 600px at 50% 0%, rgba(56,189,248,0.22), transparent 70%)' }} />
-        <div className="mx-auto max-w-5xl px-6 py-20 text-center relative">
+      {/* HERO — bold dark Higgsfield-style with cyan gradient */}
+      <section className="relative min-h-[calc(100vh-72px)] flex items-center overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 40%, #07111f 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 900px 600px at 50% 0%, rgba(56,189,248,0.22), transparent 70%)" }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 600px 400px at 80% 80%, rgba(3,105,161,0.25), transparent 70%)" }} />
+        <div className="mx-auto max-w-6xl px-6 py-20 text-center relative w-full">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7 }}
+            className="mx-auto mb-12 relative rounded-3xl overflow-hidden max-w-2xl"
+            style={{ boxShadow: "0 60px 120px -30px rgba(56,189,248,0.5)", border: "1px solid rgba(56,189,248,0.25)" }}
+          >
+            <div className="grid grid-cols-2">
+              <img src={demoBefore} alt="Shopper photo" className="w-full h-[260px] sm:h-[340px] object-cover" />
+              <img src={demoAfter} alt="AI try-on result" className="w-full h-[260px] sm:h-[340px] object-cover" />
+            </div>
+            <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-white" style={{ background: "rgba(2,6,12,0.7)", backdropFilter: "blur(8px)" }}>Before</div>
+            <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-white" style={{ background: GRAD }}>After</div>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full text-xs font-semibold text-white flex items-center gap-2" style={{ background: "rgba(2,6,12,0.85)", backdropFilter: "blur(8px)", border: "1px solid rgba(56,189,248,0.3)" }}>
+              <Sparkles size={12} style={{ color: "#38BDF8" }} /> Powered by Gemini 2.5
+            </div>
+          </motion.div>
+
           <motion.h1
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="mt-6 text-white"
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[44px] sm:text-[68px] md:text-[88px]"
+            style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}
           >
-            Try It On. From a Single Photo.
+            Try It On.<br/>From One Photo.
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.45 }}
-            className="mt-6 max-w-2xl mx-auto text-[18px] text-white/80"
+            className="mt-6 max-w-2xl mx-auto text-[16px] sm:text-[18px] text-white/65"
           >
-            Upload your product photos. Shoppers upload one of themselves — or their room — and our AI generates a photorealistic try-on in seconds. No camera tracking, no headset, no model files.
+            The best AI try-on for e-commerce — turn product photos into photoreal try-ons your shoppers can see on themselves in seconds.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6 }}
-            className="mt-10 flex flex-wrap justify-center gap-4"
+            className="mt-10 flex justify-center"
           >
-            <Link to="/auth" search={{ mode: "signup" }} className="btn-cyan">Start for Free</Link>
-            <Link to="/try-ar" className="btn-outline-cyan">See a Try-On</Link>
+            <Link
+              to="/try-ar"
+              className="inline-flex items-center gap-3 rounded-full font-bold text-base px-8 py-4 transition-transform hover:-translate-y-0.5"
+              style={{ background: GRAD, color: "#fff", boxShadow: "0 25px 60px -15px rgba(56,189,248,0.7), 0 0 0 2px rgba(56,189,248,0.4)" }}
+            >
+              Try it yourself <Play size={16} fill="currentColor" />
+            </Link>
           </motion.div>
-          <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
+
+          <div className="mt-12 flex items-center justify-center gap-4 flex-wrap">
             <div className="flex -space-x-3">
               {[
                 "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=faces",
@@ -64,28 +87,11 @@ function Landing() {
                 "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80&h=80&fit=crop&crop=faces",
                 "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=faces",
               ].map((src, i) => (
-                <img key={i} src={src} alt="" loading="lazy"
-                  className="w-9 h-9 rounded-full object-cover border-2 border-white"
-                  style={{ boxShadow: "0 4px 10px rgba(2,132,199,0.25)" }} />
+                <img key={i} src={src} alt="" loading="lazy" className="w-9 h-9 rounded-full object-cover border-2" style={{ borderColor: "#0a1929" }} />
               ))}
             </div>
-            <div className="text-sm font-medium text-white/90">Join 10,000+ store owners</div>
-            <div className="flex gap-1">{[0,1,2,3,4].map(i => <Star key={i} size={14} className="text-cyan" fill="currentColor" />)}</div>
-          </div>
-
-          {/* Before / after preview — real correlated photos */}
-          <div className="mt-16 grid grid-cols-2 gap-3 sm:gap-6 max-w-3xl mx-auto">
-            {[
-              { label: "Shopper photo", img: demoBefore, tag: "Before" },
-              { label: "AI try-on result", img: demoAfter, tag: "After" },
-            ].map((c, i) => (
-              <motion.div key={c.tag} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 + i * 0.15 }}
-                className="rounded-2xl overflow-hidden relative" style={{ boxShadow: "0 30px 80px -25px rgba(2,132,199,0.45)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                <img src={c.img} alt={c.label} width={1024} height={1024} loading="lazy" className="w-full h-[280px] sm:h-[420px] object-cover" />
-                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold text-white" style={{ background: i === 0 ? "rgba(11,18,32,0.7)" : GRAD }}>{c.tag}</div>
-                <div className="absolute bottom-3 left-3 right-3 text-xs font-semibold text-white drop-shadow">{c.label}</div>
-              </motion.div>
-            ))}
+            <div className="text-sm font-medium text-white/80">10,000+ stores</div>
+            <div className="flex gap-1">{[0,1,2,3,4].map(i => <Star key={i} size={14} style={{ color: "#38BDF8" }} fill="currentColor" />)}</div>
           </div>
         </div>
       </section>
