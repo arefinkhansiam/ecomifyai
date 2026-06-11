@@ -18,6 +18,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ArTokenRouteImport } from './routes/ar.$token'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as ArViewProductIdRouteImport } from './routes/ar.view.$productId'
 import { Route as ArStoreProductRouteImport } from './routes/ar.$store.$product'
@@ -79,6 +80,11 @@ const IndexRoute = IndexRouteImport.update({
 const ArTokenRoute = ArTokenRouteImport.update({
   id: '/ar/$token',
   path: '/ar/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardIndexRoute =
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/try-ar': typeof TryArRoute
+  '/api/chat': typeof ApiChatRoute
   '/ar/$token': typeof ArTokenRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/try-ar': typeof TryArRoute
+  '/api/chat': typeof ApiChatRoute
   '/ar/$token': typeof ArTokenRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/try-ar': typeof TryArRoute
+  '/api/chat': typeof ApiChatRoute
   '/ar/$token': typeof ArTokenRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/behaviour': typeof AuthenticatedDashboardBehaviourRoute
@@ -277,6 +286,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/pricing'
     | '/try-ar'
+    | '/api/chat'
     | '/ar/$token'
     | '/dashboard/analytics'
     | '/dashboard/behaviour'
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/pricing'
     | '/try-ar'
+    | '/api/chat'
     | '/ar/$token'
     | '/dashboard/analytics'
     | '/dashboard/behaviour'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/pricing'
     | '/try-ar'
+    | '/api/chat'
     | '/ar/$token'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/behaviour'
@@ -363,6 +375,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   PricingRoute: typeof PricingRoute
   TryArRoute: typeof TryArRoute
+  ApiChatRoute: typeof ApiChatRoute
   ArTokenRoute: typeof ArTokenRoute
   ApiPublicArComposeRoute: typeof ApiPublicArComposeRoute
   ApiPublicTrackArSessionRoute: typeof ApiPublicTrackArSessionRoute
@@ -437,6 +450,13 @@ declare module '@tanstack/react-router' {
       path: '/ar/$token'
       fullPath: '/ar/$token'
       preLoaderRoute: typeof ArTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/': {
@@ -621,6 +641,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   PricingRoute: PricingRoute,
   TryArRoute: TryArRoute,
+  ApiChatRoute: ApiChatRoute,
   ArTokenRoute: ArTokenRoute,
   ApiPublicArComposeRoute: ApiPublicArComposeRoute,
   ApiPublicTrackArSessionRoute: ApiPublicTrackArSessionRoute,

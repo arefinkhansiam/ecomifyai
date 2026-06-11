@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { AiChatbot } from "./AiChatbot";
 
 export function MarketingShell({ children }: { children: ReactNode }) {
   return (
@@ -8,6 +9,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
       <Navbar />
       <main>{children}</main>
       <Footer />
+      <AiChatbot />
     </div>
   );
 }
