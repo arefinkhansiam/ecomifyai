@@ -1,8 +1,9 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { useEffect, useRef, useState } from "react";
-import { MessageCircle, X, Send, Sparkles, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { MessageCircle, X, Send, Sparkles, Loader2, GripVertical } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { motion, useDragControls } from "framer-motion";
 
 const STORAGE_KEY = "ecomify_help_chat_v1";
 
