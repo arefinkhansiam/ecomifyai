@@ -1,9 +1,10 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Box, BarChart2, Link as LinkIcon, CreditCard, Settings, LogOut, Bell, HelpCircle, Crown, Activity, Upload, ChevronDown, User, Sparkles, BookOpen, MessageCircleQuestion } from "lucide-react";
+import { LayoutDashboard, Box, BarChart2, Link as LinkIcon, CreditCard, Settings, Bell, HelpCircle, Crown, Activity, Upload, ChevronDown, BookOpen, MessageCircleQuestion } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { AiChatbot } from "./AiChatbot";
 
 const NAV_MAIN = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard, exact: true },
@@ -197,15 +198,15 @@ export function DashboardShell({ title, children }: { title: string; children: R
                   </div>
                 </div>
                 <div className="py-1">
-                  <Link to="/dashboard/billing" onClick={() => setOpenMenu(null)} className="flex items-center gap-2.5 px-4 py-2 text-[13px] hover:bg-[#F8FAFC]" style={{ color: "#0B1220" }}>
-                    <Sparkles size={14} style={{ color: "#FBBF24" }} /> Plan upgrade
-                    {!isPaid && <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", color: "#fff" }}>FREE</span>}
+                  <Link to="/dashboard/billing" onClick={() => setOpenMenu(null)} className="flex items-center justify-between px-4 py-2.5 text-[13px] font-medium hover:bg-[#F8FAFC]" style={{ color: "#0B1220" }}>
+                    <span>Plan upgrade</span>
+                    {!isPaid && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", color: "#fff" }}>FREE</span>}
                   </Link>
-                  <Link to="/dashboard/settings" onClick={() => setOpenMenu(null)} className="flex items-center gap-2.5 px-4 py-2 text-[13px] hover:bg-[#F8FAFC]" style={{ color: "#0B1220" }}>
-                    <User size={14} style={{ color: "#0EA5E9" }} /> Profile update
+                  <Link to="/dashboard/settings" onClick={() => setOpenMenu(null)} className="block px-4 py-2.5 text-[13px] font-medium hover:bg-[#F8FAFC]" style={{ color: "#0B1220" }}>
+                    Profile update
                   </Link>
-                  <button onClick={signOut} className="w-full flex items-center gap-2.5 px-4 py-2 text-[13px] hover:bg-[#FEF2F2]" style={{ color: "#DC2626" }}>
-                    <LogOut size={14} /> Log out
+                  <button onClick={signOut} className="w-full text-left px-4 py-2.5 text-[13px] font-medium hover:bg-[#FEF2F2]" style={{ color: "#DC2626" }}>
+                    Log out
                   </button>
                 </div>
               </div>
@@ -232,6 +233,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
           })}
         </nav>
       </div>
+      <AiChatbot />
     </div>
   );
 }
