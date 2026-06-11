@@ -14,7 +14,7 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
 });
 
-const GRAD = "linear-gradient(135deg, #0369A1 0%, #38BDF8 100%)";
+
 
 const COMPARE: { label: string; free: boolean | string; pro: boolean | string }[] = [
   { label: "Try-On products", free: "1", pro: "Unlimited" },
