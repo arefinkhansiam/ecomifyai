@@ -313,6 +313,7 @@ function CustomizePage() {
               <input type="range" min={0} max={30} value={radius} onChange={(e) => setRadius(Number(e.target.value))} className="w-full accent-sky-500" />
             </Field>
             <Toggle label="Button shadow" on={buttonShadow} onChange={setButtonShadow} />
+            <Toggle label="Glowing button (animated halo)" on={buttonGlow} onChange={setButtonGlow} />
           </Section>
 
           <Section title="Try-On viewer">
