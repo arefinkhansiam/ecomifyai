@@ -1,8 +1,9 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { useEffect, useRef, useState } from "react";
-import { MessageCircle, X, Send, Sparkles, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { MessageCircle, X, Send, Sparkles, Loader2, GripVertical } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { motion, useDragControls } from "framer-motion";
 
 const STORAGE_KEY = "ecomify_help_chat_v1";
 
@@ -25,12 +26,29 @@ const SUGGESTIONS = [
   "How do I customize the button color?",
 ];
 
+const POS_KEY = "ecomify_chat_pos_v1";
+
+function loadPosition() {
+  if (typeof window === "undefined") return { x: 0, y: 0 };
+  try {
+    const raw = localStorage.getItem(POS_KEY);
+    if (!raw) return { x: 0, y: 0 };
+    const p = JSON.parse(raw);
+    return { x: typeof p.x === "number" ? p.x : 0, y: typeof p.y === "number" ? p.y : 0 };
+  } catch {
+    return { x: 0, y: 0 };
+  }
+}
+
 export function AiChatbot() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [initial] = useState<UIMessage[]>(() => loadInitial());
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const dragControls = useDragControls();
+  const [pos, setPos] = useState(() => loadPosition());
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const transport = useRef(new DefaultChatTransport({ api: "/api/chat" })).current;
   const { messages, sendMessage, status, setMessages } = useChat({
@@ -67,25 +85,32 @@ export function AiChatbot() {
     try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
   };
 
-  return (
-    <>
-      {/* Launcher */}
-      <button
-        onClick={() => setOpen((v) => !v)}
-        aria-label="Open help chat"
-        className="fixed bottom-5 right-5 z-[60] w-14 h-14 rounded-full grid place-items-center text-white transition-transform hover:scale-105"
-        style={{
-          background: "linear-gradient(135deg,#0369A1 0%,#0EA5E9 50%,#38BDF8 100%)",
-          boxShadow: "0 18px 40px -10px rgba(14,165,233,0.55), 0 0 0 4px rgba(14,165,233,0.18)",
-        }}
-      >
-        {open ? <X size={22} /> : <MessageCircle size={22} />}
-      </button>
+  const handleDragEnd = useCallback(
+    (_: any, info: any) => {
+      const newPos = { x: pos.x + info.offset.x, y: pos.y + info.offset.y };
+      setPos(newPos);
+      try { localStorage.setItem(POS_KEY, JSON.stringify(newPos)); } catch { /* ignore */ }
+    },
+    [pos]
+  );
 
+  return (
+    <motion.div
+      ref={containerRef}
+      drag
+      dragControls={dragControls}
+      dragMomentum={false}
+      dragElastic={0}
+      onDragEnd={handleDragEnd}
+      initial={{ x: pos.x, y: pos.y }}
+      animate={{ x: pos.x, y: pos.y }}
+      className="fixed bottom-5 right-5 z-[60] flex flex-col items-end gap-0 pointer-events-none"
+      style={{ touchAction: "none" }}
+    >
       {/* Panel */}
       {open && (
         <div
-          className="fixed bottom-24 right-5 z-[60] w-[92vw] max-w-[380px] h-[70vh] max-h-[560px] rounded-2xl overflow-hidden flex flex-col"
+          className="pointer-events-auto mb-3 w-[92vw] max-w-[380px] h-[70vh] max-h-[560px] rounded-2xl overflow-hidden flex flex-col"
           style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", boxShadow: "0 30px 80px -20px rgba(2,132,199,0.45)" }}
         >
           {/* Header */}
@@ -175,6 +200,23 @@ export function AiChatbot() {
           </form>
         </div>
       )}
-    </>
+
+      {/* Launcher */}
+      <motion.button
+        onPointerDown={(e) => dragControls.start(e)}
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Open help chat"
+        className="pointer-events-auto w-14 h-14 rounded-full grid place-items-center text-white transition-transform hover:scale-105 relative"
+        style={{
+          background: "linear-gradient(135deg,#0369A1 0%,#0EA5E9 50%,#38BDF8 100%)",
+          boxShadow: "0 18px 40px -10px rgba(14,165,233,0.55), 0 0 0 4px rgba(14,165,233,0.18)",
+          cursor: "move",
+        }}
+        whileTap={{ scale: 0.92 }}
+      >
+        <GripVertical size={10} className="absolute top-1.5 left-1/2 -translate-x-1/2 opacity-40" />
+        {open ? <X size={22} /> : <MessageCircle size={22} />}
+      </motion.button>
+    </motion.div>
   );
 }
