@@ -102,7 +102,7 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
   }, [p.processed_image_url, p.original_image_url, user]);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const productSlug = `${slugify(p.product_name)}-${p.id.slice(0, 8)}`;
+  const productSlug = `${slugify(p.product_name)}-${p.id}`;
   const viewerUrl = `${origin}/ar/${storeSlug}/${productSlug}`;
   const embedCode = `<iframe src="${viewerUrl}" width="100%" height="550" frameborder="0" allow="xr-spatial-tracking; camera" allowfullscreen></iframe>`;
 
