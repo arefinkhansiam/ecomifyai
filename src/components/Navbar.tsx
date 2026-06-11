@@ -47,7 +47,7 @@ export function Navbar() {
           {/* Mobile: left spacer for centering */}
           <div className="md:hidden justify-self-start" />
 
-          <Link to="/" className="flex items-center justify-self-center md:justify-self-auto font-display font-extrabold tracking-tight text-[22px] md:text-[24px] leading-none">
+          <Link to="/" className="flex items-center justify-self-center md:justify-self-auto font-display font-extrabold tracking-tight text-[22px] md:text-[30px] leading-none">
             <span
               style={{
                 backgroundImage: "linear-gradient(135deg, #0B1220 0%, #0369A1 45%, #38BDF8 100%)",
@@ -60,12 +60,12 @@ export function Navbar() {
               ECOMIFY
             </span>
           </Link>
-          <nav className="hidden md:flex items-center gap-7">
+          <nav className="hidden md:flex items-center gap-10">
             {links.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className="text-[16px] font-semibold transition-colors hover:text-primary"
                 style={{
                   color: pathname === l.to
                     ? "var(--primary)"
