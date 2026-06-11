@@ -169,6 +169,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [phase, setPhase] = useState<"requesting" | "ready" | "capturing" | "processing" | "result" | "denied" | "unsupported">("requesting");
+  const [progress, setProgress] = useState(0);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<null | "liked" | "disliked">(null);
@@ -208,6 +209,16 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     return () => streamRef.current?.getTracks().forEach((t) => t.stop());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Simulated progress while the AI composes the try-on
+  useEffect(() => {
+    if (phase !== "processing") return;
+    setProgress(4);
+    const iv = setInterval(() => {
+      setProgress((p) => (p >= 95 ? 95 : p + Math.max(0.4, (95 - p) * 0.045)));
+    }, 350);
+    return () => clearInterval(iv);
+  }, [phase]);
 
   const flipCamera = () => {
     const next = facing === "user" ? "environment" : "user";
@@ -468,12 +479,17 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       {/* Processing overlay */}
       {(phase === "capturing" || phase === "processing") && (
         <div className="absolute inset-0 z-40 grid place-items-center text-center px-6" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}>
-          <div>
-            <div className="w-16 h-16 mx-auto rounded-full animate-pulse" style={{ background: cust.accent + "33", border: `2px solid ${cust.accent}` }} />
+          <div className="w-full max-w-xs">
+            <div className="w-20 h-20 mx-auto rounded-full grid place-items-center animate-pulse" style={{ background: cust.accent + "33", border: `2px solid ${cust.accent}` }}>
+              <span className="text-lg font-bold" style={{ color: cust.fontColor }}>{phase === "processing" ? `${Math.round(progress)}%` : "…"}</span>
+            </div>
             <h3 className="mt-5" style={{ color: cust.fontColor }}>
               {mode === "fashion" ? "Trying it on…" : mode === "makeup" ? "Applying makeup…" : "Placing it in your space…"}
             </h3>
-            <p className="mt-2 text-sm opacity-70">This usually takes 10–20 seconds.</p>
+            <div className="mt-4 h-1.5 w-full rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.15)" }}>
+              <div className="h-full rounded-full transition-all duration-300" style={{ width: `${phase === "processing" ? Math.round(progress) : 2}%`, background: cust.accent }} />
+            </div>
+            <p className="mt-3 text-sm opacity-70">This usually takes 10–20 seconds.</p>
           </div>
         </div>
       )}
