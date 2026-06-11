@@ -155,7 +155,7 @@ function Landing() {
             <h2 className="text-gradient-ocean">Built for Every Catalogue</h2>
             <p className="mt-4">One pipeline. Four ways to try on.</p>
           </div>
-          <div className="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { icon: Shirt, t: "Fashion", d: "T-shirts, dresses, jackets, bottoms — fit them onto the shopper's own photo." },
               { icon: Gem, t: "Jewellery & Accessories", d: "Place necklaces, rings, watches, bags and glasses with realistic scale and shadow." },
