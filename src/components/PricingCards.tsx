@@ -113,8 +113,8 @@ export function PricingCards() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10">
-      <div className="flex flex-col gap-5">
+    <div className="max-w-2xl lg:max-w-6xl mx-auto mt-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
         {PLANS.map((p) => {
           const isSelected = selected === p.id;
           const bestValue = !!p.bestValue;
