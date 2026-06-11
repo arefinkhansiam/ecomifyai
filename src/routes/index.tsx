@@ -241,6 +241,45 @@ function Landing() {
         </div>
       </section>
 
+      {/* UNLOCK FULL TRY-ON CAPABILITIES */}
+      <section className="py-20 relative overflow-hidden" style={{ background: "#02060c" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 700px 500px at 50% 30%, rgba(56,189,248,0.30), transparent 70%)" }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 500px 400px at 20% 70%, rgba(3,105,161,0.35), transparent 70%)" }} />
+        <div className="mx-auto max-w-4xl px-6 relative">
+          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]">
+            <span className="block" style={{ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Unlock Full</span>
+            <span className="block" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Try-On Capabilities</span>
+          </h2>
+          <p className="mt-4 text-center text-white/70">Everything pro brands need to convert shoppers from view to checkout.</p>
+
+          <div className="mt-12 grid grid-cols-2 gap-4">
+            {[
+              { Icon: null as any, prefix: "∞", value: "Unlimited", label: "Try-On products on Pro" },
+              { Icon: Sparkles, prefix: "", value: "120+", label: "Supported product categories" },
+              { Icon: ShieldCheck, prefix: "", value: "24/7", label: "Priority support" },
+              { Icon: BarChart2, prefix: "#", value: "1", label: "Conversion lift in category" },
+            ].map((s, i) => (
+              <div key={i} className="rounded-2xl p-5 text-center"
+                style={{
+                  background: "rgba(10,16,28,0.6)",
+                  border: "1px solid rgba(56,189,248,0.2)",
+                  backdropFilter: "blur(10px)",
+                }}>
+                <div className="flex items-center justify-center gap-2">
+                  {s.Icon && <s.Icon size={22} style={{ color: "#38BDF8" }} />}
+                  {s.prefix && !s.Icon && <span className="font-display font-extrabold text-2xl sm:text-3xl" style={{ color: "#38BDF8" }}>{s.prefix}</span>}
+                  <span className="font-display font-extrabold text-2xl sm:text-3xl" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+                    {s.Icon ? `${s.prefix}${s.value}` : s.value}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs sm:text-sm text-white/70">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
       {/* BEST PRICES IN INDUSTRY */}
       <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #051226 50%, #02060c 100%)" }}>
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 700px 500px at 50% 50%, rgba(56,189,248,0.28), transparent 70%)" }} />

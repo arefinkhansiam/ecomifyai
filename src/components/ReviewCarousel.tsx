@@ -21,25 +21,25 @@ function Row({ items, reverse = false }: { items: typeof reviews; reverse?: bool
         {loop.map((r, i) => (
           <div
             key={i}
-            className="rounded-2xl p-5 shrink-0 w-[78vw] sm:w-[340px] flex flex-col"
+            className="rounded-xl p-3.5 shrink-0 w-[240px] sm:w-[260px] flex flex-col"
             style={{
               background: "rgba(15,23,42,0.85)",
               border: "1px solid rgba(56,189,248,0.18)",
-              boxShadow: "0 20px 50px -25px rgba(2,132,199,0.45)",
+              boxShadow: "0 14px 30px -18px rgba(2,132,199,0.45)",
             }}
           >
-            <div className="flex gap-1 mb-3">
+            <div className="flex gap-0.5 mb-2">
               {[0,1,2,3,4].map((s) => (
-                <Star key={s} size={14} style={{ color: s < r.stars ? "#38BDF8" : "rgba(255,255,255,0.18)" }} fill="currentColor" />
+                <Star key={s} size={11} style={{ color: s < r.stars ? "#38BDF8" : "rgba(255,255,255,0.18)" }} fill="currentColor" />
               ))}
             </div>
-            <div className="font-display font-bold text-white text-[15px] mb-2">{r.title}</div>
-            <p className="text-[13px] leading-relaxed mb-4 text-white/70 flex-1">{r.text}</p>
-            <div className="flex items-center gap-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-              <div className="w-7 h-7 rounded-full grid place-items-center text-[10px] font-bold text-white shrink-0" style={{ background: GRAD }}>
+            <div className="font-display font-bold text-white text-[13px] mb-1.5 leading-tight">{r.title}</div>
+            <p className="text-[11px] leading-snug mb-3 text-white/65 flex-1 line-clamp-3">{r.text}</p>
+            <div className="flex items-center gap-2 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="w-6 h-6 rounded-full grid place-items-center text-[9px] font-bold text-white shrink-0" style={{ background: GRAD }}>
                 {r.initials}
               </div>
-              <div className="text-xs font-semibold text-white/90 truncate">{r.name}</div>
+              <div className="text-[11px] font-semibold text-white/90 truncate">{r.name}</div>
             </div>
           </div>
         ))}
