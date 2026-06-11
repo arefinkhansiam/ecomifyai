@@ -235,8 +235,8 @@ function Landing() {
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 30%, rgba(56,189,248,0.20), transparent 70%)" }} />
         <div className="mx-auto max-w-7xl px-6 relative">
           <div className="text-center max-w-2xl mx-auto">
-            <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl" style={{ backgroundImage: "linear-gradient(180deg, #0a1929 0%, #ffffff 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Pick Your Plan</h2>
-            <p className="mt-4 text-white/80">Start free. Upgrade when you are ready to scale.</p>
+          <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl text-white">Pick Your Plan</h2>
+          <p className="mt-4 text-white">Start free. Upgrade when you are ready to scale.</p>
           </div>
           <PricingCards />
           <p className="text-center text-sm text-white/60 mt-10">All paid plans include a 7-day free trial. Sign in required to purchase.</p>
