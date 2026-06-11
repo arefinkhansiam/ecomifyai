@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ArTokenRouteImport } from './routes/ar.$token'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as ArViewProductIdRouteImport } from './routes/ar.view.$productId'
+import { Route as ArStoreProductRouteImport } from './routes/ar.$store.$product'
 import { Route as ApiPublicTryonRelatedRouteImport } from './routes/api/public/tryon-related'
 import { Route as ApiPublicTryonFeedbackRouteImport } from './routes/api/public/tryon-feedback'
 import { Route as ApiPublicTryonEventRouteImport } from './routes/api/public/tryon-event'
@@ -88,6 +89,11 @@ const AuthenticatedDashboardIndexRoute =
 const ArViewProductIdRoute = ArViewProductIdRouteImport.update({
   id: '/ar/view/$productId',
   path: '/ar/view/$productId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArStoreProductRoute = ArStoreProductRouteImport.update({
+  id: '/ar/$store/$product',
+  path: '/ar/$store/$product',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicTryonRelatedRoute = ApiPublicTryonRelatedRouteImport.update({
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/api/public/tryon-event': typeof ApiPublicTryonEventRoute
   '/api/public/tryon-feedback': typeof ApiPublicTryonFeedbackRoute
   '/api/public/tryon-related': typeof ApiPublicTryonRelatedRoute
+  '/ar/$store/$product': typeof ArStoreProductRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/api/public/tryon-event': typeof ApiPublicTryonEventRoute
   '/api/public/tryon-feedback': typeof ApiPublicTryonFeedbackRoute
   '/api/public/tryon-related': typeof ApiPublicTryonRelatedRoute
+  '/ar/$store/$product': typeof ArStoreProductRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
@@ -245,6 +253,7 @@ export interface FileRoutesById {
   '/api/public/tryon-event': typeof ApiPublicTryonEventRoute
   '/api/public/tryon-feedback': typeof ApiPublicTryonFeedbackRoute
   '/api/public/tryon-related': typeof ApiPublicTryonRelatedRoute
+  '/ar/$store/$product': typeof ArStoreProductRoute
   '/ar/view/$productId': typeof ArViewProductIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/api/public/tryon-event'
     | '/api/public/tryon-feedback'
     | '/api/public/tryon-related'
+    | '/ar/$store/$product'
     | '/ar/view/$productId'
     | '/dashboard/'
     | '/dashboard/products/$id/customize'
@@ -299,6 +309,7 @@ export interface FileRouteTypes {
     | '/api/public/tryon-event'
     | '/api/public/tryon-feedback'
     | '/api/public/tryon-related'
+    | '/ar/$store/$product'
     | '/ar/view/$productId'
     | '/dashboard'
     | '/dashboard/products/$id/customize'
@@ -326,6 +337,7 @@ export interface FileRouteTypes {
     | '/api/public/tryon-event'
     | '/api/public/tryon-feedback'
     | '/api/public/tryon-related'
+    | '/ar/$store/$product'
     | '/ar/view/$productId'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/products/$id/customize'
@@ -347,6 +359,7 @@ export interface RootRouteChildren {
   ApiPublicTryonEventRoute: typeof ApiPublicTryonEventRoute
   ApiPublicTryonFeedbackRoute: typeof ApiPublicTryonFeedbackRoute
   ApiPublicTryonRelatedRoute: typeof ApiPublicTryonRelatedRoute
+  ArStoreProductRoute: typeof ArStoreProductRoute
   ArViewProductIdRoute: typeof ArViewProductIdRoute
 }
 
@@ -427,6 +440,13 @@ declare module '@tanstack/react-router' {
       path: '/ar/view/$productId'
       fullPath: '/ar/view/$productId'
       preLoaderRoute: typeof ArViewProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ar/$store/$product': {
+      id: '/ar/$store/$product'
+      path: '/ar/$store/$product'
+      fullPath: '/ar/$store/$product'
+      preLoaderRoute: typeof ArStoreProductRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/tryon-related': {
@@ -587,6 +607,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicTryonEventRoute: ApiPublicTryonEventRoute,
   ApiPublicTryonFeedbackRoute: ApiPublicTryonFeedbackRoute,
   ApiPublicTryonRelatedRoute: ApiPublicTryonRelatedRoute,
+  ArStoreProductRoute: ArStoreProductRoute,
   ArViewProductIdRoute: ArViewProductIdRoute,
 }
 export const routeTree = rootRouteImport

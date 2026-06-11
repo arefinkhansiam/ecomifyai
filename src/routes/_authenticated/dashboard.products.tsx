@@ -48,23 +48,26 @@ function ProductsPage() {
 
   return (
     <DashboardShell title="My Try-Ons">
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-sm">{items.length} products</p>
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <p className="text-xs uppercase tracking-wider text-muted">Catalog</p>
+          <h3 className="text-ink m-0 text-lg">{items.length} products</h3>
+        </div>
         <Link to="/dashboard/upload" className="btn-primary text-xs"><Upload size={14} /> New Product</Link>
       </div>
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[0,1,2].map(i => <div key={i} className="bg-card rounded-2xl h-64 animate-pulse" />)}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          {[0,1,2,3].map(i => <div key={i} className="bg-card rounded-xl h-48 animate-pulse" />)}
         </div>
       ) : items.length === 0 ? (
-        <div className="bg-card rounded-2xl p-12 text-center">
-          <Box size={48} className="mx-auto text-[var(--lavender)]" />
-          <h3 className="text-white mt-4">No try-on products yet</h3>
-          <p className="mt-2 text-sm">Upload your first product photo to get started.</p>
-          <Link to="/dashboard/upload" className="btn-primary mt-6 inline-flex"><Upload size={14} /> Upload Now</Link>
+        <div className="bg-card rounded-2xl p-10 text-center">
+          <Box size={40} className="mx-auto text-[var(--lavender)]" />
+          <h4 className="text-ink mt-3">No try-on products yet</h4>
+          <p className="mt-1 text-sm">Upload your first product photo to get started.</p>
+          <Link to="/dashboard/upload" className="btn-primary mt-5 inline-flex"><Upload size={14} /> Upload Now</Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {items.map((p) => (
             <ProductCard key={p.id} p={p} onDelete={() => del(p.id)} />
           ))}
@@ -74,19 +77,33 @@ function ProductsPage() {
   );
 }
 
+function slugify(s: string) {
+  return (s || "item").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50) || "item";
+}
+
 function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
+  const { user } = useAuth();
   const [thumb, setThumb] = useState<string | null>(null);
+  const [storeSlug, setStoreSlug] = useState<string>("store");
   const [copied, setCopied] = useState(false);
   useEffect(() => {
     const path = p.processed_image_url ?? p.original_image_url;
-    if (!path) return;
-    supabase.storage.from("product-images").createSignedUrl(path, 3600).then(({ data }) => {
-      if (data?.signedUrl) setThumb(data.signedUrl);
-    });
-  }, [p.processed_image_url, p.original_image_url]);
+    if (path) {
+      supabase.storage.from("product-images").createSignedUrl(path, 3600).then(({ data }) => {
+        if (data?.signedUrl) setThumb(data.signedUrl);
+      });
+    }
+    if (user) {
+      supabase.from("profiles").select("business_name, store_name, full_name").eq("id", user.id).maybeSingle().then(({ data }: any) => {
+        const name = data?.business_name || data?.store_name || data?.full_name;
+        if (name) setStoreSlug(slugify(name));
+      });
+    }
+  }, [p.processed_image_url, p.original_image_url, user]);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const viewerUrl = `${origin}/ar/view/${p.id}`;
+  const productSlug = `${slugify(p.product_name)}-${p.id.slice(0, 8)}`;
+  const viewerUrl = `${origin}/ar/${storeSlug}/${productSlug}`;
   const embedCode = `<iframe src="${viewerUrl}" width="100%" height="550" frameborder="0" allow="xr-spatial-tracking; camera" allowfullscreen></iframe>`;
 
   const copyEmbed = async () => {
@@ -97,37 +114,38 @@ function ProductCard({ p, onDelete }: { p: Product; onDelete: () => void }) {
   };
 
   return (
-    <div className="bg-card rounded-2xl overflow-hidden">
-      <div className="aspect-square relative grid place-items-center" style={{ background: `radial-gradient(ellipse at center, ${p.dominant_color}33, transparent 70%)` }}>
-        {thumb ? <img src={thumb} alt={p.product_name} className="max-h-full max-w-full object-contain" /> : <Box size={56} className="text-[var(--lavender)]" />}
-        <span className="absolute top-3 left-3 text-[10px] uppercase tracking-wider px-2 py-1 rounded-full"
+    <div className="rounded-xl overflow-hidden group transition-transform hover:-translate-y-0.5" style={{ background: "rgba(255,255,255,0.96)", border: "1px solid rgba(2,132,199,0.14)", boxShadow: "0 8px 24px -16px rgba(2,132,199,0.4)" }}>
+      <div className="aspect-square relative grid place-items-center" style={{ background: `radial-gradient(ellipse at center, ${p.dominant_color}22, transparent 70%)` }}>
+        {thumb ? <img src={thumb} alt={p.product_name} className="max-h-full max-w-full object-contain p-3" /> : <Box size={36} className="text-[var(--lavender)]" />}
+        <span className="absolute top-2 left-2 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full font-bold"
           style={{
-            background: p.status === "ready" ? "rgba(16,185,129,0.15)" : p.status === "failed" ? "rgba(239,68,68,0.15)" : "rgba(245,158,11,0.15)",
+            background: p.status === "ready" ? "rgba(16,185,129,0.18)" : p.status === "failed" ? "rgba(239,68,68,0.18)" : "rgba(245,158,11,0.18)",
             color: p.status === "ready" ? "var(--success)" : p.status === "failed" ? "var(--error)" : "var(--warning)",
-          }}>{p.status === "ready" ? "Try-On Ready" : p.status}</span>
+          }}>{p.status === "ready" ? "Ready" : p.status}</span>
       </div>
       {p.status === "processing" && (
-        <div className="h-1 bg-[var(--surface)]"><div className="h-full bg-[var(--primary)]" style={{ width: `${p.processing_progress}%` }} /></div>
+        <div className="h-0.5 bg-[var(--surface)]"><div className="h-full bg-[var(--primary)]" style={{ width: `${p.processing_progress}%` }} /></div>
       )}
-      <div className="p-4">
-        <h4 className="text-white truncate">{p.product_name}</h4>
-        <div className="text-xs text-muted mt-1">{(p.view_count ?? p.views_count ?? 0).toLocaleString()} views</div>
-        <div className="flex gap-2 mt-4 flex-wrap">
+      <div className="p-3">
+        <h5 className="text-ink truncate text-sm font-semibold m-0">{p.product_name}</h5>
+        <div className="text-[10px] text-muted mt-0.5">{(p.view_count ?? p.views_count ?? 0).toLocaleString()} views</div>
+        <div className="flex gap-1 mt-2.5">
+          <Link to="/dashboard/products/$id/customize" params={{ id: p.id }} className="flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold text-white" style={{ background: "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)" }} title="Edit">
+            <Settings2 size={11} /> Edit
+          </Link>
           {p.status === "ready" && (
-            <a href={viewerUrl} target="_blank" rel="noreferrer" className="flex-1 btn-ghost text-[10px]"><ExternalLink size={12} /> Preview Try-On</a>
+            <a href={viewerUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center w-8 h-8 rounded-lg" style={{ border: "1px solid rgba(2,132,199,0.2)", color: "var(--ink-soft)" }} title="Preview"><ExternalLink size={12} /></a>
           )}
           {p.status === "ready" && (
-            <button onClick={copyEmbed} className="btn-ghost text-[10px]">
-              {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? "Copied" : "Embed"}
+            <button onClick={copyEmbed} className="inline-flex items-center justify-center w-8 h-8 rounded-lg" style={{ border: "1px solid rgba(2,132,199,0.2)", color: "var(--ink-soft)" }} title="Embed">
+              {copied ? <Check size={12} /> : <Copy size={12} />}
             </button>
           )}
-          <Link to="/dashboard/products/$id/customize" params={{ id: p.id }} className="btn-ghost text-[10px]" title="Customize">
-            <Settings2 size={12} /> Edit
-          </Link>
-          <Link to="/dashboard/embed" search={{ product: p.id }} className="btn-ghost text-[10px]"><QrCode size={12} /></Link>
-          <button onClick={onDelete} className="btn-ghost text-[10px]" style={{ borderColor: "var(--error)", color: "var(--error)" }}><Trash2 size={12} /></button>
+          <button onClick={onDelete} className="inline-flex items-center justify-center w-8 h-8 rounded-lg" style={{ border: "1px solid rgba(239,68,68,0.35)", color: "#EF4444" }} title="Delete"><Trash2 size={12} /></button>
         </div>
       </div>
     </div>
   );
 }
+
+
