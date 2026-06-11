@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { Tag, Check as CheckIcon } from "lucide-react";
 import {
   Sparkles, Play, Star, UploadCloud, ImagePlus, Wand2, Share2,
   Shirt, Sofa, Gem, Brush, Smartphone, BarChart2, Link as LinkIcon, ShieldCheck,
