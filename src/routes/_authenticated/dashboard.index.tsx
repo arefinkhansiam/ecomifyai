@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Box, Eye, Upload, ArrowRight, TrendingUp, Crown, ArrowUpRight, MoreHorizontal } from "lucide-react";
+import { Box, Eye, Upload, ArrowRight, TrendingUp, Crown, ArrowUpRight, MoreHorizontal, Check } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: Dashboard,
