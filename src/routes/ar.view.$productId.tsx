@@ -250,9 +250,10 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       setPhase("result");
       logEvent("tryon_completed");
     } catch (e: any) {
-      setErrorMsg(e?.message || "Something went wrong");
-      setPhase("ready");
-      startCamera(facing);
+      setResultUrl(dataUrl);
+      setErrorMsg(e?.message || "AI unavailable — showing your photo so the flow completes.");
+      setPhase("result");
+      logEvent("tryon_completed", { fallback: true, reason: e?.message || "request_failed" });
     }
   };
 
@@ -280,7 +281,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
   const onPickPhoto = async (file: File | null) => {
     if (!file) return;
     if (!/^image\//.test(file.type)) { setErrorMsg("Please pick an image file"); return; }
-    if (file.size > 8 * 1024 * 1024) { setErrorMsg("Image too large (max 8MB)"); return; }
+    if (file.size > 15 * 1024 * 1024) { setErrorMsg("Image too large (max 15MB)"); return; }
     tracker.markInteract();
     const reader = new FileReader();
     reader.onload = async () => {
