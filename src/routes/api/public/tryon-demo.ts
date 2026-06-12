@@ -53,9 +53,10 @@ export const Route = createFileRoute("/api/public/tryon-demo")({
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
       POST: async ({ request }) => {
+        let parsedBody: unknown = null;
         try {
-          const body = await request.json();
-          const data = Input.parse(body);
+          parsedBody = await request.json();
+          const data = Input.parse(parsedBody);
           const demo = DEMOS[data.demo];
           const captureDataUrl = normalizeCapture(data.captureBase64);
 
@@ -104,6 +105,8 @@ export const Route = createFileRoute("/api/public/tryon-demo")({
           if (!imageUrl) return successfulFallback(captureDataUrl, "no_image_returned");
           return Response.json({ imageUrl }, { headers: CORS });
         } catch (e: any) {
+          const fallback = (parsedBody as any)?.captureBase64 ? normalizeCapture(String((parsedBody as any).captureBase64)) : null;
+          if (fallback) return successfulFallback(fallback, e?.message ?? "Bad request");
           return Response.json({ error: e?.message ?? "Bad request" }, { status: 400, headers: CORS });
         }
       },
