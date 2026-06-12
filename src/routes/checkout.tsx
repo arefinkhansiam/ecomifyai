@@ -62,8 +62,8 @@ function Checkout() {
               <div className="font-display text-5xl font-extrabold text-slate-800 mt-1">{planDef.price}<span className="text-base text-slate-400 font-normal"> / month</span></div>
               <ul className="mt-6 space-y-3">
                 {planDef.features.map((f) => (
-                  <li key={f.text} className="flex items-start gap-2 text-slate-700 text-sm">
-                    <CheckCircle2 size={18} className="text-sky-500 shrink-0 mt-0.5" /> {f.text}
+                  <li key={f} className="flex items-start gap-2 text-slate-700 text-sm">
+                    <CheckCircle2 size={18} className="text-sky-500 shrink-0 mt-0.5" /> {f}
                   </li>
                 ))}
               </ul>
