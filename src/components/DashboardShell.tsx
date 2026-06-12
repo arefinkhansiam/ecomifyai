@@ -1,10 +1,28 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, Box, BarChart2, Link as LinkIcon, CreditCard, Settings, Bell, HelpCircle, Crown, Activity, Upload, ChevronDown, BookOpen, MessageCircleQuestion } from "lucide-react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { AiChatbot } from "./AiChatbot";
+
+const dashboardTheme = {
+  background: "#F5F5F5",
+  "--bg": "#F5F5F5",
+  "--surface": "#FFFFFF",
+  "--card": "#FFFFFF",
+  "--border": "#D4D4D4",
+  "--ink": "#0A0A0A",
+  "--ink-soft": "#404040",
+  "--primary": "#0A0A0A",
+  "--primary-light": "#525252",
+  "--accent": "#171717",
+  "--muted": "#6B7280",
+  "--gradient-ocean": "linear-gradient(135deg, #000000 0%, #1F1F1F 55%, #4B5563 100%)",
+  "--gradient-soft": "linear-gradient(180deg, #FFFFFF 0%, #F4F4F5 100%)",
+  "--shadow-ocean": "0 24px 55px -28px rgba(0,0,0,0.42)",
+  "--shadow-soft": "0 16px 45px -26px rgba(0,0,0,0.28)",
+} as CSSProperties;
 
 const NAV_MAIN = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard, exact: true },
@@ -73,10 +91,10 @@ export function DashboardShell({ title, children }: { title: string; children: R
   const initial = (displayName?.[0] ?? "?").toUpperCase();
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#F1F5F9" }}>
-      {/* Sidebar - ocean gradient */}
+    <div className="min-h-screen flex dashboard-mono" style={dashboardTheme}>
+      {/* Sidebar */}
       <aside className="hidden md:flex w-60 flex-col fixed left-0 top-0 bottom-0 z-30"
-        style={{ background: "linear-gradient(180deg,#0B1220 0%,#0C2A4A 45%,#0369A1 100%)", borderRight: "1px solid rgba(56,189,248,0.15)" }}>
+        style={{ background: "linear-gradient(180deg,#000000 0%,#111111 52%,#242424 100%)", borderRight: "1px solid rgba(255,255,255,0.10)" }}>
         {/* Store switcher */}
         <div className="px-3 pt-4 pb-3 relative">
           <button
@@ -84,7 +102,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
             className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white/5 transition"
             style={{ color: "#E3E3E3" }}
           >
-            <div className="w-7 h-7 rounded-md grid place-items-center text-[11px] font-bold flex-shrink-0" style={{ background: "linear-gradient(135deg,#38BDF8,#0EA5E9)", color: "#fff", boxShadow: "0 4px 12px -4px rgba(14,165,233,0.6)" }}>
+            <div className="w-7 h-7 rounded-md grid place-items-center text-[11px] font-bold flex-shrink-0" style={{ background: "#FFFFFF", color: "#000000", boxShadow: "0 4px 12px -6px rgba(255,255,255,0.55)" }}>
               {initial}
             </div>
             <div className="min-w-0 flex-1 text-left">
@@ -97,7 +115,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
             <>
               <div className="fixed inset-0 z-40" onClick={() => setStoreMenuOpen(false)} />
               <div className="absolute left-3 right-3 top-[68px] z-50 rounded-lg overflow-hidden shadow-2xl"
-                style={{ background: "#0F1B2D", border: "1px solid rgba(56,189,248,0.25)" }}>
+                style={{ background: "#111111", border: "1px solid rgba(255,255,255,0.18)" }}>
                 <div className="px-3 py-2.5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                   <div className="text-[12px] font-semibold" style={{ color: "#E0F2FE" }}>{displayName}</div>
                   <div className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.5)" }}>{user?.email}</div>
@@ -152,11 +170,11 @@ export function DashboardShell({ title, children }: { title: string; children: R
         </nav>
 
         {/* Footer / plan */}
-        <div className="px-3 py-3 border-t" style={{ borderColor: "rgba(56,189,248,0.18)" }}>
+        <div className="px-3 py-3 border-t" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
           {!isPaid && (
-            <Link to="/dashboard/billing" className="flex items-center justify-between px-2.5 py-2 rounded-md mb-2 text-[12px] font-medium transition" style={{ color: "#fff", background: "linear-gradient(135deg,rgba(56,189,248,0.18),rgba(14,165,233,0.10))", border: "1px solid rgba(56,189,248,0.3)" }}>
-              <span className="flex items-center gap-2"><Crown size={13} style={{ color: "#FBBF24" }} /> Upgrade plan</span>
-              <span style={{ color: "#7DD3FC" }}>→</span>
+            <Link to="/dashboard/billing" className="flex items-center justify-between px-2.5 py-2 rounded-md mb-2 text-[12px] font-medium transition" style={{ color: "#000", background: "#FFFFFF", border: "1px solid rgba(255,255,255,0.55)" }}>
+              <span className="flex items-center gap-2"><Crown size={13} style={{ color: "#111111" }} /> Upgrade plan</span>
+              <span style={{ color: "#000000" }}>→</span>
             </Link>
           )}
         </div>
@@ -172,7 +190,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
             {/* Notifications */}
             <button onClick={() => setOpenMenu(openMenu === "bell" ? null : "bell")} className="w-9 h-9 rounded-md grid place-items-center hover:bg-[#F1F2F4] transition relative" title="Notifications">
               <Bell size={16} style={{ color: "#4A4A4A" }} />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full" style={{ background: "#0EA5E9" }} />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full" style={{ background: "#111111" }} />
             </button>
             {/* FAQ / Help */}
             <button onClick={() => setOpenMenu(openMenu === "help" ? null : "help")} className="w-9 h-9 rounded-md grid place-items-center hover:bg-[#F1F2F4] transition" title="FAQ & Help">
@@ -181,7 +199,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
 
             {/* Profile chip with name (desktop) */}
             <button onClick={() => setOpenMenu(openMenu === "profile" ? null : "profile")} className="ml-1 flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-[#F1F2F4] transition">
-              <span className="w-7 h-7 rounded-full overflow-hidden grid place-items-center text-[11px] font-semibold" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", color: "#fff" }}>
+              <span className="w-7 h-7 rounded-full overflow-hidden grid place-items-center text-[11px] font-semibold" style={{ background: "#111111", color: "#fff" }}>
                 {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" /> : initial}
               </span>
               <span className="hidden sm:inline text-[13px] font-semibold max-w-[140px] truncate" style={{ color: "#1A1A1A" }}>{displayName}</span>
@@ -246,7 +264,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 md:p-8 pb-24 md:pb-8" style={{ background: "#F1F2F4" }}>
+        <main className="flex-1 p-4 sm:p-6 md:p-8 pb-24 md:pb-8" style={{ background: "#F5F5F5" }}>
           <div className="max-w-[1100px] mx-auto">{children}</div>
         </main>
 
