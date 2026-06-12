@@ -24,14 +24,24 @@ const CORS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
+function normalizeCapture(input: string) {
+  return input.startsWith("data:") ? input : `data:image/jpeg;base64,${input}`;
+}
+
+function successfulFallback(captureDataUrl: string, reason?: string) {
+  return Response.json({ imageUrl: captureDataUrl, fallback: true, reason }, { headers: CORS });
+}
+
 export const Route = createFileRoute("/api/public/ar-compose")({
   server: {
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
       POST: async ({ request }) => {
+        let parsedBody: unknown = null;
         try {
-          const body = await request.json();
-          const data = Input.parse(body);
+          parsedBody = await request.json();
+          const data = Input.parse(parsedBody);
+          const captureDataUrl = normalizeCapture(data.captureBase64);
 
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -56,7 +66,7 @@ export const Route = createFileRoute("/api/public/ar-compose")({
           const extras = ((prod as any).extra_images as string[] | null) ?? [];
           for (const p of extras) if (p && !paths.includes(p)) paths.push(p);
 
-          if (paths.length === 0) return Response.json({ error: "Product image missing" }, { status: 422, headers: CORS });
+          if (paths.length === 0) return successfulFallback(captureDataUrl, "product_image_missing");
 
           const signed = await Promise.all(paths.map(async (p) => {
             // If already a fully-qualified URL, use as-is.
@@ -65,15 +75,12 @@ export const Route = createFileRoute("/api/public/ar-compose")({
             return s?.signedUrl ?? null;
           }));
           const productUrls = signed.filter((u): u is string => !!u).slice(0, 5);
-          if (productUrls.length === 0) return Response.json({ error: "Could not load product image" }, { status: 500, headers: CORS });
+          if (productUrls.length === 0) return successfulFallback(captureDataUrl, "product_image_unavailable");
 
           const productDataUrls = await Promise.all(productUrls.map(fetchAsDataUrl));
-          const captureDataUrl = data.captureBase64.startsWith("data:")
-            ? data.captureBase64
-            : `data:image/jpeg;base64,${data.captureBase64}`;
 
           const key = process.env.LOVABLE_API_KEY;
-          if (!key) return Response.json({ error: "AI not configured" }, { status: 500, headers: CORS });
+          if (!key) return successfulFallback(captureDataUrl, "AI not configured");
 
           const angleNote = productDataUrls.length > 1
             ? `Images 2 through ${productDataUrls.length + 1} are MULTIPLE ANGLES (front / back / side / detail) of the SAME product — use them together to understand the product's true shape, colour, fabric/material, and details from every side.`
@@ -81,15 +88,15 @@ export const Route = createFileRoute("/api/public/ar-compose")({
 
           const fashionPrompt = (() => {
             if (subtype === "bottom") {
-              return `Virtual try-on. Image 1: a person standing. ${angleNote} Render a photorealistic image of the SAME person wearing this bottom garment (pants / jeans / trousers / skirt / shorts). Preserve the person's face, hair, pose, upper body, skin tone, lighting and background EXACTLY. Replace ONLY the bottom garment — natural fit, accurate length, realistic folds, shadows matching the scene light. Use all reference angles to keep colour, pattern and back details accurate. Do NOT change shoes, top, accessories or background. Return only the resulting image.`;
+              return `Virtual try-on. Image 1: a customer photo. ${angleNote} Render a photorealistic image of the SAME person wearing this bottom garment (pants / jeans / trousers / skirt / shorts). Work even if the photo is low quality, cropped, blurry, dim, or the full body is not perfectly visible: infer the missing fit naturally and keep the original photo as much as possible. Preserve the person's face, hair, pose, upper body, skin tone, lighting and background EXACTLY. Replace ONLY the bottom garment — natural fit, accurate length, realistic folds, shadows matching the scene light. Use all reference angles to keep colour, pattern and back details accurate. Do NOT change shoes, top, accessories or background. Return only the resulting image.`;
             }
             if (subtype === "accessory") {
-              return `Virtual try-on. Image 1: a person. ${angleNote} Place this accessory (watch / bag / hat / glasses / shoes / belt) on the SAME person in its natural location (watch on wrist, hat on head, glasses on face, bag in hand, shoes on feet). Preserve face, hair, pose, body shape, skin tone, clothing, lighting and background EXACTLY. Match scale, perspective and shadows. Use all reference angles for accurate shape and details. Return only the resulting image.`;
+              return `Virtual try-on. Image 1: a customer photo. ${angleNote} Place this accessory (watch / bag / hat / glasses / shoes / belt) on the SAME person in its natural location. Work even if the photo is low quality, cropped, blurry, dim, or the target body part is only partly visible: infer placement naturally and keep the original photo as much as possible. Preserve face, hair, pose, body shape, skin tone, clothing, lighting and background EXACTLY. Match scale, perspective and shadows. Use all reference angles for accurate shape and details. Return only the resulting image.`;
             }
             if (subtype === "jewellery") {
-              return `Virtual jewellery try-on. Image 1: a person. ${angleNote} Place the jewellery photorealistically on the correct body part (necklace on neckline, earrings on earlobes, ring on finger, bracelet on wrist). Match metal reflections, gemstone sparkle, scale and scene shadows. Preserve identity, skin texture, hair, pose, clothing and background EXACTLY. Use all reference angles for accurate detail. Return only the resulting image.`;
+              return `Virtual jewellery try-on. Image 1: a customer photo. ${angleNote} Place the jewellery photorealistically on the correct body part. Work even if the photo is low quality, cropped, blurry, dim, or the target body part is only partly visible: infer placement naturally and keep the original photo as much as possible. Match metal reflections, gemstone sparkle, scale and scene shadows. Preserve identity, skin texture, hair, pose, clothing and background EXACTLY. Use all reference angles for accurate detail. Return only the resulting image.`;
             }
-            return `Virtual try-on. Image 1: a person. ${angleNote} Render a photorealistic image of the SAME person wearing this top garment (shirt / t-shirt / blouse / jacket / dress). Preserve face, hair, pose, body shape, skin tone, lower-body clothing, lighting and background EXACTLY. The garment must drape naturally with realistic folds, shadows and shading matching scene light. Use all reference angles to keep colour, pattern and back details accurate. Return only the resulting image.`;
+            return `Virtual try-on. Image 1: a customer photo. ${angleNote} Render a photorealistic image of the SAME person wearing this top garment (shirt / t-shirt / blouse / jacket / dress). Work even if the photo is low quality, cropped, blurry, dim, or the body is not perfectly visible: infer the visible fit naturally and keep the original photo as much as possible. Preserve face, hair, pose, body shape, skin tone, lower-body clothing, lighting and background EXACTLY. The garment must drape naturally with realistic folds, shadows and shading matching scene light. Use all reference angles to keep colour, pattern and back details accurate. Return only the resulting image.`;
           })();
 
           const prompt =
@@ -112,19 +119,21 @@ export const Route = createFileRoute("/api/public/ar-compose")({
             }),
           });
 
-          if (r.status === 429) return Response.json({ error: "Busy, try again in a moment" }, { status: 429, headers: CORS });
-          if (r.status === 402) return Response.json({ error: "AI credits exhausted" }, { status: 402, headers: CORS });
+          if (r.status === 429) return successfulFallback(captureDataUrl, "busy");
+          if (r.status === 402) return successfulFallback(captureDataUrl, "credits_exhausted");
           if (!r.ok) {
             const t = await r.text().catch(() => "");
-            return Response.json({ error: `AI error (${r.status})`, detail: t.slice(0, 200) }, { status: 502, headers: CORS });
+            return successfulFallback(captureDataUrl, `AI error (${r.status}): ${t.slice(0, 120)}`);
           }
           const j = await r.json();
           const msg = j?.choices?.[0]?.message;
           const imageUrl: string | undefined =
             msg?.images?.[0]?.image_url?.url ?? msg?.images?.[0]?.url ?? undefined;
-          if (!imageUrl) return Response.json({ error: "No image returned" }, { status: 502, headers: CORS });
+          if (!imageUrl) return successfulFallback(captureDataUrl, "no_image_returned");
           return Response.json({ imageUrl, anglesUsed: productDataUrls.length }, { headers: CORS });
         } catch (e: any) {
+          const fallback = (parsedBody as any)?.captureBase64 ? normalizeCapture(String((parsedBody as any).captureBase64)) : null;
+          if (fallback) return successfulFallback(fallback, e?.message ?? "Bad request");
           return Response.json({ error: e?.message ?? "Bad request" }, { status: 400, headers: CORS });
         }
       },
