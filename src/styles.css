@@ -178,6 +178,31 @@
     color: var(--primary); border-radius: 999px;
     padding: 6px 14px; font-size: 13px; font-weight: 500;
   }
+  .dashboard-mono .bg-card,
+  .dashboard-mono .bg-surface,
+  .dashboard-mono .bg-soft {
+    background: #ffffff !important;
+  }
+  .dashboard-mono .glow-card {
+    border: 1px solid #d4d4d4;
+    box-shadow: 0 18px 45px -28px rgba(0,0,0,0.34) !important;
+  }
+  .dashboard-mono .btn-primary,
+  .dashboard-mono .btn-cyan {
+    background: #0a0a0a !important;
+    color: #ffffff !important;
+    box-shadow: 0 16px 35px -20px rgba(0,0,0,0.55) !important;
+  }
+  .dashboard-mono .btn-ghost {
+    background: #ffffff !important;
+    border-color: #d4d4d4 !important;
+    color: #0a0a0a !important;
+  }
+  .dashboard-mono .text-primary,
+  .dashboard-mono .text-cyan,
+  .dashboard-mono .text-lavender {
+    color: #111111 !important;
+  }
   @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
   .float { animation: float 3s ease-in-out infinite; }
   @keyframes scroll-x { from { transform: translateX(0); } to { transform: translateX(-50%); } }
