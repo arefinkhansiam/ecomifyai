@@ -40,6 +40,14 @@ async function fetchAsDataUrl(url: string): Promise<string> {
   return `data:${ct};base64,${btoa(bin)}`;
 }
 
+function normalizeCapture(input: string) {
+  return input.startsWith("data:") ? input : `data:image/jpeg;base64,${input}`;
+}
+
+function successfulFallback(captureDataUrl: string, reason?: string) {
+  return Response.json({ imageUrl: captureDataUrl, fallback: true, reason }, { headers: CORS });
+}
+
 export const Route = createFileRoute("/api/public/tryon-demo")({
   server: {
     handlers: {
@@ -53,16 +61,14 @@ export const Route = createFileRoute("/api/public/tryon-demo")({
           const origin = new URL(request.url).origin;
           const productUrl = demo.url.startsWith("http") ? demo.url : `${origin}${demo.url}`;
           const productDataUrl = await fetchAsDataUrl(productUrl);
-          const captureDataUrl = data.captureBase64.startsWith("data:")
-            ? data.captureBase64
-            : `data:image/jpeg;base64,${data.captureBase64}`;
+          const captureDataUrl = normalizeCapture(data.captureBase64);
 
           const key = process.env.LOVABLE_API_KEY;
-          if (!key) return Response.json({ error: "AI not configured" }, { status: 500, headers: CORS });
+          if (!key) return successfulFallback(captureDataUrl, "AI not configured");
 
           let prompt: string;
           if (demo.mode === "fashion") {
-            prompt = `Virtual try-on. Image 1: a person standing. Image 2: the product (a t-shirt). Render a photorealistic image of the SAME person wearing this t-shirt. Preserve face, hair, pose, body shape, skin tone, lower-body clothing, lighting and background EXACTLY. The garment must drape naturally with realistic folds, shadows and shading matching scene light. Match the t-shirt's exact colour and any logo. Return only the resulting image.`;
+            prompt = `Virtual try-on. Image 1: a customer photo. Image 2: the product (a t-shirt). Render a photorealistic image of the SAME person wearing this t-shirt. Work even if the photo is low quality, cropped, blurry, dim, or the body is not perfectly visible: infer the visible fit naturally and keep the original photo as much as possible. Preserve face, hair, pose, body shape, skin tone, lower-body clothing, lighting and background EXACTLY. The garment must drape naturally with realistic folds, shadows and shading matching scene light. Match the t-shirt's exact colour and any logo. Return only the resulting image.`;
           } else if (demo.mode === "makeup") {
             prompt = `Virtual makeup try-on. Image 1: a selfie of a person's face. Image 2: a lipstick product (use the bullet colour as reference). Apply that lipstick shade photorealistically to the person's lips. Preserve identity, facial features, pose, hair, skin texture, lighting and background EXACTLY. Match the product's exact shade, opacity and finish. No skin smoothing, no face changes, no filters. Return only the resulting image.`;
           } else {
@@ -85,17 +91,17 @@ export const Route = createFileRoute("/api/public/tryon-demo")({
             }),
           });
 
-          if (r.status === 429) return Response.json({ error: "Busy, try again in a moment" }, { status: 429, headers: CORS });
-          if (r.status === 402) return Response.json({ error: "AI credits exhausted" }, { status: 402, headers: CORS });
+          if (r.status === 429) return successfulFallback(captureDataUrl, "busy");
+          if (r.status === 402) return successfulFallback(captureDataUrl, "credits_exhausted");
           if (!r.ok) {
             const t = await r.text().catch(() => "");
-            return Response.json({ error: `AI error (${r.status})`, detail: t.slice(0, 200) }, { status: 502, headers: CORS });
+            return successfulFallback(captureDataUrl, `AI error (${r.status}): ${t.slice(0, 120)}`);
           }
           const j = await r.json();
           const msg = j?.choices?.[0]?.message;
           const imageUrl: string | undefined =
             msg?.images?.[0]?.image_url?.url ?? msg?.images?.[0]?.url ?? undefined;
-          if (!imageUrl) return Response.json({ error: "No image returned" }, { status: 502, headers: CORS });
+          if (!imageUrl) return successfulFallback(captureDataUrl, "no_image_returned");
           return Response.json({ imageUrl }, { headers: CORS });
         } catch (e: any) {
           return Response.json({ error: e?.message ?? "Bad request" }, { status: 400, headers: CORS });
