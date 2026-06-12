@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Check, Crown, Sparkles, Zap, Gem, ArrowRight, Infinity as InfinityIcon, X } from "lucide-react";
+import { Check, X, Infinity as InfinityIcon, Sparkles, Zap, Crown, Gem } from "lucide-react";
 import { useAuth } from "@/lib/use-auth";
 
 export type Plan = {
@@ -8,20 +7,21 @@ export type Plan = {
   name: string;
   price: string;
   perDay: string;
+  oldPrice?: string;
   oldPerDay?: string;
   billed: string;
+  tagline: string;
   features: { icon: "check" | "infinity" | "x"; text: string }[];
   cta: string;
   href: string;
-  badge?: string;
-  bestValue?: boolean;
+  badge?: "popular" | "best";
   discount?: string;
   icon: typeof Sparkles;
 };
 
 export const PLANS: Plan[] = [
   {
-    id: "free", name: "Free Forever", price: "$0", perDay: "$0.00", billed: "Free forever",
+    id: "free", name: "Free Forever", price: "$0", perDay: "$0.00", billed: "Free forever", tagline: "Perfect to get started",
     features: [
       { icon: "check", text: "1 Try-On product" },
       { icon: "check", text: "Shareable link & QR code" },
@@ -31,10 +31,10 @@ export const PLANS: Plan[] = [
       { icon: "x", text: "Custom brand colours" },
       { icon: "x", text: "Priority support" },
     ],
-    cta: "Get Started Free", href: "/auth?mode=signup", icon: Sparkles,
+    cta: "Start for free", href: "/auth?mode=signup", icon: Sparkles,
   },
   {
-    id: "starter", name: "Starter Monthly", price: "$10", perDay: "$0.33", billed: "$10, billed monthly",
+    id: "starter", name: "Starter Monthly", price: "$10", perDay: "$0.33", billed: "$10, billed monthly", tagline: "Elevate your business",
     features: [
       { icon: "check", text: "10 Try-On products" },
       { icon: "check", text: "Remove Ecomify branding" },
@@ -44,11 +44,10 @@ export const PLANS: Plan[] = [
       { icon: "x", text: "Custom viewer skin" },
       { icon: "x", text: "Team seats" },
     ],
-    cta: "Start Starter Plan", href: "/checkout?plan=starter", icon: Zap,
-    badge: "Most Popular",
+    cta: "Get Started", href: "/checkout?plan=starter", icon: Zap, badge: "popular",
   },
   {
-    id: "growth", name: "Growth Monthly", price: "$39", perDay: "$1.30", billed: "$39, billed monthly",
+    id: "growth", name: "Growth Monthly", price: "$39", perDay: "$1.30", billed: "$39, billed monthly", tagline: "Scalability for pros",
     features: [
       { icon: "check", text: "50 Try-On products" },
       { icon: "check", text: "Custom brand colours & gradient" },
@@ -58,10 +57,10 @@ export const PLANS: Plan[] = [
       { icon: "check", text: "Same-category recommendations" },
       { icon: "x", text: "Custom viewer skin" },
     ],
-    cta: "Start Growth Plan", href: "/checkout?plan=growth", icon: Crown,
+    cta: "Try Growth", href: "/checkout?plan=growth", icon: Crown,
   },
   {
-    id: "pro", name: "Pro Monthly", price: "$49", perDay: "$1.63", oldPerDay: "$2.60", billed: "$49, billed monthly",
+    id: "pro", name: "Pro Monthly", price: "$49", oldPrice: "$79", perDay: "$1.63", oldPerDay: "$2.60", billed: "$49, billed monthly", tagline: "Unlimited everything for pros",
     features: [
       { icon: "infinity", text: "Unlimited Try-On products" },
       { icon: "check", text: "Custom viewer skin" },
@@ -72,146 +71,132 @@ export const PLANS: Plan[] = [
       { icon: "check", text: "Watermarked downloads" },
       { icon: "check", text: "24/7 Priority support" },
     ],
-    cta: "Go Pro", href: "/checkout?plan=pro", icon: Gem,
-    bestValue: true, discount: "21% OFF",
+    cta: "Upgrade to Pro", href: "/checkout?plan=pro", icon: Gem, badge: "best", discount: "21% OFF",
   },
 ];
 
-const GRAD = "linear-gradient(135deg, #0369A1 0%, #38BDF8 100%)";
-
-function FeatureIcon({ kind, active }: { kind: "check" | "infinity" | "x"; active: boolean }) {
-  const color = active ? "#38BDF8" : "#7dd3fc";
-  if (kind === "infinity") return <InfinityIcon size={16} style={{ color }} strokeWidth={2.5} />;
-  if (kind === "x") return <X size={16} className="text-white/40" strokeWidth={2.5} />;
-  return <Check size={16} style={{ color }} strokeWidth={3} />;
-}
-
-function FeatureIconRed({ kind, active, accent }: { kind: "check" | "infinity" | "x"; active: boolean; accent: string }) {
-  const color = active ? accent : "rgba(255,255,255,0.55)";
-  if (kind === "infinity") return <InfinityIcon size={16} style={{ color }} strokeWidth={2.5} />;
-  if (kind === "x") return <X size={16} className="text-white/35" strokeWidth={2.5} />;
-  return <Check size={16} style={{ color }} strokeWidth={3} />;
+function FeatureRow({ kind, text, accent }: { kind: "check" | "infinity" | "x"; text: string; accent?: boolean }) {
+  if (kind === "x") {
+    return (
+      <li className="flex items-start gap-3 text-[13.5px] text-slate-500">
+        <X size={18} strokeWidth={2.5} className="shrink-0 mt-0.5" />
+        <span className="line-through opacity-80">{text}</span>
+      </li>
+    );
+  }
+  const Icon = kind === "infinity" ? InfinityIcon : Check;
+  return (
+    <li className={`flex items-start gap-3 text-[13.5px] ${accent ? "text-sky-50 font-semibold" : "text-slate-300"}`}>
+      <Icon size={18} strokeWidth={2.75} className={`shrink-0 mt-0.5 ${accent ? "text-sky-300" : "text-sky-500"}`} />
+      <span>{text}</span>
+    </li>
+  );
 }
 
 export function PricingCards() {
-  const [selected, setSelected] = useState<string>("starter");
-  const current = PLANS.find((p) => p.id === selected) ?? PLANS[1];
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleCta = (e: React.MouseEvent) => {
+  const go = (p: Plan) => (e: React.MouseEvent) => {
     e.preventDefault();
-    if (current.id === "free") {
+    if (p.id === "free") {
       navigate({ to: "/auth", search: { mode: "signup" } });
       return;
     }
     if (!user) {
-      navigate({ to: "/auth", search: { mode: "signup", redirect: current.href } as any });
+      navigate({ to: "/auth", search: { mode: "signup", redirect: p.href } as any });
       return;
     }
-    window.location.href = current.href;
+    window.location.href = p.href;
   };
 
   return (
-    <div className="max-w-2xl lg:max-w-6xl mx-auto mt-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+    <div className="mx-auto max-w-7xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {PLANS.map((p) => {
-          const isSelected = selected === p.id;
-          const bestValue = !!p.bestValue;
-          const hasHeader = p.badge || bestValue;
+          const isStarter = p.badge === "popular";
+          const isPro = p.badge === "best";
+
+          const cardBase = "relative flex flex-col p-7 lg:p-8 rounded-3xl transition-colors";
+          let cardStyle: React.CSSProperties = {
+            background: "rgba(30, 41, 59, 0.30)",
+            border: "1px solid rgb(30, 41, 59)",
+          };
+          if (isStarter) {
+            cardStyle = {
+              background: "rgba(30, 41, 59, 0.40)",
+              border: "2px solid rgba(14, 165, 233, 0.55)",
+              boxShadow: "0 0 40px -15px rgba(14, 165, 233, 0.45)",
+            };
+          }
+          if (isPro) {
+            cardStyle = {
+              background: "linear-gradient(180deg, rgba(2, 132, 199, 0.22) 0%, rgba(30, 41, 59, 0.30) 100%)",
+              border: "1px solid rgba(14, 165, 233, 0.35)",
+              boxShadow: "0 30px 70px -30px rgba(14, 165, 233, 0.55)",
+            };
+          }
+
+          const titleColor = isStarter ? "text-sky-400" : isPro ? "text-sky-300" : "text-slate-400";
+
+          let btnClass = "w-full py-3 px-4 rounded-xl font-semibold text-[13.5px] mb-7 transition-colors";
+          let btnStyle: React.CSSProperties = { background: "#1e293b", color: "#fff" };
+          if (isStarter) {
+            btnStyle = { background: "#0EA5E9", color: "#fff", boxShadow: "0 12px 28px -12px rgba(14,165,233,0.65)" };
+          }
+          if (isPro) {
+            btnClass += " font-bold";
+            btnStyle = { background: "#fff", color: "#0F172A", boxShadow: "0 14px 30px -12px rgba(255,255,255,0.25)" };
+          }
+
           return (
-            <button
-              type="button"
-              key={p.id}
-              onClick={() => setSelected(p.id)}
-              className="relative text-left pt-3 group focus:outline-none"
-            >
-              {hasHeader && (
-                <div className="rounded-t-2xl px-5 pt-2.5 pb-3 -mb-3 text-center text-[12px] font-bold flex items-center justify-center gap-2"
-                  style={{
-                    background: GRAD,
-                    boxShadow: "0 0 40px -10px rgba(56,189,248,0.6)",
-                    color: "#fff",
-                  }}>
-                  {p.badge ?? "Best Value"}
-                  {p.discount && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold" style={{ background: "#ef4444", color: "#fff", boxShadow: "0 0 12px rgba(239,68,68,0.6)" }}>
-                      {p.discount}
-                    </span>
-                  )}
+            <div key={p.id} className={cardBase} style={cardStyle}>
+              {/* Badges */}
+              {isStarter && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-sky-500 text-white text-[10px] font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full shadow-lg">
+                  Most Popular
                 </div>
               )}
-              <div
-                className="rounded-2xl p-5 sm:p-6 relative transition-all"
-                style={{
-                  background: isSelected
-                    ? "linear-gradient(180deg, rgba(3,105,161,0.30) 0%, rgba(10,16,28,0.95) 100%)"
-                    : "rgba(10,16,28,0.95)",
-                  border: "none",
-                  boxShadow: isSelected
-                    ? "0 0 60px -10px rgba(56,189,248,0.55), inset 0 0 40px rgba(56,189,248,0.10)"
-                    : "0 20px 50px -25px rgba(0,0,0,0.6)",
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="shrink-0 mt-1 w-5 h-5 rounded-full flex items-center justify-center transition-all"
-                    style={{
-                      background: isSelected ? GRAD : "rgba(255,255,255,0.08)",
-                    }}>
-                    {isSelected && <Check size={11} strokeWidth={4} color="#fff" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-display font-extrabold text-white text-xl sm:text-2xl leading-tight">{p.name}</div>
-                    <div className="text-xs sm:text-sm text-white/55 mt-1">{p.billed}</div>
-                  </div>
-                  <div className="shrink-0 text-center px-4 py-3 rounded-xl"
-                    style={{
-                      background: isSelected ? GRAD : "linear-gradient(180deg, rgba(30,41,59,0.9), rgba(15,23,42,0.9))",
-                      minWidth: 96,
-                    }}>
-                    {p.oldPerDay && (
-                      <div className="text-[11px] leading-none mb-1 line-through" style={{ color: isSelected ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.5)" }}>{p.oldPerDay}</div>
-                    )}
-                    <div className="font-display font-extrabold text-2xl leading-none text-white">{p.perDay}</div>
-                    <div className="text-[10px] mt-1 uppercase tracking-wider" style={{ color: isSelected ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.6)" }}>per day</div>
-                  </div>
+              {isPro && (
+                <div className="absolute -top-3 right-5 bg-white text-sky-900 text-[10px] font-extrabold uppercase tracking-[0.16em] px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg">
+                  Best Value
+                  <span className="text-sky-300">|</span>
+                  <span className="text-sky-600">{p.discount}</span>
                 </div>
+              )}
 
-                <div className="my-4 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }} />
-
-                <ul className="space-y-2.5">
-                  {p.features.map((f, i) => (
-                    <li key={i} className="flex items-center gap-3 text-[14px] text-white/85">
-                      <FeatureIcon kind={f.icon} active={isSelected} />
-                      <span>{f.text}</span>
-                    </li>
-                  ))}
-                </ul>
+              {/* Header */}
+              <div className="mb-7">
+                <h3 className={`text-[15px] font-medium mb-2 ${titleColor}`}>{p.name}</h3>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-display text-[42px] leading-none font-extrabold text-white tabular-nums">{p.price}</span>
+                  <span className="text-slate-500 text-sm">/mo</span>
+                </div>
+                {p.oldPrice ? (
+                  <div className="mt-1.5 text-[11.5px] text-slate-500 line-through">was {p.oldPrice}</div>
+                ) : (
+                  <p className="text-slate-500 text-[11.5px] mt-2">{p.tagline}</p>
+                )}
               </div>
-            </button>
+
+              {/* CTA */}
+              <a href={p.href} onClick={go(p)} className={btnClass + " text-center inline-block"} style={btnStyle}>
+                {user || p.id === "free" ? p.cta : `Log in to ${p.cta}`}
+              </a>
+
+              {/* Features */}
+              <ul className="space-y-3.5 mt-1">
+                {p.features.map((f, i) => (
+                  <FeatureRow key={i} kind={f.icon} text={f.text} accent={isPro && i === 0} />
+                ))}
+              </ul>
+            </div>
           );
         })}
       </div>
 
-
-
-      {/* Single CTA */}
-      <a
-        href={current.href}
-        onClick={handleCta}
-        className="mt-8 lg:mt-10 w-full lg:max-w-md lg:mx-auto inline-flex items-center justify-center gap-3 rounded-2xl font-bold text-base py-4 px-6 transition-transform hover:-translate-y-0.5"
-        style={{
-          background: GRAD,
-          color: "#fff",
-          boxShadow: "0 25px 60px -15px rgba(56,189,248,0.7)",
-        }}
-      >
-        {user || current.id === "free" ? current.cta : `Log in to ${current.cta}`} <ArrowRight size={18} />
-      </a>
-
-
-      {!user && current.id !== "free" && (
-        <p className="text-center text-xs text-white/55 mt-3">You'll need to sign in or create an account to purchase a plan.</p>
+      {!user && (
+        <p className="text-center text-xs text-white/55 mt-8">You'll need to sign in or create an account to purchase a paid plan.</p>
       )}
     </div>
   );
