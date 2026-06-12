@@ -306,17 +306,17 @@ function Landing() {
 
 
       {/* BEST PRICES IN INDUSTRY — professional table */}
-      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 50%, #02060c 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 700px 400px at 50% 0%, rgba(56,189,248,0.18), transparent 70%)" }} />
+      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 50%, #FFFFFF 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 700px 400px at 50% 0%, rgba(56,189,248,0.12), transparent 70%)" }} />
         <div className="mx-auto max-w-4xl px-6 relative">
           <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]">
-            <span className="block" style={{ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.35) 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Best Prices</span>
+            <span className="block" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Best Prices</span>
             <span className="block" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>In Try-On Industry</span>
           </h2>
-          <p className="mt-4 text-center text-white/70 max-w-xl mx-auto">Create more with the lowest cost per try-on. Transparent pricing — no hidden fees.</p>
+          <p className="mt-4 text-center text-slate-600 max-w-xl mx-auto">Create more with the lowest cost per try-on. Transparent pricing — no hidden fees.</p>
 
-          <div className="mt-12 rounded-2xl overflow-hidden" style={{ background: "rgba(10,16,28,0.85)", boxShadow: "0 30px 80px -25px rgba(56,189,248,0.35)" }}>
-            <div className="grid grid-cols-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-white/60" style={{ background: "rgba(56,189,248,0.10)" }}>
+          <div className="mt-12 rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.95)", boxShadow: "0 30px 80px -25px rgba(56,189,248,0.25)", border: "1px solid rgba(224,242,254,0.80)" }}>
+            <div className="grid grid-cols-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500" style={{ background: "rgba(224,242,254,0.60)" }}>
               <div className="px-3 sm:px-5 py-4">Plan</div>
               <div className="px-3 sm:px-5 py-4 text-center">Monthly</div>
               <div className="px-3 sm:px-5 py-4 text-center">Per try-on</div>
@@ -329,20 +329,20 @@ function Landing() {
               { plan: "Pro", monthly: "$49", per: "$0.020", value: "50 / $1", highlight: true },
             ].map((row) => (
               <div key={row.plan} className="grid grid-cols-4 text-sm items-center" style={{
-                borderTop: "1px solid rgba(255,255,255,0.05)",
-                background: row.highlight ? "linear-gradient(90deg, rgba(56,189,248,0.10), rgba(3,105,161,0.18))" : "transparent",
+                borderTop: "1px solid rgba(2,132,199,0.08)",
+                background: row.highlight ? "linear-gradient(90deg, rgba(56,189,248,0.08), rgba(3,105,161,0.10))" : "transparent",
               }}>
-                <div className="px-3 sm:px-5 py-4 font-display font-bold text-white flex items-center gap-2">
+                <div className="px-3 sm:px-5 py-4 font-display font-bold text-slate-800 flex items-center gap-2">
                   {row.plan}
                   {row.highlight && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider" style={{ background: GRAD, color: "#fff" }}>Best</span>}
                 </div>
-                <div className="px-3 sm:px-5 py-4 text-center text-white/85 tabular-nums">{row.monthly}</div>
-                <div className="px-3 sm:px-5 py-4 text-center tabular-nums font-semibold" style={{ color: row.highlight ? "#38BDF8" : "rgba(255,255,255,0.85)" }}>{row.per}</div>
-                <div className="px-3 sm:px-5 py-4 text-center text-white/70 tabular-nums text-xs sm:text-sm">{row.value}</div>
+                <div className="px-3 sm:px-5 py-4 text-center text-slate-700 tabular-nums">{row.monthly}</div>
+                <div className="px-3 sm:px-5 py-4 text-center tabular-nums font-semibold" style={{ color: row.highlight ? "#0284C7" : "rgba(15,23,42,0.85)" }}>{row.per}</div>
+                <div className="px-3 sm:px-5 py-4 text-center text-slate-600 tabular-nums text-xs sm:text-sm">{row.value}</div>
               </div>
             ))}
           </div>
-          <p className="mt-6 text-center text-xs text-white/50">Pro delivers up to <span style={{ color: "#38BDF8" }} className="font-bold">2.3× more try-ons per dollar</span> than Starter.</p>
+          <p className="mt-6 text-center text-xs text-slate-500">Pro delivers up to <span style={{ color: "#0284C7" }} className="font-bold">2.3× more try-ons per dollar</span> than Starter.</p>
         </div>
       </section>
 
