@@ -41,10 +41,10 @@ export function Navbar() {
       />
       <header className="fixed top-3 md:top-4 left-0 right-0 z-50 px-3 md:px-10 pointer-events-none">
         <div
-          className="pointer-events-auto mx-auto max-w-[1400px] grid grid-cols-3 items-center px-4 md:px-7 h-14 md:h-20 rounded-full transition-all bg-white/90 md:bg-white/15 border border-white/85 md:border-white/30 shadow-[0_14px_40px_-18px_rgba(2,132,199,0.3)] md:shadow-[0_18px_50px_-22px_rgba(2,132,199,0.45)]"
+          className="pointer-events-auto mx-auto max-w-[1400px] grid grid-cols-3 items-center px-4 md:px-7 h-14 md:h-20 rounded-full transition-all bg-white/90 md:bg-white/80 border border-white/85 md:border-white/40 shadow-[0_14px_40px_-18px_rgba(2,132,199,0.3)] md:shadow-[0_18px_50px_-22px_rgba(2,132,199,0.45)]"
           style={{
-            backdropFilter: "blur(22px) saturate(180%)",
-            WebkitBackdropFilter: "blur(22px) saturate(180%)",
+            backdropFilter: "blur(10px) saturate(140%)",
+            WebkitBackdropFilter: "blur(10px) saturate(140%)",
           }}
         >
           {/* Left spacer (keeps logo perfectly centered) */}
