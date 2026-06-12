@@ -154,7 +154,7 @@ function AuthPage() {
           <div className={inputWrap} style={inputWrapStyle}>
             <KeyRound size={18} className="shrink-0" style={{ color: "#7dd3fc" }} />
             <input type={showPw ? "text" : "password"} className="flex-1 bg-transparent outline-none text-white placeholder:text-slate-500 text-[15px]"
-              placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+              placeholder={mode === "signup" ? "Password (min 8 characters)" : "Password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
             <button type="button" onClick={() => setShowPw(!showPw)} className="shrink-0" style={{ color: "rgba(148,163,184,0.8)" }} aria-label="Toggle password visibility">
               {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
