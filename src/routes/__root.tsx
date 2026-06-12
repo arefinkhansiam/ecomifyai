@@ -92,9 +92,13 @@ function RootComponent() {
   const router = useRouter();
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+      if (event === "SIGNED_OUT") {
+        queryClient.clear();
         router.invalidate();
-        if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+        return;
+      }
+      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
+        queryClient.invalidateQueries();
       }
     });
     return () => subscription.unsubscribe();
