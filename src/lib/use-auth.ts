@@ -17,17 +17,21 @@ export function useAuth() {
       setLoading(false);
     };
 
-    supabase.auth.getSession().then(({ data }) => {
-      bootstrapped = true;
-      applySession(data.session);
-    });
+    supabase.auth.getSession()
+      .then(({ data }) => {
+        bootstrapped = true;
+        applySession(data.session);
+      })
+      .catch(() => {
+        bootstrapped = true;
+        applySession(null);
+      });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       if (event === "INITIAL_SESSION" && !bootstrapped) return;
       applySession(s);
     });
 
-    return () => subscription.unsubscribe();
     return () => {
       cancelled = true;
       subscription.unsubscribe();
