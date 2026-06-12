@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Check, Tag, ShieldCheck } from "lucide-react";
+import { Check, Tag, ShieldCheck, Sparkles, Clock, Zap } from "lucide-react";
 import { MarketingShell } from "@/components/MarketingShell";
 import { PricingCards } from "@/components/PricingCards";
 
