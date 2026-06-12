@@ -203,26 +203,7 @@
   .dashboard-mono .text-lavender {
     color: #111111 !important;
   }
-  .dashboard-mono [style*="linear-gradient"],
-  .dashboard-mono [style*="rgba(2,132,199"],
-  .dashboard-mono [style*="rgba(14,165,233"],
-  .dashboard-mono [style*="rgba(56,189,248"] {
-    background: #111111 !important;
-    box-shadow: 0 16px 35px -22px rgba(0,0,0,0.55) !important;
-  }
-  .dashboard-mono [style*="#0369A1"],
-  .dashboard-mono [style*="#0EA5E9"],
-  .dashboard-mono [style*="#38BDF8"],
-  .dashboard-mono [style*="#0284C7"] {
-    border-color: #111111 !important;
-    color: #111111 !important;
-  }
-  .dashboard-mono .text-white,
-  .dashboard-mono [style*="background: #111111"] .text-ink,
-  .dashboard-mono [style*="background: #111111"] p,
-  .dashboard-mono [style*="background: #111111"] [style*="color"] {
-    color: #ffffff !important;
-  }
+  .dashboard-mono .text-white { color: #ffffff !important; }
   @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
   .float { animation: float 3s ease-in-out infinite; }
   @keyframes scroll-x { from { transform: translateX(0); } to { transform: translateX(-50%); } }
