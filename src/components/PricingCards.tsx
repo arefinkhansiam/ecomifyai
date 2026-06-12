@@ -93,49 +93,62 @@ export function PricingCards() {
 
   return (
     <div className="mx-auto max-w-7xl">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
         {PLANS.map((p) => {
           const isPro = p.badge === "best";
+          const isPopular = p.badge === "popular";
 
           return (
             <div
               key={p.id}
-              className="relative flex flex-col p-7 rounded-2xl transition-all duration-300 hover:-translate-y-1"
+              className="relative flex flex-col p-8 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
               style={{
-                background: "#0A0A0A",
-                border: isPro ? "1px solid rgba(56,189,248,0.55)" : "1px solid rgba(255,255,255,0.08)",
+                background: isPro
+                  ? "linear-gradient(180deg, #0B1220 0%, #050810 100%)"
+                  : "#0A0A0A",
+                border: isPro
+                  ? "1px solid rgba(56,189,248,0.6)"
+                  : "1px solid rgba(255,255,255,0.08)",
                 boxShadow: isPro
-                  ? "0 20px 50px -20px rgba(14,165,233,0.45)"
-                  : "0 10px 30px -16px rgba(0,0,0,0.5)",
+                  ? "0 30px 70px -25px rgba(14,165,233,0.55), inset 0 1px 0 rgba(255,255,255,0.06)"
+                  : "0 14px 40px -20px rgba(0,0,0,0.6)",
               }}
             >
-              {p.badge === "popular" && (
-                <div className="absolute -top-3 left-6 text-[10px] font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full"
-                  style={{ background: "#fff", color: "#0A0A0A" }}>
+              {isPopular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-[0.22em] px-3.5 py-1.5 rounded-full whitespace-nowrap"
+                  style={{ background: "#fff", color: "#0A0A0A", boxShadow: "0 6px 18px -6px rgba(0,0,0,0.4)" }}>
                   Most Popular
                 </div>
               )}
               {isPro && (
-                <div className="absolute -top-3 left-6 text-white text-[10px] font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full"
-                  style={{ background: "linear-gradient(90deg, #0EA5E9, #0284C7)" }}>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-[10px] font-bold uppercase tracking-[0.22em] px-3.5 py-1.5 rounded-full whitespace-nowrap"
+                  style={{ background: "linear-gradient(90deg, #0EA5E9, #0284C7)", boxShadow: "0 8px 20px -6px rgba(14,165,233,0.6)" }}>
                   Best Value · {p.discount}
                 </div>
               )}
 
-              {/* Header row: name + price */}
-              <div className="flex items-start justify-between gap-3 mb-1">
-                <h3 className="font-display text-[22px] font-bold text-white leading-tight">{p.name}</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="font-display text-[26px] font-extrabold text-white tabular-nums leading-none">{p.price}</span>
-                  <span className="text-[12px] text-white/50">/mo</span>
-                </div>
+              {/* Plan name */}
+              <h3 className="font-display text-[15px] font-bold uppercase tracking-[0.18em] text-white/70 mb-4">
+                {p.name}
+              </h3>
+
+              {/* Price block */}
+              <div className="flex items-baseline gap-1.5 mb-2">
+                <span className="font-display text-[44px] font-extrabold text-white tabular-nums leading-none tracking-tight">
+                  {p.price}
+                </span>
+                <span className="text-[13px] font-medium text-white/45">/month</span>
               </div>
 
-              {/* Tagline in accent */}
+              {p.oldPrice && (
+                <p className="text-[12px] text-white/40 line-through mb-2 tabular-nums">was {p.oldPrice}/mo</p>
+              )}
+
+              {/* Tagline */}
               <p
-                className="text-[13.5px] font-medium mb-1"
+                className="text-[14px] font-semibold mb-6 leading-snug"
                 style={{
-                  background: "linear-gradient(90deg, #38BDF8, #0EA5E9)",
+                  background: "linear-gradient(90deg, #7DD3FC, #0EA5E9)",
                   WebkitBackgroundClip: "text",
                   backgroundClip: "text",
                   color: "transparent",
@@ -144,43 +157,55 @@ export function PricingCards() {
                 {p.tagline}
               </p>
 
-              {p.oldPrice && (
-                <p className="text-[11px] text-white/40 line-through mb-1">was {p.oldPrice}/mo</p>
-              )}
-
-              {/* CTA — pill outlined like Shopify */}
+              {/* CTA */}
               <a
                 href={p.href}
                 onClick={go(p)}
-                className="w-full py-3 px-4 mt-5 mb-7 rounded-full font-semibold text-[13.5px] text-center inline-block transition-all duration-200"
+                className="w-full py-3.5 px-4 mb-7 rounded-full font-semibold text-[14px] text-center inline-block transition-all duration-200 hover:scale-[1.02]"
                 style={
                   isPro
                     ? {
-                        background: "linear-gradient(90deg, #0EA5E9, #0284C7)",
+                        background: "linear-gradient(90deg, #38BDF8, #0284C7)",
                         color: "#fff",
-                        border: "1px solid transparent",
-                        boxShadow: "0 10px 24px -10px rgba(14,165,233,0.55)",
+                        boxShadow: "0 12px 28px -10px rgba(14,165,233,0.7)",
                       }
                     : {
-                        background: "transparent",
-                        color: "#fff",
-                        border: "1.5px solid rgba(255,255,255,0.85)",
+                        background: "#fff",
+                        color: "#0A0A0A",
+                        boxShadow: "0 6px 18px -8px rgba(255,255,255,0.4)",
                       }
                 }
               >
-                {user || p.id === "free" ? p.cta : `Log in to ${p.cta}`}
+                {user || p.id === "free" ? p.cta : `Sign in to ${p.cta}`}
               </a>
 
-              {/* Features list — no icons, just rows divided by hairlines (Shopify-style) */}
-              <ul className="flex-1 flex flex-col">
+              {/* Divider label */}
+              <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40 mb-3">
+                What's included
+              </div>
+
+              {/* Features */}
+              <ul className="flex-1 flex flex-col gap-2.5">
                 {p.features.map((f, i) => (
                   <li
                     key={i}
-                    className={`py-3 text-[13.5px] leading-snug ${f.icon === "x" ? "text-white/35 line-through" : "text-white/85"}`}
-                    style={{ borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.06)" }}
+                    className={`flex items-start gap-2.5 text-[13.5px] leading-snug ${
+                      f.icon === "x" ? "text-white/35" : "text-white/85"
+                    }`}
                   >
-                    {f.icon === "infinity" ? "Unlimited — " : ""}
-                    {f.text}
+                    <span
+                      className="mt-[3px] shrink-0 w-4 h-4 rounded-full grid place-items-center text-[10px] font-bold"
+                      style={
+                        f.icon === "x"
+                          ? { background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)" }
+                          : f.icon === "infinity"
+                          ? { background: "linear-gradient(135deg, #38BDF8, #0284C7)", color: "#fff" }
+                          : { background: "rgba(14,165,233,0.18)", color: "#7DD3FC" }
+                      }
+                    >
+                      {f.icon === "x" ? "✕" : f.icon === "infinity" ? "∞" : "✓"}
+                    </span>
+                    <span className={f.icon === "x" ? "line-through" : ""}>{f.text}</span>
                   </li>
                 ))}
               </ul>
@@ -190,7 +215,9 @@ export function PricingCards() {
       </div>
 
       {!user && (
-        <p className="text-center text-xs text-white/40 mt-8">You'll need to sign in or create an account to purchase a paid plan.</p>
+        <p className="text-center text-[13px] text-white/45 mt-10">
+          You'll need to sign in or create an account to purchase a paid plan.
+        </p>
       )}
     </div>
   );
