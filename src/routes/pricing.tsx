@@ -53,19 +53,63 @@ function PricingPage() {
           </h1>
           <p className="mt-4 text-slate-600">You're one step away. Pick a plan to start selling try-ons.</p>
 
-          {/* Promo ticket */}
-          <div className="mt-10 mx-auto max-w-2xl rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(3,105,161,0.15), rgba(56,189,248,0.12))", border: "1px solid rgba(56,189,248,0.35)", boxShadow: "0 30px 70px -25px rgba(56,189,248,0.35)" }}>
-            <div className="py-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-700 flex items-center justify-center gap-2" style={{ background: "rgba(224,242,254,0.6)" }}>
-              <Tag size={12} style={{ color: "#0284C7" }} /> <span style={{ color: "#0284C7" }}>launch_promo</span> is applied
-            </div>
-            <div className="grid grid-cols-2 divide-x" style={{ borderColor: "rgba(2,132,199,0.15)" }}>
-              <div className="py-6">
-                <div className="font-display font-extrabold text-3xl" style={{ color: "#0284C7" }}>21% OFF</div>
-                <div className="mt-1 text-[11px] uppercase tracking-wider text-slate-500">Limited promo</div>
+          {/* Premium promo ticket */}
+          <div className="mt-10 mx-auto max-w-3xl relative group">
+            {/* Glow halo */}
+            <div
+              className="absolute -inset-1 rounded-[28px] opacity-70 blur-2xl pointer-events-none transition-opacity group-hover:opacity-90"
+              style={{ background: "linear-gradient(135deg, rgba(56,189,248,0.55), rgba(3,105,161,0.5), rgba(14,165,233,0.45))" }}
+            />
+            <div
+              className="relative rounded-[24px] overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg, #0B1220 0%, #0F2A44 55%, #0369A1 100%)",
+                border: "1px solid rgba(56,189,248,0.45)",
+                boxShadow: "0 30px 80px -25px rgba(3,105,161,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
+              }}
+            >
+              {/* shimmer overlay */}
+              <div
+                className="absolute inset-0 opacity-[0.18] pointer-events-none"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle at 20% 0%, rgba(56,189,248,0.6), transparent 40%), radial-gradient(circle at 80% 100%, rgba(125,211,252,0.45), transparent 45%)",
+                }}
+              />
+              {/* Header */}
+              <div className="relative flex items-center justify-center gap-2 py-3 px-4 text-[11px] font-bold uppercase tracking-[0.22em] border-b" style={{ borderColor: "rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}>
+                <Sparkles size={13} className="text-sky-300" />
+                <span className="text-sky-300">launch_promo</span>
+                <span className="text-white/60">is applied</span>
               </div>
-              <div className="py-6">
-                <div className="font-display font-extrabold text-3xl text-slate-800 tabular-nums">{m} : {sec}</div>
-                <div className="mt-1 text-[11px] uppercase tracking-wider text-slate-500">minutes · seconds</div>
+
+              <div className="relative grid grid-cols-1 sm:grid-cols-[1.1fr_auto_1fr] items-center gap-0">
+                {/* Discount */}
+                <div className="py-7 px-6 text-center sm:text-left">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" style={{ background: "rgba(56,189,248,0.15)", color: "#7DD3FC", border: "1px solid rgba(56,189,248,0.35)" }}>
+                    <Zap size={11} /> Save big today
+                  </div>
+                  <div className="mt-2 font-display font-extrabold text-5xl sm:text-6xl tracking-tight leading-none" style={{ backgroundImage: "linear-gradient(135deg, #FFFFFF 0%, #7DD3FC 60%, #38BDF8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+                    21% OFF
+                  </div>
+                  <div className="mt-2 text-[11px] uppercase tracking-[0.2em] text-sky-200/70">Limited launch promo</div>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden sm:block h-24 w-px mx-auto" style={{ background: "linear-gradient(180deg, transparent, rgba(255,255,255,0.18), transparent)" }} />
+
+                {/* Countdown */}
+                <div className="py-7 px-6 text-center sm:text-right">
+                  <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-sky-200/80">
+                    <Clock size={11} /> Ends in
+                  </div>
+                  <div className="mt-2 flex items-center justify-center sm:justify-end gap-2 tabular-nums">
+                    <span className="font-display font-extrabold text-4xl sm:text-5xl text-white px-3 py-1.5 rounded-xl min-w-[64px] sm:min-w-[78px]" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}>{m}</span>
+                    <span className="font-display font-extrabold text-3xl sm:text-4xl text-sky-300 animate-pulse">:</span>
+                    <span className="font-display font-extrabold text-4xl sm:text-5xl text-white px-3 py-1.5 rounded-xl min-w-[64px] sm:min-w-[78px]" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}>{sec}</span>
+                  </div>
+                  <div className="mt-2 text-[11px] uppercase tracking-[0.2em] text-sky-200/70">minutes · seconds</div>
+                </div>
               </div>
             </div>
           </div>
