@@ -472,8 +472,14 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
       {/* Garment preview thumbnail */}
       {phase === "ready" && imageUrl && (
-        <div className="absolute z-30 left-4 top-32 w-16 h-20 rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: cust.fontColor }}>
-          <img src={imageUrl} alt="" className="w-full h-full object-contain bg-white/10" />
+        <div className="absolute z-30 left-4 top-32 w-16 h-20 rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: cust.fontColor, background: "rgba(255,255,255,0.1)" }}>
+          <img
+            src={imageUrl}
+            alt={product.product_name || "Product"}
+            className="w-full h-full object-contain"
+            referrerPolicy="no-referrer"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+          />
         </div>
       )}
 
