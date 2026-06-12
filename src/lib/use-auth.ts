@@ -39,8 +39,6 @@ function authLog(event: AuthChangeEvent | "BOOTSTRAP_ERROR", session?: Session |
 }
 
 export function initializeAuth() {
-  if (initPromise) return initPromise;
-
   if (!authSubscription) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       authLog(event, session);
@@ -54,6 +52,9 @@ export function initializeAuth() {
     });
     authSubscription = subscription;
   }
+
+  if (bootstrapped) return Promise.resolve(snapshot.session);
+  if (initPromise) return initPromise;
 
   initPromise = supabase.auth.getSession()
     .then(({ data, error }) => {
@@ -75,7 +76,7 @@ export function initializeAuth() {
 
 export async function getStableAuthSession(timeoutMs = 4500) {
   const timeout = new Promise<Session | null>((resolve) => {
-    window.setTimeout(() => resolve(snapshot.session), timeoutMs);
+    setTimeout(() => resolve(snapshot.session), timeoutMs);
   });
   return Promise.race([initializeAuth(), timeout]);
 }
