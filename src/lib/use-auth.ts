@@ -46,7 +46,7 @@ export function initializeAuth() {
       authLog(event, session);
       if (event === "INITIAL_SESSION" && !bootstrapped) return;
       bootstrapped = true;
-      if (event === "SIGNED_OUT" || event === "USER_DELETED") {
+      if (event === "SIGNED_OUT") {
         setAuthSession(null);
         return;
       }
