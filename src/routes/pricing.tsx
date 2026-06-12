@@ -45,27 +45,27 @@ function PricingPage() {
   return (
     <MarketingShell>
       {/* HEADER + PROMO */}
-      <section className="relative overflow-hidden pt-20 pb-12" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 100%)" }}>
+      <section className="relative overflow-hidden pt-20 pb-12" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #E0F2FE 100%)" }}>
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 900px 500px at 50% 0%, rgba(56,189,248,0.18), transparent 70%)" }} />
         <div className="mx-auto max-w-5xl px-6 text-center relative">
-          <h1 className="font-display font-extrabold uppercase tracking-tight text-4xl sm:text-6xl" style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+          <h1 className="font-display font-extrabold uppercase tracking-tight text-4xl sm:text-6xl" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
             Pick Your Plan
           </h1>
-          <p className="mt-4 text-white/70">You're one step away. Pick a plan to start selling try-ons.</p>
+          <p className="mt-4 text-slate-600">You're one step away. Pick a plan to start selling try-ons.</p>
 
           {/* Promo ticket */}
-          <div className="mt-10 mx-auto max-w-2xl rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(3,105,161,0.35), rgba(56,189,248,0.25))", border: "1px solid rgba(56,189,248,0.4)", boxShadow: "0 30px 70px -25px rgba(56,189,248,0.55)" }}>
-            <div className="py-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-white flex items-center justify-center gap-2" style={{ background: "rgba(2,6,12,0.4)" }}>
-              <Tag size={12} style={{ color: "#38BDF8" }} /> <span style={{ color: "#38BDF8" }}>launch_promo</span> is applied
+          <div className="mt-10 mx-auto max-w-2xl rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(3,105,161,0.15), rgba(56,189,248,0.12))", border: "1px solid rgba(56,189,248,0.35)", boxShadow: "0 30px 70px -25px rgba(56,189,248,0.35)" }}>
+            <div className="py-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-700 flex items-center justify-center gap-2" style={{ background: "rgba(224,242,254,0.6)" }}>
+              <Tag size={12} style={{ color: "#0284C7" }} /> <span style={{ color: "#0284C7" }}>launch_promo</span> is applied
             </div>
-            <div className="grid grid-cols-2 divide-x" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+            <div className="grid grid-cols-2 divide-x" style={{ borderColor: "rgba(2,132,199,0.15)" }}>
               <div className="py-6">
-                <div className="font-display font-extrabold text-3xl" style={{ color: "#38BDF8" }}>21% OFF</div>
-                <div className="mt-1 text-[11px] uppercase tracking-wider text-white/60">Limited promo</div>
+                <div className="font-display font-extrabold text-3xl" style={{ color: "#0284C7" }}>21% OFF</div>
+                <div className="mt-1 text-[11px] uppercase tracking-wider text-slate-500">Limited promo</div>
               </div>
               <div className="py-6">
-                <div className="font-display font-extrabold text-3xl text-white tabular-nums">{m} : {sec}</div>
-                <div className="mt-1 text-[11px] uppercase tracking-wider text-white/60">minutes · seconds</div>
+                <div className="font-display font-extrabold text-3xl text-slate-800 tabular-nums">{m} : {sec}</div>
+                <div className="mt-1 text-[11px] uppercase tracking-wider text-slate-500">minutes · seconds</div>
               </div>
             </div>
           </div>
@@ -73,60 +73,60 @@ function PricingPage() {
       </section>
 
       {/* CARDS */}
-      <section className="py-12 relative" style={{ background: "linear-gradient(180deg, #050d1a 0%, #02060c 100%)" }}>
+      <section className="py-12 relative" style={{ background: "linear-gradient(180deg, #E0F2FE 0%, #FFFFFF 100%)" }}>
         <div className="mx-auto max-w-7xl px-6 relative">
           <PricingCards />
         </div>
       </section>
 
       {/* COMPARISON TABLE */}
-      <section className="py-20 relative" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 0%, rgba(56,189,248,0.12), transparent 70%)" }} />
+      <section className="py-20 relative" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 0%, rgba(56,189,248,0.10), transparent 70%)" }} />
         <div className="mx-auto max-w-4xl px-6 relative">
-          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
             Unlock Full Try-On Capabilities
           </h2>
           <div className="mt-12 relative">
             {/* Glow on Pro column */}
             <div className="grid grid-cols-[1.6fr_1fr_1fr] items-center text-sm">
-              <div className="text-white/60 font-semibold uppercase tracking-wider text-xs py-4">What you'll get</div>
-              <div className="text-center font-bold text-white/70 py-4">Free</div>
-              <div className="text-center font-bold py-4 rounded-t-2xl" style={{ color: "#38BDF8", background: "linear-gradient(180deg, rgba(56,189,248,0.15), transparent)", border: "1.5px solid #38BDF8", borderBottom: "none", boxShadow: "0 -10px 40px -10px rgba(56,189,248,0.4)" }}>Pro</div>
+              <div className="text-slate-500 font-semibold uppercase tracking-wider text-xs py-4">What you'll get</div>
+              <div className="text-center font-bold text-slate-600 py-4">Free</div>
+              <div className="text-center font-bold py-4 rounded-t-2xl" style={{ color: "#0284C7", background: "linear-gradient(180deg, rgba(56,189,248,0.10), transparent)", border: "1.5px solid #38BDF8", borderBottom: "none", boxShadow: "0 -10px 40px -10px rgba(56,189,248,0.25)" }}>Pro</div>
               {COMPARE.map((row, i) => (
                 <div key={row.label} className="contents">
-                  <div className="py-4 text-white/85 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>{row.label}</div>
-                  <div className="py-4 text-center text-white/40 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-                    {typeof row.free === "boolean" ? (row.free ? <Check size={16} className="inline" style={{ color: "#38BDF8" }} /> : <span>–</span>) : row.free}
+                  <div className="py-4 text-slate-700 border-t" style={{ borderColor: "rgba(2,132,199,0.10)" }}>{row.label}</div>
+                  <div className="py-4 text-center text-slate-400 border-t" style={{ borderColor: "rgba(2,132,199,0.10)" }}>
+                    {typeof row.free === "boolean" ? (row.free ? <Check size={16} className="inline" style={{ color: "#0284C7" }} /> : <span>–</span>) : row.free}
                   </div>
                   <div
                     className="py-4 text-center"
                     style={{
                       borderLeft: "1.5px solid #38BDF8",
                       borderRight: "1.5px solid #38BDF8",
-                      borderTop: i === 0 ? "none" : "1px solid rgba(56,189,248,0.15)",
+                      borderTop: i === 0 ? "none" : "1px solid rgba(56,189,248,0.12)",
                       borderBottom: i === COMPARE.length - 1 ? "1.5px solid #38BDF8" : undefined,
-                      background: "linear-gradient(180deg, rgba(56,189,248,0.05), rgba(56,189,248,0.02))",
+                      background: "linear-gradient(180deg, rgba(56,189,248,0.04), rgba(56,189,248,0.01))",
                       borderBottomLeftRadius: i === COMPARE.length - 1 ? 16 : 0,
                       borderBottomRightRadius: i === COMPARE.length - 1 ? 16 : 0,
                     }}
                   >
-                    {typeof row.pro === "boolean" ? (row.pro ? <Check size={16} className="inline" style={{ color: "#38BDF8" }} /> : <span className="text-white/40">–</span>) : <span className="text-white font-semibold">{row.pro}</span>}
+                    {typeof row.pro === "boolean" ? (row.pro ? <Check size={16} className="inline" style={{ color: "#0284C7" }} /> : <span className="text-slate-400">–</span>) : <span className="text-slate-800 font-semibold">{row.pro}</span>}
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="mt-10 flex items-center justify-center gap-2 text-xs text-white/60">
-            <ShieldCheck size={14} style={{ color: "#38BDF8" }} /> 7-day free trial · cancel anytime · pay safe & secure
+          <div className="mt-10 flex items-center justify-center gap-2 text-xs text-slate-500">
+            <ShieldCheck size={14} style={{ color: "#0284C7" }} /> 7-day free trial · cancel anytime · pay safe & secure
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-20" style={{ background: "linear-gradient(180deg, #050d1a 0%, #02060c 100%)" }}>
+      <section className="py-20" style={{ background: "linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)" }}>
         <div className="mx-auto max-w-3xl px-6">
-          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl mb-10 leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl mb-10 leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
             Frequently Asked Questions
           </h2>
           <div className="space-y-3">
@@ -138,12 +138,12 @@ function PricingPage() {
               { q: "Is my shopper data safe?", a: "Yes. Shopper photos are processed for the try-on only and never used for training. Enterprise-grade storage." },
               { q: "Do you offer refunds?", a: "If something is broken, contact support and we'll make it right. Otherwise, cancel anytime to stop future charges." },
             ].map((f) => (
-              <details key={f.q} className="group rounded-2xl px-5 py-4" style={{ background: "rgba(15,23,42,0.85)", border: "1px solid rgba(56,189,248,0.15)" }}>
-                <summary className="flex items-center justify-between cursor-pointer list-none text-white font-semibold">
+              <details key={f.q} className="group rounded-2xl px-5 py-4" style={{ background: "rgba(255,255,255,0.95)", border: "1px solid rgba(56,189,248,0.20)", boxShadow: "0 4px 20px -8px rgba(2,132,199,0.15)" }}>
+                <summary className="flex items-center justify-between cursor-pointer list-none text-slate-800 font-semibold">
                   {f.q}
-                  <span className="text-white/50 group-open:rotate-180 transition-transform">⌄</span>
+                  <span className="text-slate-400 group-open:rotate-180 transition-transform">⌄</span>
                 </summary>
-                <p className="mt-3 text-sm text-white/70 leading-relaxed">{f.a}</p>
+                <p className="mt-3 text-sm text-slate-600 leading-relaxed">{f.a}</p>
               </details>
             ))}
           </div>
