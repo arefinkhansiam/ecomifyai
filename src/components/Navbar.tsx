@@ -41,19 +41,17 @@ export function Navbar() {
       />
       <header className="fixed top-3 md:top-4 left-0 right-0 z-50 px-3 md:px-10 pointer-events-none">
         <div
-          className="pointer-events-auto mx-auto max-w-[1400px] grid grid-cols-3 md:flex items-center md:justify-between px-4 md:px-7 h-14 md:h-20 rounded-full transition-all bg-white/90 md:bg-white/15 border border-white/85 md:border-white/30 shadow-[0_14px_40px_-18px_rgba(2,132,199,0.3)] md:shadow-[0_18px_50px_-22px_rgba(2,132,199,0.45)]"
+          className="pointer-events-auto mx-auto max-w-[1400px] grid grid-cols-3 items-center px-4 md:px-7 h-14 md:h-20 rounded-full transition-all bg-white/90 md:bg-white/15 border border-white/85 md:border-white/30 shadow-[0_14px_40px_-18px_rgba(2,132,199,0.3)] md:shadow-[0_18px_50px_-22px_rgba(2,132,199,0.45)]"
           style={{
             backdropFilter: "blur(22px) saturate(180%)",
             WebkitBackdropFilter: "blur(22px) saturate(180%)",
           }}
         >
+          {/* Left spacer (keeps logo perfectly centered) */}
+          <div className="justify-self-start" />
 
-
-
-          {/* Mobile: left spacer for centering */}
-          <div className="md:hidden justify-self-start" />
-
-          <Link to="/" className="flex items-center justify-self-center md:justify-self-auto font-display font-extrabold tracking-tight text-[22px] md:text-[30px] leading-none">
+          {/* Centered logo */}
+          <Link to="/" className="flex items-center justify-self-center font-display font-extrabold tracking-tight text-[22px] md:text-[30px] leading-none">
             <span
               style={{
                 backgroundImage: "linear-gradient(135deg, #0B1220 0%, #0369A1 45%, #38BDF8 100%)",
@@ -66,70 +64,40 @@ export function Navbar() {
               ECOMIFY
             </span>
           </Link>
-          <nav className="hidden md:flex items-center gap-10">
-            {links.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                className="text-[16px] font-semibold transition-colors hover:text-primary"
-                style={{
-                  color: pathname === l.to
-                    ? "var(--primary)"
-                    : "var(--ink-soft)",
-                }}
+
+          {/* Right: 3-dot menu button (both desktop & mobile) */}
+          <div className="justify-self-end flex items-center gap-2">
+            {user && (
+              <button
+                onClick={() => setOpen((o) => !o)}
+                className="hidden md:flex w-9 h-9 rounded-full bg-[var(--primary)] items-center justify-center text-white font-display font-bold text-sm"
+                aria-label="Account"
               >
-                {l.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="hidden md:flex items-center gap-3">
-            {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setOpen((o) => !o)}
-                  className="flex items-center gap-2"
-                >
-                  <div className="w-9 h-9 rounded-full bg-[var(--primary)] grid place-items-center text-white font-display font-bold">
-                    {user.email?.[0].toUpperCase()}
-                  </div>
+                {user.email?.[0].toUpperCase()}
+              </button>
+            )}
+            <button
+              onClick={() => setMenuOpen(true)}
+              className="w-10 h-10 md:w-11 md:h-11 rounded-full grid place-items-center bg-white/80 md:bg-white/25 border border-white/70 md:border-white/40 hover:bg-white transition shadow-sm"
+              aria-label="Open menu"
+              style={{ color: "var(--ink)" }}
+            >
+              <MoreVertical size={20} />
+            </button>
+            {open && user && (
+              <div className="absolute right-4 top-20 w-52 rounded-xl bg-card p-2 shadow-2xl border border-[var(--border)]">
+                <Link to="/dashboard" onClick={() => setOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-ink text-sm">
+                  <LayoutDashboard size={16} /> Dashboard
+                </Link>
+                <Link to="/dashboard/settings" onClick={() => setOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-ink text-sm">
+                  <Settings size={16} /> Settings
+                </Link>
+                <button onClick={signOut} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-ink text-sm">
+                  <LogOut size={16} /> Sign Out
                 </button>
-                {open && (
-                  <div className="absolute right-0 top-12 w-48 rounded-xl bg-card p-2 shadow-2xl border border-[var(--border)]">
-                    <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-ink text-sm">
-                      <LayoutDashboard size={16} /> Dashboard
-                    </Link>
-                    <Link to="/dashboard/settings" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-ink text-sm">
-                      <Settings size={16} /> Settings
-                    </Link>
-                    <button onClick={signOut} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface)] text-ink text-sm">
-                      <LogOut size={16} /> Sign Out
-                    </button>
-                  </div>
-                )}
               </div>
-            ) : (
-              <>
-                <Link
-                  to="/auth"
-                  search={{ mode: "signin" }}
-                  className="text-[15px] font-semibold hover:text-primary transition-colors"
-                  style={{ color: "var(--ink-soft)" }}
-                >
-                  Sign In
-                </Link>
-                <Link to="/auth" search={{ mode: "signup" }} className="px-6 py-2.5 rounded-full bg-[var(--primary)] text-white text-[15px] font-semibold hover:brightness-110 transition shadow-lg shadow-sky-500/30">
-                  Get Started
-                </Link>
-              </>
             )}
           </div>
-          <button
-            className="md:hidden justify-self-end"
-            onClick={() => setMenuOpen(true)}
-            style={{ color: "var(--ink)" }}
-          >
-            <Menu size={24} />
-          </button>
         </div>
       </header>
       <AnimatePresence>
@@ -150,10 +118,13 @@ export function Navbar() {
             ))}
             <div className="flex flex-col gap-3 w-64 mt-4">
               {user ? (
-                <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="btn-primary w-full">Dashboard</Link>
+                <>
+                  <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="btn-primary w-full">Dashboard</Link>
+                  <button onClick={() => { setMenuOpen(false); signOut(); }} className="btn-ghost w-full text-white border-white/30">Sign Out</button>
+                </>
               ) : (
                 <>
-                  <Link to="/auth" search={{ mode: "signin" }} onClick={() => setMenuOpen(false)} className="btn-ghost w-full">Sign In</Link>
+                  <Link to="/auth" search={{ mode: "signin" }} onClick={() => setMenuOpen(false)} className="btn-ghost w-full text-white border-white/30">Sign In</Link>
                   <Link to="/auth" search={{ mode: "signup" }} onClick={() => setMenuOpen(false)} className="btn-primary w-full">Get Started</Link>
                 </>
               )}
