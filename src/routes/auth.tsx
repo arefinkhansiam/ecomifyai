@@ -44,7 +44,17 @@ function AuthPage() {
   const [gLoading, setGLoading] = useState(false);
 
   const done = () => {
-    if (search.redirect) { window.location.href = search.redirect; return; }
+    if (search.redirect) {
+      try {
+        const target = new URL(search.redirect, window.location.origin);
+        if (target.origin === window.location.origin) {
+          window.location.href = `${target.pathname}${target.search}${target.hash}`;
+          return;
+        }
+      } catch (error) {
+        console.warn("[auth] ignored invalid redirect", error);
+      }
+    }
     navigate({ to: "/dashboard" });
   };
 
@@ -143,18 +153,18 @@ function AuthPage() {
             <div className={inputWrap} style={inputWrapStyle}>
               <User size={18} className="shrink-0" style={{ color: "#7dd3fc" }} />
               <input className="flex-1 bg-transparent outline-none text-white placeholder:text-slate-500 text-[15px]"
-                placeholder="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+                placeholder="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" required />
             </div>
           )}
           <div className={inputWrap} style={inputWrapStyle}>
             <Mail size={18} className="shrink-0" style={{ color: "#7dd3fc" }} />
             <input type="email" className="flex-1 bg-transparent outline-none text-white placeholder:text-slate-500 text-[15px]"
-              placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
           </div>
           <div className={inputWrap} style={inputWrapStyle}>
             <KeyRound size={18} className="shrink-0" style={{ color: "#7dd3fc" }} />
             <input type={showPw ? "text" : "password"} className="flex-1 bg-transparent outline-none text-white placeholder:text-slate-500 text-[15px]"
-              placeholder={mode === "signup" ? "Password (min 8 characters)" : "Password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+              placeholder={mode === "signup" ? "Password (min 8 characters)" : "Password"} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} required minLength={8} />
             <button type="button" onClick={() => setShowPw(!showPw)} className="shrink-0" style={{ color: "rgba(148,163,184,0.8)" }} aria-label="Toggle password visibility">
               {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
