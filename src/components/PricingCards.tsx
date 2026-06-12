@@ -78,7 +78,7 @@ export const PLANS: Plan[] = [
 function FeatureRow({ kind, text, accent }: { kind: "check" | "infinity" | "x"; text: string; accent?: boolean }) {
   if (kind === "x") {
     return (
-      <li className="flex items-start gap-3 text-[13.5px] text-slate-500">
+      <li className="flex items-start gap-3 text-[13.5px] text-slate-400">
         <X size={18} strokeWidth={2.5} className="shrink-0 mt-0.5" />
         <span className="line-through opacity-80">{text}</span>
       </li>
@@ -86,8 +86,8 @@ function FeatureRow({ kind, text, accent }: { kind: "check" | "infinity" | "x"; 
   }
   const Icon = kind === "infinity" ? InfinityIcon : Check;
   return (
-    <li className={`flex items-start gap-3 text-[13.5px] ${accent ? "text-sky-50 font-semibold" : "text-slate-300"}`}>
-      <Icon size={18} strokeWidth={2.75} className={`shrink-0 mt-0.5 ${accent ? "text-sky-300" : "text-sky-500"}`} />
+    <li className={`flex items-start gap-3 text-[13.5px] ${accent ? "text-sky-700 font-semibold" : "text-slate-600"}`}>
+      <Icon size={18} strokeWidth={2.75} className={`shrink-0 mt-0.5 ${accent ? "text-sky-500" : "text-sky-500"}`} />
       <span>{text}</span>
     </li>
   );
@@ -119,34 +119,35 @@ export function PricingCards() {
 
           const cardBase = "relative flex flex-col p-7 lg:p-8 rounded-3xl transition-colors";
           let cardStyle: React.CSSProperties = {
-            background: "rgba(30, 41, 59, 0.30)",
-            border: "1px solid rgb(30, 41, 59)",
+            background: "rgba(255, 255, 255, 0.95)",
+            border: "1px solid rgba(224, 242, 254, 0.80)",
+            boxShadow: "0 4px 24px -8px rgba(2, 132, 199, 0.15)",
           };
           if (isStarter) {
             cardStyle = {
-              background: "rgba(30, 41, 59, 0.40)",
-              border: "2px solid rgba(14, 165, 233, 0.55)",
-              boxShadow: "0 0 40px -15px rgba(14, 165, 233, 0.45)",
+              background: "rgba(255, 255, 255, 0.98)",
+              border: "2px solid rgba(14, 165, 233, 0.50)",
+              boxShadow: "0 8px 40px -12px rgba(14, 165, 233, 0.30)",
             };
           }
           if (isPro) {
             cardStyle = {
-              background: "linear-gradient(180deg, rgba(2, 132, 199, 0.22) 0%, rgba(30, 41, 59, 0.30) 100%)",
-              border: "1px solid rgba(14, 165, 233, 0.35)",
-              boxShadow: "0 30px 70px -30px rgba(14, 165, 233, 0.55)",
+              background: "linear-gradient(180deg, rgba(224, 242, 254, 0.60) 0%, rgba(255, 255, 255, 0.95) 100%)",
+              border: "1px solid rgba(14, 165, 233, 0.30)",
+              boxShadow: "0 12px 50px -20px rgba(14, 165, 233, 0.35)",
             };
           }
 
-          const titleColor = isStarter ? "text-sky-400" : isPro ? "text-sky-300" : "text-slate-400";
+          const titleColor = isStarter ? "text-sky-600" : isPro ? "text-sky-700" : "text-slate-500";
 
           let btnClass = "w-full py-3 px-4 rounded-xl font-semibold text-[13.5px] mb-7 transition-colors";
-          let btnStyle: React.CSSProperties = { background: "#1e293b", color: "#fff" };
+          let btnStyle: React.CSSProperties = { background: "#f1f5f9", color: "#0f172a" };
           if (isStarter) {
-            btnStyle = { background: "#0EA5E9", color: "#fff", boxShadow: "0 12px 28px -12px rgba(14,165,233,0.65)" };
+            btnStyle = { background: "#0EA5E9", color: "#fff", boxShadow: "0 12px 28px -12px rgba(14,165,233,0.50)" };
           }
           if (isPro) {
             btnClass += " font-bold";
-            btnStyle = { background: "#fff", color: "#0F172A", boxShadow: "0 14px 30px -12px rgba(255,255,255,0.25)" };
+            btnStyle = { background: "#0F172A", color: "#fff", boxShadow: "0 14px 30px -12px rgba(15,23,42,0.25)" };
           }
 
           return (
@@ -158,10 +159,10 @@ export function PricingCards() {
                 </div>
               )}
               {isPro && (
-                <div className="absolute -top-3 right-5 bg-white text-sky-900 text-[10px] font-extrabold uppercase tracking-[0.16em] px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg">
+                <div className="absolute -top-3 right-5 bg-sky-600 text-white text-[10px] font-extrabold uppercase tracking-[0.16em] px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg">
                   Best Value
-                  <span className="text-sky-300">|</span>
-                  <span className="text-sky-600">{p.discount}</span>
+                  <span className="text-sky-200">|</span>
+                  <span className="text-sky-100">{p.discount}</span>
                 </div>
               )}
 
@@ -169,13 +170,13 @@ export function PricingCards() {
               <div className="mb-7">
                 <h3 className={`text-[15px] font-medium mb-2 ${titleColor}`}>{p.name}</h3>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="font-display text-[42px] leading-none font-extrabold text-white tabular-nums">{p.price}</span>
-                  <span className="text-slate-500 text-sm">/mo</span>
+                  <span className="font-display text-[42px] leading-none font-extrabold text-slate-800 tabular-nums">{p.price}</span>
+                  <span className="text-slate-400 text-sm">/mo</span>
                 </div>
                 {p.oldPrice ? (
-                  <div className="mt-1.5 text-[11.5px] text-slate-500 line-through">was {p.oldPrice}</div>
+                  <div className="mt-1.5 text-[11.5px] text-slate-400 line-through">was {p.oldPrice}</div>
                 ) : (
-                  <p className="text-slate-500 text-[11.5px] mt-2">{p.tagline}</p>
+                  <p className="text-slate-400 text-[11.5px] mt-2">{p.tagline}</p>
                 )}
               </div>
 
@@ -196,7 +197,7 @@ export function PricingCards() {
       </div>
 
       {!user && (
-        <p className="text-center text-xs text-white/55 mt-8">You'll need to sign in or create an account to purchase a paid plan.</p>
+        <p className="text-center text-xs text-slate-400 mt-8">You'll need to sign in or create an account to purchase a paid plan.</p>
       )}
     </div>
   );

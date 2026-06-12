@@ -236,33 +236,33 @@ function Landing() {
         </div>
       </section>
 
-      {/* PRICING — ocean blue→black gradient */}
-      <section id="pricing" className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #0c4a6e 0%, #0369A1 30%, #050d1a 80%, #02060c 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 30%, rgba(56,189,248,0.20), transparent 70%)" }} />
+      {/* PRICING — white → ocean blue gradient */}
+      <section id="pricing" className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #E0F2FE 40%, #F0F9FF 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 30%, rgba(56,189,248,0.14), transparent 70%)" }} />
         <div className="mx-auto max-w-7xl px-6 relative">
           <div className="text-center max-w-2xl mx-auto">
-          <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl text-white">Pick Your Plan</h2>
-          <p className="mt-4 text-white">Start free. Upgrade when you are ready to scale.</p>
+          <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Pick Your Plan</h2>
+          <p className="mt-4 text-slate-600">Start free. Upgrade when you are ready to scale.</p>
           </div>
           <PricingCards />
-          <p className="text-center text-sm text-white/60 mt-10">All paid plans include a 7-day free trial. Sign in required to purchase.</p>
+          <p className="text-center text-sm text-slate-500 mt-10">All paid plans include a 7-day free trial. Sign in required to purchase.</p>
         </div>
       </section>
 
 
 
       {/* UNLOCK FULL TRY-ON CAPABILITIES — comparison table */}
-      <section className="py-20 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 0%, rgba(56,189,248,0.12), transparent 70%)" }} />
+      <section className="py-20 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 0%, rgba(56,189,248,0.10), transparent 70%)" }} />
         <div className="mx-auto max-w-4xl px-6 relative">
-          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
             Unlock Full Try-On Capabilities
           </h2>
           <div className="mt-12 relative">
             <div className="grid grid-cols-[1.6fr_1fr_1fr] items-center text-sm">
-              <div className="text-white/60 font-semibold uppercase tracking-wider text-xs py-4">What you'll get</div>
-              <div className="text-center font-bold text-white/70 py-4">Free</div>
-              <div className="text-center font-bold py-4 rounded-t-2xl" style={{ color: "#38BDF8", background: "linear-gradient(180deg, rgba(56,189,248,0.15), transparent)", border: "1.5px solid #38BDF8", borderBottom: "none", boxShadow: "0 -10px 40px -10px rgba(56,189,248,0.4)" }}>Pro</div>
+              <div className="text-slate-500 font-semibold uppercase tracking-wider text-xs py-4">What you'll get</div>
+              <div className="text-center font-bold text-slate-600 py-4">Free</div>
+              <div className="text-center font-bold py-4 rounded-t-2xl" style={{ color: "#0284C7", background: "linear-gradient(180deg, rgba(56,189,248,0.10), transparent)", border: "1.5px solid #38BDF8", borderBottom: "none", boxShadow: "0 -10px 40px -10px rgba(56,189,248,0.25)" }}>Pro</div>
               {[
                 { label: "Try-On products", free: "1", pro: "Unlimited" },
                 { label: "Access to all features", free: false, pro: true },
@@ -276,47 +276,47 @@ function Landing() {
                 { label: "Team seats", free: "1", pro: "Unlimited" },
               ].map((row, i, arr) => (
                 <div key={row.label} className="contents">
-                  <div className="py-4 text-white/85 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>{row.label}</div>
-                  <div className="py-4 text-center text-white/40 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-                    {typeof row.free === "boolean" ? (row.free ? <span style={{ color: "#38BDF8" }}>✓</span> : <span>–</span>) : row.free}
+                  <div className="py-4 text-slate-700 border-t" style={{ borderColor: "rgba(2,132,199,0.10)" }}>{row.label}</div>
+                  <div className="py-4 text-center text-slate-400 border-t" style={{ borderColor: "rgba(2,132,199,0.10)" }}>
+                    {typeof row.free === "boolean" ? (row.free ? <span style={{ color: "#0284C7" }}>✓</span> : <span>–</span>) : row.free}
                   </div>
                   <div
                     className="py-4 text-center"
                     style={{
                       borderLeft: "1.5px solid #38BDF8",
                       borderRight: "1.5px solid #38BDF8",
-                      borderTop: "1px solid rgba(56,189,248,0.15)",
+                      borderTop: "1px solid rgba(56,189,248,0.12)",
                       borderBottom: i === arr.length - 1 ? "1.5px solid #38BDF8" : undefined,
-                      background: "linear-gradient(180deg, rgba(56,189,248,0.05), rgba(56,189,248,0.02))",
+                      background: "linear-gradient(180deg, rgba(56,189,248,0.04), rgba(56,189,248,0.01))",
                       borderBottomLeftRadius: i === arr.length - 1 ? 16 : 0,
                       borderBottomRightRadius: i === arr.length - 1 ? 16 : 0,
                     }}
                   >
-                    {typeof row.pro === "boolean" ? (row.pro ? <span style={{ color: "#38BDF8" }}>✓</span> : <span className="text-white/40">–</span>) : <span className="text-white font-semibold">{row.pro}</span>}
+                    {typeof row.pro === "boolean" ? (row.pro ? <span style={{ color: "#0284C7" }}>✓</span> : <span className="text-slate-400">–</span>) : <span className="text-slate-800 font-semibold">{row.pro}</span>}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="mt-10 flex items-center justify-center gap-2 text-xs text-white/60">
-            <ShieldCheck size={14} style={{ color: "#38BDF8" }} /> 7-day free trial · cancel anytime · pay safe & secure
+          <div className="mt-10 flex items-center justify-center gap-2 text-xs text-slate-500">
+            <ShieldCheck size={14} style={{ color: "#0284C7" }} /> 7-day free trial · cancel anytime · pay safe & secure
           </div>
         </div>
       </section>
 
 
       {/* BEST PRICES IN INDUSTRY — professional table */}
-      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 50%, #02060c 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 700px 400px at 50% 0%, rgba(56,189,248,0.18), transparent 70%)" }} />
+      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 50%, #FFFFFF 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 700px 400px at 50% 0%, rgba(56,189,248,0.12), transparent 70%)" }} />
         <div className="mx-auto max-w-4xl px-6 relative">
           <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]">
-            <span className="block" style={{ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.35) 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Best Prices</span>
+            <span className="block" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Best Prices</span>
             <span className="block" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>In Try-On Industry</span>
           </h2>
-          <p className="mt-4 text-center text-white/70 max-w-xl mx-auto">Create more with the lowest cost per try-on. Transparent pricing — no hidden fees.</p>
+          <p className="mt-4 text-center text-slate-600 max-w-xl mx-auto">Create more with the lowest cost per try-on. Transparent pricing — no hidden fees.</p>
 
-          <div className="mt-12 rounded-2xl overflow-hidden" style={{ background: "rgba(10,16,28,0.85)", boxShadow: "0 30px 80px -25px rgba(56,189,248,0.35)" }}>
-            <div className="grid grid-cols-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-white/60" style={{ background: "rgba(56,189,248,0.10)" }}>
+          <div className="mt-12 rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.95)", boxShadow: "0 30px 80px -25px rgba(56,189,248,0.25)", border: "1px solid rgba(224,242,254,0.80)" }}>
+            <div className="grid grid-cols-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500" style={{ background: "rgba(224,242,254,0.60)" }}>
               <div className="px-3 sm:px-5 py-4">Plan</div>
               <div className="px-3 sm:px-5 py-4 text-center">Monthly</div>
               <div className="px-3 sm:px-5 py-4 text-center">Per try-on</div>
@@ -329,20 +329,20 @@ function Landing() {
               { plan: "Pro", monthly: "$49", per: "$0.020", value: "50 / $1", highlight: true },
             ].map((row) => (
               <div key={row.plan} className="grid grid-cols-4 text-sm items-center" style={{
-                borderTop: "1px solid rgba(255,255,255,0.05)",
-                background: row.highlight ? "linear-gradient(90deg, rgba(56,189,248,0.10), rgba(3,105,161,0.18))" : "transparent",
+                borderTop: "1px solid rgba(2,132,199,0.08)",
+                background: row.highlight ? "linear-gradient(90deg, rgba(56,189,248,0.08), rgba(3,105,161,0.10))" : "transparent",
               }}>
-                <div className="px-3 sm:px-5 py-4 font-display font-bold text-white flex items-center gap-2">
+                <div className="px-3 sm:px-5 py-4 font-display font-bold text-slate-800 flex items-center gap-2">
                   {row.plan}
                   {row.highlight && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider" style={{ background: GRAD, color: "#fff" }}>Best</span>}
                 </div>
-                <div className="px-3 sm:px-5 py-4 text-center text-white/85 tabular-nums">{row.monthly}</div>
-                <div className="px-3 sm:px-5 py-4 text-center tabular-nums font-semibold" style={{ color: row.highlight ? "#38BDF8" : "rgba(255,255,255,0.85)" }}>{row.per}</div>
-                <div className="px-3 sm:px-5 py-4 text-center text-white/70 tabular-nums text-xs sm:text-sm">{row.value}</div>
+                <div className="px-3 sm:px-5 py-4 text-center text-slate-700 tabular-nums">{row.monthly}</div>
+                <div className="px-3 sm:px-5 py-4 text-center tabular-nums font-semibold" style={{ color: row.highlight ? "#0284C7" : "rgba(15,23,42,0.85)" }}>{row.per}</div>
+                <div className="px-3 sm:px-5 py-4 text-center text-slate-600 tabular-nums text-xs sm:text-sm">{row.value}</div>
               </div>
             ))}
           </div>
-          <p className="mt-6 text-center text-xs text-white/50">Pro delivers up to <span style={{ color: "#38BDF8" }} className="font-bold">2.3× more try-ons per dollar</span> than Starter.</p>
+          <p className="mt-6 text-center text-xs text-slate-500">Pro delivers up to <span style={{ color: "#0284C7" }} className="font-bold">2.3× more try-ons per dollar</span> than Starter.</p>
         </div>
       </section>
 
@@ -359,9 +359,9 @@ function Landing() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 relative" style={{ background: "linear-gradient(180deg, #050d1a 0%, #02060c 100%)" }}>
+      <section className="py-20 relative" style={{ background: "linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)" }}>
         <div className="mx-auto max-w-3xl px-6">
-          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl mb-10 leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl mb-10 leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
             Frequently Asked Questions
           </h2>
           <div className="space-y-3">
@@ -373,12 +373,12 @@ function Landing() {
               { q: "Is my shopper data safe?", a: "Yes. Shopper photos are processed for the try-on only and never used for training. Enterprise-grade storage." },
               { q: "Do you offer refunds?", a: "If something is broken, contact support and we'll make it right. Otherwise, cancel anytime to stop future charges." },
             ].map((f) => (
-              <details key={f.q} className="group rounded-2xl px-5 py-4" style={{ background: "rgba(15,23,42,0.85)" }}>
-                <summary className="flex items-center justify-between cursor-pointer list-none text-white font-semibold">
+              <details key={f.q} className="group rounded-2xl px-5 py-4" style={{ background: "rgba(255,255,255,0.95)", border: "1px solid rgba(56,189,248,0.20)", boxShadow: "0 4px 20px -8px rgba(2,132,199,0.15)" }}>
+                <summary className="flex items-center justify-between cursor-pointer list-none text-slate-800 font-semibold">
                   {f.q}
-                  <span className="text-white/50 group-open:rotate-180 transition-transform">⌄</span>
+                  <span className="text-slate-400 group-open:rotate-180 transition-transform">⌄</span>
                 </summary>
-                <p className="mt-3 text-sm text-white/70 leading-relaxed">{f.a}</p>
+                <p className="mt-3 text-sm text-slate-600 leading-relaxed">{f.a}</p>
               </details>
             ))}
           </div>
