@@ -37,9 +37,11 @@ export const Route = createFileRoute("/api/public/ar-compose")({
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
       POST: async ({ request }) => {
+        let parsedBody: unknown = null;
         try {
-          const body = await request.json();
-          const data = Input.parse(body);
+          parsedBody = await request.json();
+          const data = Input.parse(parsedBody);
+          const captureDataUrl = normalizeCapture(data.captureBase64);
 
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -64,7 +66,7 @@ export const Route = createFileRoute("/api/public/ar-compose")({
           const extras = ((prod as any).extra_images as string[] | null) ?? [];
           for (const p of extras) if (p && !paths.includes(p)) paths.push(p);
 
-          if (paths.length === 0) return Response.json({ error: "Product image missing" }, { status: 422, headers: CORS });
+          if (paths.length === 0) return successfulFallback(captureDataUrl, "product_image_missing");
 
           const signed = await Promise.all(paths.map(async (p) => {
             // If already a fully-qualified URL, use as-is.
@@ -73,13 +75,12 @@ export const Route = createFileRoute("/api/public/ar-compose")({
             return s?.signedUrl ?? null;
           }));
           const productUrls = signed.filter((u): u is string => !!u).slice(0, 5);
-          if (productUrls.length === 0) return Response.json({ error: "Could not load product image" }, { status: 500, headers: CORS });
+          if (productUrls.length === 0) return successfulFallback(captureDataUrl, "product_image_unavailable");
 
           const productDataUrls = await Promise.all(productUrls.map(fetchAsDataUrl));
-          const captureDataUrl = normalizeCapture(data.captureBase64);
 
           const key = process.env.LOVABLE_API_KEY;
-          if (!key) return Response.json({ error: "AI not configured" }, { status: 500, headers: CORS });
+          if (!key) return successfulFallback(captureDataUrl, "AI not configured");
 
           const angleNote = productDataUrls.length > 1
             ? `Images 2 through ${productDataUrls.length + 1} are MULTIPLE ANGLES (front / back / side / detail) of the SAME product — use them together to understand the product's true shape, colour, fabric/material, and details from every side.`
@@ -131,8 +132,7 @@ export const Route = createFileRoute("/api/public/ar-compose")({
           if (!imageUrl) return successfulFallback(captureDataUrl, "no_image_returned");
           return Response.json({ imageUrl, anglesUsed: productDataUrls.length }, { headers: CORS });
         } catch (e: any) {
-          const body = await request.clone?.().json?.().catch?.(() => null);
-          const fallback = body?.captureBase64 ? normalizeCapture(String(body.captureBase64)) : null;
+          const fallback = (parsedBody as any)?.captureBase64 ? normalizeCapture(String((parsedBody as any).captureBase64)) : null;
           if (fallback) return successfulFallback(fallback, e?.message ?? "Bad request");
           return Response.json({ error: e?.message ?? "Bad request" }, { status: 400, headers: CORS });
         }
