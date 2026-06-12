@@ -326,7 +326,7 @@ function Landing() {
               { plan: "Free", monthly: "$0", per: "$0.00", value: "1 try-on", highlight: false },
               { plan: "Starter", monthly: "$10", per: "$0.05", value: "20 / $1", highlight: false },
               { plan: "Growth", monthly: "$39", per: "$0.043", value: "23 / $1", highlight: false },
-              { plan: "Pro", monthly: "$79", per: "$0.030", value: "33 / $1", highlight: true },
+              { plan: "Pro", monthly: "$49", per: "$0.020", value: "50 / $1", highlight: true },
             ].map((row) => (
               <div key={row.plan} className="grid grid-cols-4 text-sm items-center" style={{
                 borderTop: "1px solid rgba(255,255,255,0.05)",

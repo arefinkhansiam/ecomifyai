@@ -61,7 +61,7 @@ export const PLANS: Plan[] = [
     cta: "Start Growth Plan", href: "/checkout?plan=growth", icon: Crown,
   },
   {
-    id: "pro", name: "Pro Monthly", price: "$79", perDay: "$2.60", oldPerDay: "$3.30", billed: "$79, billed monthly",
+    id: "pro", name: "Pro Monthly", price: "$49", perDay: "$1.63", oldPerDay: "$2.60", billed: "$49, billed monthly",
     features: [
       { icon: "infinity", text: "Unlimited Try-On products" },
       { icon: "check", text: "Custom viewer skin" },
