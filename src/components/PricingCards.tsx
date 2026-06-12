@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Check, X, Infinity as InfinityIcon, Sparkles, Zap, Crown, Gem, ShieldCheck } from "lucide-react";
+import { Check, X, Infinity as InfinityIcon, Sparkles, Zap, Crown, Gem } from "lucide-react";
 import { useAuth } from "@/lib/use-auth";
 
 export type Plan = {
@@ -79,9 +79,7 @@ function FeatureRow({ kind, text }: { kind: "check" | "infinity" | "x"; text: st
   if (kind === "x") {
     return (
       <li className="flex items-start gap-3 text-[13.5px] text-slate-400">
-        <span className="shrink-0 mt-0.5 inline-flex items-center justify-center w-[18px] h-[18px] rounded-full bg-slate-100">
-          <X size={11} strokeWidth={3} className="text-slate-400" />
-        </span>
+        <X size={16} strokeWidth={2.5} className="shrink-0 mt-0.5 text-slate-300" />
         <span className="line-through opacity-80">{text}</span>
       </li>
     );
@@ -89,9 +87,7 @@ function FeatureRow({ kind, text }: { kind: "check" | "infinity" | "x"; text: st
   const Icon = kind === "infinity" ? InfinityIcon : Check;
   return (
     <li className="flex items-start gap-3 text-[13.5px] text-slate-700">
-      <span className="shrink-0 mt-0.5 inline-flex items-center justify-center w-[18px] h-[18px] rounded-full" style={{ background: "rgba(14,165,233,0.12)" }}>
-        <Icon size={11} strokeWidth={3.25} style={{ color: "#0284C7" }} />
-      </span>
+      <Icon size={16} strokeWidth={2.75} className="shrink-0 mt-0.5" style={{ color: "#0EA5E9" }} />
       <span>{text}</span>
     </li>
   );
@@ -116,132 +112,78 @@ export function PricingCards() {
 
   return (
     <div className="mx-auto max-w-7xl">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-5 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
         {PLANS.map((p) => {
-          const isStarter = p.badge === "popular";
+          const isPopular = p.badge === "popular";
           const isPro = p.badge === "best";
-          const Icon = p.icon;
 
-          // Card surface
-          const cardBase = "group relative flex flex-col p-7 lg:p-8 rounded-[20px] transition-all duration-300 hover:-translate-y-1";
-          let cardStyle: React.CSSProperties = {
+          const cardStyle: React.CSSProperties = isPro
+            ? {
+                background: "#ffffff",
+                border: "2px solid #0EA5E9",
+                boxShadow: "0 20px 50px -20px rgba(14,165,233,0.40)",
+              }
+            : {
+                background: "#ffffff",
+                border: "1px solid #E2E8F0",
+                boxShadow: "0 1px 2px rgba(15,23,42,0.04), 0 10px 30px -16px rgba(15,23,42,0.08)",
+              };
+
+          let btnStyle: React.CSSProperties = {
             background: "#ffffff",
+            color: "#0F172A",
             border: "1px solid #E2E8F0",
-            boxShadow: "0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -12px rgba(15,23,42,0.08)",
           };
-          if (isStarter) {
-            cardStyle = {
-              background: "#ffffff",
-              border: "1px solid rgba(14,165,233,0.35)",
-              boxShadow: "0 1px 2px rgba(14,165,233,0.08), 0 18px 40px -18px rgba(14,165,233,0.30)",
-            };
-          }
-          if (isPro) {
-            cardStyle = {
-              background: "linear-gradient(180deg, #0C2340 0%, #0F2F5C 100%)",
-              border: "1px solid rgba(56,189,248,0.40)",
-              boxShadow: "0 24px 60px -24px rgba(2,132,199,0.55), 0 2px 0 rgba(255,255,255,0.04) inset",
-              transform: "translateY(-4px)",
-            };
-          }
-
-          // Typography colors
-          const titleColor = isPro ? "text-sky-300" : "text-slate-500";
-          const priceColor = isPro ? "text-white" : "text-slate-900";
-          const taglineColor = isPro ? "text-sky-100/70" : "text-slate-500";
-          const dividerColor = isPro ? "rgba(255,255,255,0.10)" : "#EEF2F7";
-
-          // CTA
-          let btnClass = "w-full py-3 px-4 rounded-xl font-semibold text-[13.5px] mb-6 transition-all duration-200 text-center inline-block";
-          let btnStyle: React.CSSProperties = { background: "#F1F5F9", color: "#0F172A" };
-          if (isStarter) {
-            btnStyle = { background: "linear-gradient(180deg, #0EA5E9 0%, #0284C7 100%)", color: "#fff", boxShadow: "0 10px 24px -10px rgba(14,165,233,0.55)" };
-          }
-          if (isPro) {
-            btnStyle = { background: "#ffffff", color: "#0C2340", boxShadow: "0 10px 24px -10px rgba(255,255,255,0.35)" };
-          }
+          if (isPopular) btnStyle = { background: "#0F172A", color: "#fff", border: "1px solid #0F172A" };
+          if (isPro) btnStyle = { background: "linear-gradient(180deg, #0EA5E9 0%, #0284C7 100%)", color: "#fff", border: "1px solid #0284C7", boxShadow: "0 10px 24px -10px rgba(14,165,233,0.55)" };
 
           return (
-            <div key={p.id} className={cardBase} style={cardStyle}>
-              {/* Badges */}
-              {isStarter && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-[10px] font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full shadow-md"
-                  style={{ background: "linear-gradient(90deg, #0EA5E9, #0284C7)" }}>
+            <div key={p.id} className="relative flex flex-col p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1" style={cardStyle}>
+              {isPopular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full">
                   Most Popular
                 </div>
               )}
               {isPro && (
-                <div className="absolute -top-3 right-5 text-[10px] font-bold uppercase tracking-[0.16em] px-3 py-1 rounded-full flex items-center gap-1.5 shadow-md"
-                  style={{ background: "linear-gradient(90deg, #FBBF24, #F59E0B)", color: "#3B2A05" }}>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-[10px] font-bold uppercase tracking-[0.18em] px-3 py-1 rounded-full"
+                  style={{ background: "linear-gradient(90deg, #0EA5E9, #0284C7)" }}>
                   Best Value · {p.discount}
                 </div>
               )}
 
-              {/* Icon chip */}
-              <div className="mb-5">
-                <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl"
-                  style={{
-                    background: isPro ? "rgba(56,189,248,0.15)" : "rgba(14,165,233,0.10)",
-                    border: isPro ? "1px solid rgba(56,189,248,0.30)" : "1px solid rgba(14,165,233,0.20)",
-                  }}>
-                  <Icon size={18} style={{ color: isPro ? "#7DD3FC" : "#0284C7" }} strokeWidth={2.25} />
-                </div>
-              </div>
-
               {/* Header */}
               <div className="mb-6">
-                <h3 className={`text-[13px] font-semibold uppercase tracking-[0.12em] mb-3 ${titleColor}`}>{p.name}</h3>
+                <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-slate-500 mb-3">{p.name}</h3>
                 <div className="flex items-baseline gap-1.5">
-                  <span className={`font-display text-[44px] leading-none font-extrabold tabular-nums ${priceColor}`}>{p.price}</span>
-                  <span className={`text-sm ${isPro ? "text-sky-200/60" : "text-slate-400"}`}>/mo</span>
-                  {p.oldPrice && (
-                    <span className={`ml-2 text-[12px] line-through ${isPro ? "text-sky-200/40" : "text-slate-400"}`}>{p.oldPrice}</span>
+                  <span className="font-display text-[44px] leading-none font-extrabold tabular-nums text-slate-900">{p.price}</span>
+                  <span className="text-sm text-slate-400">/mo</span>
+                </div>
+                <div className="mt-2 h-5 flex items-center gap-2">
+                  {p.oldPrice ? (
+                    <>
+                      <span className="text-[12px] line-through text-slate-400">was {p.oldPrice}</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: "rgba(14,165,233,0.10)", color: "#0284C7" }}>SAVE 38%</span>
+                    </>
+                  ) : (
+                    <span className="text-[12px] text-slate-500">{p.tagline}</span>
                   )}
                 </div>
-                <p className={`text-[12px] mt-2.5 ${taglineColor}`}>{p.tagline}</p>
               </div>
 
               {/* CTA */}
-              <a href={p.href} onClick={go(p)} className={btnClass} style={btnStyle}>
+              <a href={p.href} onClick={go(p)} className="w-full py-3 px-4 rounded-xl font-semibold text-[13.5px] mb-6 text-center inline-block transition-all duration-200" style={btnStyle}>
                 {user || p.id === "free" ? p.cta : `Log in to ${p.cta}`}
               </a>
 
-              {/* Divider */}
-              <div className="h-px w-full mb-5" style={{ background: dividerColor }} />
+              <div className="h-px w-full mb-5" style={{ background: "#EEF2F7" }} />
 
-              <p className={`text-[10.5px] uppercase tracking-[0.14em] font-semibold mb-4 ${isPro ? "text-sky-200/60" : "text-slate-400"}`}>
-                What's included
-              </p>
+              <p className="text-[10.5px] uppercase tracking-[0.14em] font-semibold text-slate-400 mb-4">What's included</p>
 
-              {/* Features */}
               <ul className="space-y-3 flex-1">
                 {p.features.map((f, i) => (
-                  isPro ? (
-                    <li key={i} className={`flex items-start gap-3 text-[13.5px] ${f.icon === "x" ? "text-slate-400" : "text-sky-50"}`}>
-                      <span className="shrink-0 mt-0.5 inline-flex items-center justify-center w-[18px] h-[18px] rounded-full"
-                        style={{ background: f.icon === "x" ? "rgba(255,255,255,0.06)" : "rgba(125,211,252,0.18)" }}>
-                        {f.icon === "x" ? (
-                          <X size={11} strokeWidth={3} className="text-slate-400" />
-                        ) : f.icon === "infinity" ? (
-                          <InfinityIcon size={11} strokeWidth={3.25} style={{ color: "#7DD3FC" }} />
-                        ) : (
-                          <Check size={11} strokeWidth={3.25} style={{ color: "#7DD3FC" }} />
-                        )}
-                      </span>
-                      <span className={f.icon === "x" ? "line-through opacity-70" : ""}>{f.text}</span>
-                    </li>
-                  ) : (
-                    <FeatureRow key={i} kind={f.icon} text={f.text} />
-                  )
+                  <FeatureRow key={i} kind={f.icon} text={f.text} />
                 ))}
               </ul>
-
-              {isPro && (
-                <div className="mt-6 pt-5 flex items-center gap-2 text-[11px] text-sky-100/60" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                  <ShieldCheck size={13} style={{ color: "#7DD3FC" }} />
-                  7-day free trial · cancel anytime
-                </div>
-              )}
             </div>
           );
         })}
