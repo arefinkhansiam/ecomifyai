@@ -106,7 +106,7 @@ export function Navbar() {
             initial={{ y: "-100%" }} animate={{ y: 0 }} exit={{ y: "-100%" }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-8"
-            style={{ background: "rgba(10,10,15,0.98)", backdropFilter: "blur(20px)" }}
+            style={{ background: "rgba(10,10,15,0.98)" }}
           >
             <button onClick={() => setMenuOpen(false)} className="absolute top-6 right-6 text-white">
               <X size={28} />
