@@ -6,12 +6,12 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { supabase } from "@/integrations/supabase/client";
+import { initializeAuth, useAuth } from "@/lib/use-auth";
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
@@ -90,19 +90,36 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const { user, loading, error } = useAuth();
+  const previousUserId = useRef<string | null | undefined>(undefined);
+
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {
-        queryClient.clear();
-        router.invalidate();
-        return;
-      }
-      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
-        queryClient.invalidateQueries();
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [router, queryClient]);
+    initializeAuth();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const currentUserId = user?.id ?? null;
+    const previous = previousUserId.current;
+    previousUserId.current = currentUserId;
+
+    if (previous === undefined || previous === currentUserId) return;
+
+    if (!currentUserId) {
+      queryClient.cancelQueries();
+      queryClient.clear();
+      router.invalidate();
+      return;
+    }
+
+    queryClient.invalidateQueries();
+  }, [loading, user?.id, router, queryClient]);
+
+  useEffect(() => {
+    if (error) console.warn("[auth] session bootstrap failed", error);
+  }, [error]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />

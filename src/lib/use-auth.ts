@@ -1,42 +1,98 @@
 import { useEffect, useState } from "react";
-import type { Session, User } from "@supabase/supabase-js";
+import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export function useAuth() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+type AuthSnapshot = {
+  session: Session | null;
+  user: User | null;
+  loading: boolean;
+  error: Error | null;
+};
 
-  useEffect(() => {
-    let cancelled = false;
-    let bootstrapped = false;
-    const applySession = (s: Session | null) => {
-      if (cancelled) return;
-      setSession(s);
-      setUser(s?.user ?? null);
-      setLoading(false);
-    };
+const listeners = new Set<() => void>();
+let snapshot: AuthSnapshot = { session: null, user: null, loading: true, error: null };
+let initPromise: Promise<Session | null> | null = null;
+let bootstrapped = false;
+let authSubscription: { unsubscribe: () => void } | null = null;
 
-    supabase.auth.getSession()
-      .then(({ data }) => {
-        bootstrapped = true;
-        applySession(data.session);
-      })
-      .catch(() => {
-        bootstrapped = true;
-        applySession(null);
-      });
+function publish(next: AuthSnapshot) {
+  snapshot = next;
+  listeners.forEach((listener) => listener());
+}
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
+function setAuthSession(session: Session | null, error: Error | null = null) {
+  publish({ session, user: session?.user ?? null, loading: false, error });
+}
+
+function authLog(event: AuthChangeEvent | "BOOTSTRAP_ERROR", session?: Session | null, error?: unknown) {
+  const safePayload = {
+    event,
+    hasSession: Boolean(session),
+    userId: session?.user?.id,
+    expiresAt: session?.expires_at,
+  };
+  if (error) {
+    console.warn("[auth]", safePayload, error);
+  } else {
+    console.debug("[auth]", safePayload);
+  }
+}
+
+export function initializeAuth() {
+  if (!authSubscription) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      authLog(event, session);
       if (event === "INITIAL_SESSION" && !bootstrapped) return;
-      applySession(s);
+      bootstrapped = true;
+      if (event === "SIGNED_OUT") {
+        setAuthSession(null);
+        return;
+      }
+      setAuthSession(session);
+    });
+    authSubscription = subscription;
+  }
+
+  if (bootstrapped) return Promise.resolve(snapshot.session);
+  if (initPromise) return initPromise;
+
+  initPromise = supabase.auth.getSession()
+    .then(({ data, error }) => {
+      if (error) throw error;
+      bootstrapped = true;
+      setAuthSession(data.session);
+      return data.session;
+    })
+    .catch((error) => {
+      const err = error instanceof Error ? error : new Error(String(error));
+      bootstrapped = true;
+      authLog("BOOTSTRAP_ERROR", snapshot.session, err);
+      setAuthSession(snapshot.session, err);
+      return snapshot.session;
     });
 
+  return initPromise;
+}
+
+export async function getStableAuthSession(timeoutMs = 4500) {
+  const timeout = new Promise<Session | null>((resolve) => {
+    setTimeout(() => resolve(snapshot.session), timeoutMs);
+  });
+  return Promise.race([initializeAuth(), timeout]);
+}
+
+export function useAuth() {
+  const [state, setState] = useState<AuthSnapshot>(snapshot);
+
+  useEffect(() => {
+    const update = () => setState(snapshot);
+    listeners.add(update);
+    initializeAuth();
+
     return () => {
-      cancelled = true;
-      subscription.unsubscribe();
+      listeners.delete(update);
     };
   }, []);
 
-  return { session, user, loading };
+  return state;
 }
