@@ -72,13 +72,13 @@ function PricingPage() {
         </div>
       </section>
 
-      {/* CARDS */}
-      <section className="py-16 relative overflow-hidden" style={{ background: "#0A0A0A" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 1000px 500px at 50% 0%, rgba(14,165,233,0.18), transparent 70%)" }} />
+      {/* CARDS — white, monday/slack inspired */}
+      <section className="py-20 relative" style={{ background: "#FFFFFF" }}>
         <div className="mx-auto max-w-7xl px-6 relative">
           <PricingCards />
         </div>
       </section>
+
 
       {/* COMPARISON TABLE */}
       <section className="py-20 relative" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 100%)" }}>
