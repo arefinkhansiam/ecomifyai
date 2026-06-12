@@ -359,9 +359,9 @@ function Landing() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 relative" style={{ background: "linear-gradient(180deg, #050d1a 0%, #02060c 100%)" }}>
+      <section className="py-20 relative" style={{ background: "linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)" }}>
         <div className="mx-auto max-w-3xl px-6">
-          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl mb-10 leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl mb-10 leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
             Frequently Asked Questions
           </h2>
           <div className="space-y-3">
@@ -373,12 +373,12 @@ function Landing() {
               { q: "Is my shopper data safe?", a: "Yes. Shopper photos are processed for the try-on only and never used for training. Enterprise-grade storage." },
               { q: "Do you offer refunds?", a: "If something is broken, contact support and we'll make it right. Otherwise, cancel anytime to stop future charges." },
             ].map((f) => (
-              <details key={f.q} className="group rounded-2xl px-5 py-4" style={{ background: "rgba(15,23,42,0.85)" }}>
-                <summary className="flex items-center justify-between cursor-pointer list-none text-white font-semibold">
+              <details key={f.q} className="group rounded-2xl px-5 py-4" style={{ background: "rgba(255,255,255,0.95)", border: "1px solid rgba(56,189,248,0.20)", boxShadow: "0 4px 20px -8px rgba(2,132,199,0.15)" }}>
+                <summary className="flex items-center justify-between cursor-pointer list-none text-slate-800 font-semibold">
                   {f.q}
-                  <span className="text-white/50 group-open:rotate-180 transition-transform">⌄</span>
+                  <span className="text-slate-400 group-open:rotate-180 transition-transform">⌄</span>
                 </summary>
-                <p className="mt-3 text-sm text-white/70 leading-relaxed">{f.a}</p>
+                <p className="mt-3 text-sm text-slate-600 leading-relaxed">{f.a}</p>
               </details>
             ))}
           </div>
