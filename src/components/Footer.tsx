@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Twitter, Linkedin, Facebook } from "lucide-react";
+import paymentMethods from "@/assets/payment-methods.png.asset.json";
 
 const cols = [
   {
@@ -26,15 +27,6 @@ const cols = [
       { to: "/how-it-works", label: "Embed Guide" },
     ],
   },
-];
-
-const paymentBadges = [
-  { label: "VISA", bg: "#1A1F71", text: "#ffffff" },
-  { label: "MASTERCARD", bg: "#EB001B", text: "#ffffff" },
-  { label: "AMEX", bg: "#016FD0", text: "#ffffff" },
-  { label: "PAYPAL", bg: "#003087", text: "#ffffff" },
-  { label: "APPLE PAY", bg: "#000000", text: "#ffffff" },
-  { label: "G PAY", bg: "#ffffff", text: "#000000" },
 ];
 
 export function Footer() {
@@ -81,18 +73,16 @@ export function Footer() {
         ))}
       </div>
 
-      {/* Payment badges */}
+      {/* Payment methods */}
       <div className="mx-auto max-w-7xl px-6 mt-14">
-        <div className="flex flex-wrap justify-center gap-2.5">
-          {paymentBadges.map((p) => (
-            <span
-              key={p.label}
-              className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider"
-              style={{ background: p.bg, color: p.text, border: p.label === "G PAY" ? "1px solid rgba(255,255,255,0.15)" : "none" }}
-            >
-              {p.label}
-            </span>
-          ))}
+        <div className="text-center text-[12px] uppercase tracking-[0.2em] text-white/50 mb-4">We Accept</div>
+        <div className="flex justify-center">
+          <img
+            src={paymentMethods.url}
+            alt="Accepted payment methods: Mastercard, Visa, American Express, Discover, PayPal, Amazon Pay, 2Checkout"
+            className="max-w-full h-auto rounded-md bg-white px-4 py-3"
+            style={{ maxHeight: 72 }}
+          />
         </div>
       </div>
 
