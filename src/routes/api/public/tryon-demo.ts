@@ -57,11 +57,11 @@ export const Route = createFileRoute("/api/public/tryon-demo")({
           const body = await request.json();
           const data = Input.parse(body);
           const demo = DEMOS[data.demo];
+          const captureDataUrl = normalizeCapture(data.captureBase64);
 
           const origin = new URL(request.url).origin;
           const productUrl = demo.url.startsWith("http") ? demo.url : `${origin}${demo.url}`;
           const productDataUrl = await fetchAsDataUrl(productUrl);
-          const captureDataUrl = normalizeCapture(data.captureBase64);
 
           const key = process.env.LOVABLE_API_KEY;
           if (!key) return successfulFallback(captureDataUrl, "AI not configured");
