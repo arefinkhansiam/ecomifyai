@@ -38,7 +38,7 @@ function Checkout() {
       if (error) throw error;
       if (!free) {
         await supabase.from("payment_history").insert({
-          user_id: user.id, plan, amount_usd: plan === "starter" ? 10 : plan === "pro" ? 79 : 39,
+          user_id: user.id, plan, amount_usd: plan === "starter" ? 10 : plan === "pro" ? 49 : 39,
           status: "paid", billing_period_start: new Date().toISOString(),
           billing_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         });
