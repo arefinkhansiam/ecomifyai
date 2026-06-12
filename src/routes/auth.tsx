@@ -48,25 +48,54 @@ function AuthPage() {
     navigate({ to: "/dashboard" });
   };
 
+  const friendlyError = (err: any): string => {
+    const msg = (err?.message ?? "").toString();
+    const code = err?.code ?? err?.error_code ?? "";
+    if (code === "invalid_credentials" || /invalid login/i.test(msg)) return "Wrong email or password. Please try again.";
+    if (code === "user_already_exists" || /already registered|already exists/i.test(msg)) return "An account with this email already exists. Try signing in instead.";
+    if (code === "weak_password" || /weak|pwned/i.test(msg)) return "That password is too weak. Use at least 8 characters with letters and numbers.";
+    if (code === "email_address_invalid" || /invalid.*email/i.test(msg)) return "Please enter a valid email address.";
+    if (code === "over_email_send_rate_limit" || /rate limit/i.test(msg)) return "Too many attempts. Please wait a moment and try again.";
+    if (/network|fetch/i.test(msg)) return "Network issue. Check your connection and try again.";
+    return msg || "Authentication failed. Please try again.";
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
           options: { data: { full_name: fullName }, emailRedirectTo: window.location.origin + "/dashboard" },
         });
         if (error) throw error;
-        toast.success("Account created. Welcome to Ecomify.");
-        done();
+        if (data.session) {
+          toast.success("Welcome to Ecomify!");
+          done();
+        } else {
+          // Email confirmation required — try direct sign in
+          const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+          if (signInErr) {
+            toast.success("Account created. Please check your email to confirm, then sign in.");
+            setMode("signin");
+          } else {
+            toast.success("Welcome to Ecomify!");
+            done();
+          }
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        toast.success("Welcome back!");
         done();
       }
     } catch (err: any) {
-      toast.error(err.message ?? "Authentication failed");
+      toast.error(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -125,7 +154,7 @@ function AuthPage() {
           <div className={inputWrap} style={inputWrapStyle}>
             <KeyRound size={18} className="shrink-0" style={{ color: "#7dd3fc" }} />
             <input type={showPw ? "text" : "password"} className="flex-1 bg-transparent outline-none text-white placeholder:text-slate-500 text-[15px]"
-              placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+              placeholder={mode === "signup" ? "Password (min 8 characters)" : "Password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
             <button type="button" onClick={() => setShowPw(!showPw)} className="shrink-0" style={{ color: "rgba(148,163,184,0.8)" }} aria-label="Toggle password visibility">
               {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
