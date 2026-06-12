@@ -21,8 +21,16 @@ export const Route = createFileRoute("/ar/view/$productId")({
     let imageUrl: string | null = null;
     const imagePath = data.processed_image_url || data.original_image_url;
     if (imagePath) {
-      const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(imagePath, 3600);
-      imageUrl = signed?.signedUrl ?? imagePath;
+      if (/^https?:\/\//i.test(imagePath)) {
+        imageUrl = imagePath;
+      } else {
+        const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(imagePath, 3600);
+        imageUrl = signed?.signedUrl ?? null;
+        if (!imageUrl) {
+          const { data: pub } = supabase.storage.from("product-images").getPublicUrl(imagePath);
+          imageUrl = pub?.publicUrl ?? null;
+        }
+      }
     }
     // Fetch vendor branding (watermark + page customization)
     const { data: branding } = await supabase
@@ -464,8 +472,14 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
       {/* Garment preview thumbnail */}
       {phase === "ready" && imageUrl && (
-        <div className="absolute z-30 left-4 top-32 w-16 h-20 rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: cust.fontColor }}>
-          <img src={imageUrl} alt="" className="w-full h-full object-contain bg-white/10" />
+        <div className="absolute z-30 left-4 top-32 w-16 h-20 rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: cust.fontColor, background: "rgba(255,255,255,0.1)" }}>
+          <img
+            src={imageUrl}
+            alt={product.product_name || "Product"}
+            className="w-full h-full object-contain"
+            referrerPolicy="no-referrer"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+          />
         </div>
       )}
 

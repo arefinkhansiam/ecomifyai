@@ -7,7 +7,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen text-ink">
       <Navbar />
-      <main>{children}</main>
+      <main className="pt-20 md:pt-28">{children}</main>
       <Footer />
       <AiChatbot />
     </div>
