@@ -1,17 +1,17 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Check, Sparkles, Info } from "lucide-react";
+import { Check, Info } from "lucide-react";
 import { useAuth } from "@/lib/use-auth";
 
 export type Plan = {
   id: "free" | "starter" | "pro" | "growth";
   name: string;
   tagline: string;
-  price: string;        // numeric price, e.g. "$0", "$10"
-  oldPrice?: string;    // strikethrough price
-  unit: string;         // e.g. "free forever" or "per user / month, when paying monthly"
-  promo?: string;       // e.g. "50% OFF FOR 3 MONTHS"
+  price: string;
+  oldPrice?: string;
+  unit: string;
+  promo?: string;
   features: string[];
-  footerLabel: string;  // e.g. "Basic AI"
+  footerLabel: string;
   cta: string;
   href: string;
   badge?: "best";
@@ -89,8 +89,9 @@ export const PLANS: Plan[] = [
   },
 ];
 
-const OCEAN = "#0284C7";
 const OCEAN_DEEP = "#0369A1";
+const PREMIUM_GRADIENT = "linear-gradient(135deg, #0B1220 0%, #0F2A44 45%, #0369A1 100%)";
+const PREMIUM_GRADIENT_HOVER = "linear-gradient(135deg, #050912 0%, #0B2138 45%, #0284C7 100%)";
 
 export function PricingCards() {
   const { user } = useAuth();
@@ -110,52 +111,64 @@ export function PricingCards() {
   };
 
   return (
-    <div className="mx-auto max-w-[1240px]">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 items-stretch">
+    <div className="mx-auto max-w-[1280px]">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-5 items-stretch">
         {PLANS.map((p) => {
           const isBest = p.badge === "best";
           const isContact = p.id === "growth";
 
           return (
-            <div key={p.id} className="relative flex">
-              {/* BEST VALUE top tab */}
+            <div key={p.id} className="relative flex group">
               {isBest && (
                 <div
-                  className="absolute left-0 right-0 -top-9 mx-auto text-center text-[11px] font-extrabold uppercase tracking-[0.18em] text-white py-2.5 rounded-t-2xl z-10"
-                  style={{ background: OCEAN_DEEP }}
+                  className="absolute left-1/2 -translate-x-1/2 -top-4 text-[10.5px] font-extrabold uppercase tracking-[0.22em] text-white px-4 py-1.5 rounded-full z-10 whitespace-nowrap"
+                  style={{
+                    background: PREMIUM_GRADIENT,
+                    boxShadow: "0 10px 30px -8px rgba(3,105,161,0.55), 0 2px 6px rgba(11,18,32,0.25)",
+                  }}
                 >
                   Best Value
                 </div>
               )}
 
               <div
-                className="relative flex flex-col w-full bg-white"
+                className="relative flex flex-col w-full bg-white rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:-translate-y-1.5"
                 style={{
-                  border: isBest ? `2px solid ${OCEAN_DEEP}` : "1px solid #E5E7EB",
-                  borderRadius: isBest ? 16 : 12,
-                  marginTop: isBest ? 0 : 1,
-                  boxShadow: isBest ? "0 24px 60px -28px rgba(2,132,199,0.45)" : "none",
-                  zIndex: isBest ? 5 : 1,
+                  border: isBest ? `1.5px solid ${OCEAN_DEEP}` : "1px solid #E8ECF1",
+                  boxShadow: isBest
+                    ? "0 30px 70px -28px rgba(3,105,161,0.35), 0 8px 22px -12px rgba(11,18,32,0.18)"
+                    : "0 1px 2px rgba(11,18,32,0.04), 0 8px 24px -16px rgba(11,18,32,0.10)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = isBest
+                    ? "0 40px 90px -30px rgba(3,105,161,0.45), 0 14px 32px -14px rgba(11,18,32,0.22)"
+                    : "0 24px 60px -28px rgba(11,18,32,0.25), 0 6px 18px -10px rgba(3,105,161,0.18)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = isBest
+                    ? "0 30px 70px -28px rgba(3,105,161,0.35), 0 8px 22px -12px rgba(11,18,32,0.18)"
+                    : "0 1px 2px rgba(11,18,32,0.04), 0 8px 24px -16px rgba(11,18,32,0.10)";
                 }}
               >
-                <div className="p-7 pb-6 flex flex-col flex-1">
-                  {/* Name + tagline */}
-                  <h3 className="font-display text-[22px] font-extrabold text-slate-900 leading-tight">
+                <div className="p-7 lg:p-8 flex flex-col flex-1">
+                  <h3
+                    className="font-display text-[22px] font-extrabold leading-tight tracking-tight"
+                    style={{ color: "#0B1220" }}
+                  >
                     {p.name}
                   </h3>
-                  <p className="mt-1.5 text-[13.5px] text-slate-600 leading-snug min-h-[40px]">
+                  <p className="mt-2 text-[13.5px] text-slate-600 leading-snug min-h-[42px]">
                     {p.tagline}
                   </p>
 
-                  {/* Promo pill */}
                   <div className="mt-5 h-7 flex items-center">
                     {p.promo && (
                       <span
-                        className="inline-flex items-center text-[10.5px] font-bold uppercase tracking-[0.14em] px-2.5 py-1 rounded-full"
+                        className="inline-flex items-center text-[10.5px] font-bold uppercase tracking-[0.16em] px-2.5 py-1 rounded-full"
                         style={{
                           color: OCEAN_DEEP,
-                          background: "rgba(2,132,199,0.10)",
-                          border: "1px solid rgba(2,132,199,0.25)",
+                          background: "rgba(2,132,199,0.08)",
+                          border: "1px solid rgba(2,132,199,0.22)",
                         }}
                       >
                         {p.promo}
@@ -163,79 +176,86 @@ export function PricingCards() {
                     )}
                   </div>
 
-                  {/* Price block */}
-                  <div className="mt-3 min-h-[68px]">
+                  <div className="mt-3 min-h-[72px]">
                     {isContact ? (
                       <div className="flex items-center gap-2">
-                        <span className="font-display text-[26px] font-extrabold text-slate-900 leading-none">
+                        <span
+                          className="font-display text-[28px] font-extrabold leading-none tracking-tight"
+                          style={{ color: "#0B1220" }}
+                        >
                           {p.price}
                         </span>
                       </div>
                     ) : (
                       <div className="flex items-baseline gap-2">
                         {p.oldPrice && (
-                          <span className="font-display text-[22px] font-extrabold text-slate-400 line-through leading-none tabular-nums">
+                          <span className="font-display text-[20px] font-bold text-slate-400 line-through leading-none tabular-nums">
                             {p.oldPrice}
                           </span>
                         )}
-                        <span className="font-display text-[40px] font-extrabold text-slate-900 leading-none tabular-nums tracking-tight">
+                        <span
+                          className="font-display text-[44px] font-extrabold leading-none tabular-nums tracking-tight"
+                          style={{ color: "#0B1220" }}
+                        >
                           {p.price}
                         </span>
                         <span className="text-[12px] font-semibold text-slate-500">USD</span>
                       </div>
                     )}
-                    <p className="mt-2 text-[12px] text-slate-500 flex items-center gap-1.5">
+                    <p className="mt-2.5 text-[12px] text-slate-500 flex items-center gap-1.5">
                       {p.unit}
                       {!isContact && <Info size={12} className="text-slate-400" />}
                     </p>
                   </div>
 
-                  {/* CTA */}
                   <a
                     href={p.href}
                     onClick={go(p)}
-                    className="mt-5 w-full text-center py-3 rounded-full font-bold text-[13px] tracking-wide uppercase transition-all duration-200"
-                    style={
-                      isBest
-                        ? {
-                            background: OCEAN_DEEP,
-                            color: "#fff",
-                            border: `2px solid ${OCEAN_DEEP}`,
-                          }
-                        : {
-                            background: "transparent",
-                            color: OCEAN_DEEP,
-                            border: `2px solid ${OCEAN}`,
-                          }
-                    }
+                    className="mt-6 w-full text-center py-3.5 rounded-full font-bold text-[12.5px] tracking-[0.12em] uppercase transition-all duration-300 relative overflow-hidden"
+                    style={{
+                      background: PREMIUM_GRADIENT,
+                      color: "#fff",
+                      border: "1px solid rgba(11,18,32,0.6)",
+                      boxShadow: "0 10px 24px -10px rgba(3,105,161,0.45), inset 0 1px 0 rgba(255,255,255,0.12)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = PREMIUM_GRADIENT_HOVER;
+                      e.currentTarget.style.boxShadow =
+                        "0 16px 34px -10px rgba(3,105,161,0.6), inset 0 1px 0 rgba(255,255,255,0.18)";
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = PREMIUM_GRADIENT;
+                      e.currentTarget.style.boxShadow =
+                        "0 10px 24px -10px rgba(3,105,161,0.45), inset 0 1px 0 rgba(255,255,255,0.12)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                    }}
                   >
                     {p.cta}
                   </a>
 
-                  {/* Features */}
-                  <ul className="mt-6 space-y-3 flex-1">
+                  <div className="mt-7 h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(11,18,32,0.10), transparent)" }} />
+
+                  <ul className="mt-6 space-y-3.5 flex-1">
                     {p.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-2.5 text-[13.5px] text-slate-700 leading-snug">
-                        <Check size={16} className="mt-0.5 shrink-0" style={{ color: OCEAN_DEEP }} strokeWidth={3} />
+                      <li
+                        key={i}
+                        className="flex items-start gap-3 text-[13.5px] text-slate-700 leading-snug"
+                      >
+                        <span
+                          className="mt-0.5 shrink-0 inline-flex items-center justify-center rounded-full"
+                          style={{
+                            width: 18,
+                            height: 18,
+                            background: "rgba(3,105,161,0.10)",
+                          }}
+                        >
+                          <Check size={11} style={{ color: OCEAN_DEEP }} strokeWidth={3.5} />
+                        </span>
                         <span>{f}</span>
                       </li>
                     ))}
                   </ul>
-                </div>
-
-                {/* Tinted footer row */}
-                <div
-                  className="px-7 py-3.5 flex items-center gap-2 text-[12.5px] font-semibold"
-                  style={{
-                    background: isBest ? "rgba(2,132,199,0.10)" : "rgba(2,132,199,0.05)",
-                    color: OCEAN_DEEP,
-                    borderTop: "1px solid rgba(2,132,199,0.15)",
-                    borderBottomLeftRadius: isBest ? 14 : 11,
-                    borderBottomRightRadius: isBest ? 14 : 11,
-                  }}
-                >
-                  <Sparkles size={14} />
-                  {p.footerLabel}
                 </div>
               </div>
             </div>
