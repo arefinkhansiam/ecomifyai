@@ -44,7 +44,7 @@ export function InlineTryOnDemo({ compact = false }: { compact?: boolean }) {
 
   const onPick = async (f: File | null) => {
     if (!f || !/^image\//.test(f.type)) return;
-    if (f.size > 8 * 1024 * 1024) { setErr("Image too large (max 8MB)"); return; }
+    if (f.size > 15 * 1024 * 1024) { setErr("Image too large (max 15MB)"); return; }
     setErr(null);
     const captureBase64 = await downscale(f);
     setUserPhoto(captureBase64);
@@ -60,8 +60,9 @@ export function InlineTryOnDemo({ compact = false }: { compact?: boolean }) {
       setResult(j.imageUrl);
       setPhase("result");
     } catch (e: any) {
-      setErr(e?.message || "Something went wrong");
-      setPhase("error");
+      setResult(captureBase64);
+      setErr(e?.message || "AI unavailable — showing your uploaded photo so the flow completes.");
+      setPhase("result");
     }
   };
 
