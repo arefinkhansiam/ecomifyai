@@ -252,17 +252,17 @@ function Landing() {
 
 
       {/* UNLOCK FULL TRY-ON CAPABILITIES — comparison table */}
-      <section className="py-20 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 0%, rgba(56,189,248,0.12), transparent 70%)" }} />
+      <section className="py-20 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 0%, rgba(56,189,248,0.10), transparent 70%)" }} />
         <div className="mx-auto max-w-4xl px-6 relative">
-          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #ffffff 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
             Unlock Full Try-On Capabilities
           </h2>
           <div className="mt-12 relative">
             <div className="grid grid-cols-[1.6fr_1fr_1fr] items-center text-sm">
-              <div className="text-white/60 font-semibold uppercase tracking-wider text-xs py-4">What you'll get</div>
-              <div className="text-center font-bold text-white/70 py-4">Free</div>
-              <div className="text-center font-bold py-4 rounded-t-2xl" style={{ color: "#38BDF8", background: "linear-gradient(180deg, rgba(56,189,248,0.15), transparent)", border: "1.5px solid #38BDF8", borderBottom: "none", boxShadow: "0 -10px 40px -10px rgba(56,189,248,0.4)" }}>Pro</div>
+              <div className="text-slate-500 font-semibold uppercase tracking-wider text-xs py-4">What you'll get</div>
+              <div className="text-center font-bold text-slate-600 py-4">Free</div>
+              <div className="text-center font-bold py-4 rounded-t-2xl" style={{ color: "#0284C7", background: "linear-gradient(180deg, rgba(56,189,248,0.10), transparent)", border: "1.5px solid #38BDF8", borderBottom: "none", boxShadow: "0 -10px 40px -10px rgba(56,189,248,0.25)" }}>Pro</div>
               {[
                 { label: "Try-On products", free: "1", pro: "Unlimited" },
                 { label: "Access to all features", free: false, pro: true },
@@ -276,30 +276,30 @@ function Landing() {
                 { label: "Team seats", free: "1", pro: "Unlimited" },
               ].map((row, i, arr) => (
                 <div key={row.label} className="contents">
-                  <div className="py-4 text-white/85 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>{row.label}</div>
-                  <div className="py-4 text-center text-white/40 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-                    {typeof row.free === "boolean" ? (row.free ? <span style={{ color: "#38BDF8" }}>✓</span> : <span>–</span>) : row.free}
+                  <div className="py-4 text-slate-700 border-t" style={{ borderColor: "rgba(2,132,199,0.10)" }}>{row.label}</div>
+                  <div className="py-4 text-center text-slate-400 border-t" style={{ borderColor: "rgba(2,132,199,0.10)" }}>
+                    {typeof row.free === "boolean" ? (row.free ? <span style={{ color: "#0284C7" }}>✓</span> : <span>–</span>) : row.free}
                   </div>
                   <div
                     className="py-4 text-center"
                     style={{
                       borderLeft: "1.5px solid #38BDF8",
                       borderRight: "1.5px solid #38BDF8",
-                      borderTop: "1px solid rgba(56,189,248,0.15)",
+                      borderTop: "1px solid rgba(56,189,248,0.12)",
                       borderBottom: i === arr.length - 1 ? "1.5px solid #38BDF8" : undefined,
-                      background: "linear-gradient(180deg, rgba(56,189,248,0.05), rgba(56,189,248,0.02))",
+                      background: "linear-gradient(180deg, rgba(56,189,248,0.04), rgba(56,189,248,0.01))",
                       borderBottomLeftRadius: i === arr.length - 1 ? 16 : 0,
                       borderBottomRightRadius: i === arr.length - 1 ? 16 : 0,
                     }}
                   >
-                    {typeof row.pro === "boolean" ? (row.pro ? <span style={{ color: "#38BDF8" }}>✓</span> : <span className="text-white/40">–</span>) : <span className="text-white font-semibold">{row.pro}</span>}
+                    {typeof row.pro === "boolean" ? (row.pro ? <span style={{ color: "#0284C7" }}>✓</span> : <span className="text-slate-400">–</span>) : <span className="text-slate-800 font-semibold">{row.pro}</span>}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="mt-10 flex items-center justify-center gap-2 text-xs text-white/60">
-            <ShieldCheck size={14} style={{ color: "#38BDF8" }} /> 7-day free trial · cancel anytime · pay safe & secure
+          <div className="mt-10 flex items-center justify-center gap-2 text-xs text-slate-500">
+            <ShieldCheck size={14} style={{ color: "#0284C7" }} /> 7-day free trial · cancel anytime · pay safe & secure
           </div>
         </div>
       </section>
