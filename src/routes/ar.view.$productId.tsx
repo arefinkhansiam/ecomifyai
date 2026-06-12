@@ -21,8 +21,16 @@ export const Route = createFileRoute("/ar/view/$productId")({
     let imageUrl: string | null = null;
     const imagePath = data.processed_image_url || data.original_image_url;
     if (imagePath) {
-      const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(imagePath, 3600);
-      imageUrl = signed?.signedUrl ?? imagePath;
+      if (/^https?:\/\//i.test(imagePath)) {
+        imageUrl = imagePath;
+      } else {
+        const { data: signed } = await supabase.storage.from("product-images").createSignedUrl(imagePath, 3600);
+        imageUrl = signed?.signedUrl ?? null;
+        if (!imageUrl) {
+          const { data: pub } = supabase.storage.from("product-images").getPublicUrl(imagePath);
+          imageUrl = pub?.publicUrl ?? null;
+        }
+      }
     }
     // Fetch vendor branding (watermark + page customization)
     const { data: branding } = await supabase
