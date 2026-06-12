@@ -236,18 +236,22 @@ function Landing() {
         </div>
       </section>
 
-      {/* PRICING — black with ocean blue glow */}
-      <section id="pricing" className="py-24 relative overflow-hidden" style={{ background: "#0A0A0A" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 900px 500px at 50% 20%, rgba(14,165,233,0.18), transparent 70%)" }} />
+      {/* PRICING — white, monday/slack inspired */}
+      <section id="pricing" className="py-24 relative" style={{ background: "#FFFFFF" }}>
         <div className="mx-auto max-w-7xl px-6 relative">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl text-white">Pick Your Plan</h2>
-            <p className="mt-4 text-white/60">Start free. Upgrade when you are ready to scale.</p>
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="font-display font-extrabold tracking-tight text-slate-900 text-4xl sm:text-6xl leading-[1.05]">
+              Choose a plan built for your store.
+            </h2>
+            <p className="mt-5 text-[17px] text-slate-600">
+              Or start with the basics for free, and upgrade at any time.
+            </p>
           </div>
           <PricingCards />
-          <p className="text-center text-sm text-white/50 mt-10">All paid plans include a 7-day free trial. Sign in required to purchase.</p>
+          <p className="text-center text-sm text-slate-500 mt-10">All paid plans include a 7-day free trial. Sign in required to purchase.</p>
         </div>
       </section>
+
 
 
 

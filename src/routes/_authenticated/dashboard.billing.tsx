@@ -58,8 +58,8 @@ function BillingPage() {
           </div>
           <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4">
             {current.features.map((f) => (
-              <li key={f.text} className="flex items-center gap-2 text-[13px]" style={{ color: "#0B1220" }}>
-                <CheckCircle2 size={15} style={{ color: "#10B981" }} /> {f.text}
+              <li key={f} className="flex items-center gap-2 text-[13px]" style={{ color: "#0B1220" }}>
+                <CheckCircle2 size={15} style={{ color: "#10B981" }} /> {f}
               </li>
             ))}
           </ul>
@@ -173,9 +173,9 @@ function ChangePlanModal({ current, onClose, onChanged }: { current: Plan["id"];
                 </div>
                 <ul className="mt-3 space-y-1.5">
                   {p.features.slice(0, 4).map((f) => (
-                    <li key={f.text} className="flex items-start gap-1.5 text-[11.5px]" style={{ color: f.icon === "x" ? "#94A3B8" : "#475569" }}>
-                      {f.icon === "x" ? <X size={11} className="mt-0.5 flex-shrink-0" /> : <Check size={11} className="mt-0.5 flex-shrink-0" style={{ color: "#10B981" }} />}
-                      <span className={f.icon === "x" ? "line-through" : ""}>{f.text}</span>
+                    <li key={f} className="flex items-start gap-1.5 text-[11.5px]" style={{ color: "#475569" }}>
+                      <Check size={11} className="mt-0.5 flex-shrink-0" style={{ color: "#10B981" }} />
+                      <span>{f}</span>
                     </li>
                   ))}
                 </ul>

@@ -1,78 +1,96 @@
 import { useNavigate } from "@tanstack/react-router";
+import { Check, Sparkles, Info } from "lucide-react";
 import { useAuth } from "@/lib/use-auth";
 
 export type Plan = {
   id: "free" | "starter" | "pro" | "growth";
   name: string;
-  price: string;
-  perDay: string;
-  oldPrice?: string;
-  oldPerDay?: string;
-  billed: string;
   tagline: string;
-  features: { icon: "check" | "infinity" | "x"; text: string }[];
+  price: string;        // numeric price, e.g. "$0", "$10"
+  oldPrice?: string;    // strikethrough price
+  unit: string;         // e.g. "free forever" or "per user / month, when paying monthly"
+  promo?: string;       // e.g. "50% OFF FOR 3 MONTHS"
+  features: string[];
+  footerLabel: string;  // e.g. "Basic AI"
   cta: string;
   href: string;
-  badge?: "popular" | "best";
-  discount?: string;
-  icon?: any;
+  badge?: "best";
 };
 
 export const PLANS: Plan[] = [
   {
-    id: "free", name: "Free", price: "$0", perDay: "$0.00", billed: "Free forever", tagline: "Perfect to get started",
+    id: "free",
+    name: "Free",
+    tagline: "A simpler way to launch your first try-on",
+    price: "$0",
+    unit: "free forever",
     features: [
-      { icon: "check", text: "1 Try-On product" },
-      { icon: "check", text: "Shareable link & QR code" },
-      { icon: "check", text: "Works on any device" },
-      { icon: "x", text: "Ecomify branding shown" },
-      { icon: "x", text: "Analytics dashboard" },
-      { icon: "x", text: "Custom brand colours" },
-      { icon: "x", text: "Priority support" },
+      "1 Try-On product",
+      "Shareable link & QR code",
+      "Works on any device",
+      "Email support",
     ],
-    cta: "Start for free", href: "/auth?mode=signup",
+    footerLabel: "Basic AI",
+    cta: "Get started",
+    href: "/auth?mode=signup",
   },
   {
-    id: "starter", name: "Starter", price: "$10", perDay: "$0.33", billed: "$10, billed monthly", tagline: "Elevate your business",
+    id: "starter",
+    name: "Starter",
+    tagline: "Elevate your store with branded try-ons",
+    price: "$10",
+    oldPrice: "$13",
+    unit: "per month, when paying monthly",
+    promo: "Launch promo · 21% off",
     features: [
-      { icon: "check", text: "10 Try-On products" },
-      { icon: "check", text: "Remove Ecomify branding" },
-      { icon: "check", text: "Analytics dashboard" },
-      { icon: "check", text: "Shareable link & QR code" },
-      { icon: "check", text: "Email support" },
-      { icon: "x", text: "Custom viewer skin" },
-      { icon: "x", text: "Team seats" },
+      "10 Try-On products",
+      "Remove Ecomify branding",
+      "Analytics dashboard",
+      "Shareable link & QR code",
     ],
-    cta: "Get Started", href: "/checkout?plan=starter", badge: "popular",
+    footerLabel: "Standard AI",
+    cta: "Get started",
+    href: "/checkout?plan=starter",
   },
   {
-    id: "growth", name: "Growth", price: "$39", perDay: "$1.30", billed: "$39, billed monthly", tagline: "Scalability for pros",
+    id: "pro",
+    name: "Pro",
+    tagline: "Scale with unlimited AI-powered try-ons",
+    price: "$49",
+    oldPrice: "$79",
+    unit: "per month, when paying monthly",
+    promo: "Launch promo · 21% off",
     features: [
-      { icon: "check", text: "50 Try-On products" },
-      { icon: "check", text: "Custom brand colours & gradient" },
-      { icon: "check", text: "3 team seats" },
-      { icon: "check", text: "Analytics dashboard" },
-      { icon: "check", text: "Remove Ecomify branding" },
-      { icon: "check", text: "Same-category recommendations" },
-      { icon: "x", text: "Custom viewer skin" },
+      "Unlimited Try-On products",
+      "Custom brand colours & gradient",
+      "Unlimited team seats",
+      "Advanced analytics dashboard",
     ],
-    cta: "Try Growth", href: "/checkout?plan=growth",
+    footerLabel: "Advanced AI",
+    cta: "Get started",
+    href: "/checkout?plan=pro",
+    badge: "best",
   },
   {
-    id: "pro", name: "Pro", price: "$49", oldPrice: "$79", perDay: "$1.63", oldPerDay: "$2.60", billed: "$49, billed monthly", tagline: "Unlimited everything for pros",
+    id: "growth",
+    name: "Growth+",
+    tagline: "Maximize performance on the most comprehensive plan",
+    price: "Contact us",
+    unit: "for pricing",
     features: [
-      { icon: "infinity", text: "Unlimited Try-On products" },
-      { icon: "check", text: "Custom viewer skin" },
-      { icon: "check", text: "Custom brand colours & gradient" },
-      { icon: "check", text: "Unlimited team seats" },
-      { icon: "check", text: "Advanced analytics dashboard" },
-      { icon: "check", text: "Same-category recommendations" },
-      { icon: "check", text: "Watermarked downloads" },
-      { icon: "check", text: "24/7 Priority support" },
+      "Everything in Pro",
+      "50+ Try-On products",
+      "Same-category recommendations",
+      "Priority 24/7 support",
     ],
-    cta: "Upgrade to Pro", href: "/checkout?plan=pro", badge: "best", discount: "21% OFF",
+    footerLabel: "Enterprise-Grade AI",
+    cta: "Contact sales",
+    href: "/checkout?plan=growth",
   },
 ];
+
+const OCEAN = "#0284C7";
+const OCEAN_DEEP = "#0369A1";
 
 export function PricingCards() {
   const { user } = useAuth();
@@ -92,130 +110,141 @@ export function PricingCards() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+    <div className="mx-auto max-w-[1240px]">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 items-stretch">
         {PLANS.map((p) => {
-          const isPro = p.badge === "best";
-          const isPopular = p.badge === "popular";
+          const isBest = p.badge === "best";
+          const isContact = p.id === "growth";
 
           return (
-            <div
-              key={p.id}
-              className="relative flex flex-col p-8 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
-              style={{
-                background: isPro
-                  ? "linear-gradient(180deg, #0B1220 0%, #050810 100%)"
-                  : "#0A0A0A",
-                border: isPro
-                  ? "1px solid rgba(56,189,248,0.6)"
-                  : "1px solid rgba(255,255,255,0.08)",
-                boxShadow: isPro
-                  ? "0 30px 70px -25px rgba(14,165,233,0.55), inset 0 1px 0 rgba(255,255,255,0.06)"
-                  : "0 14px 40px -20px rgba(0,0,0,0.6)",
-              }}
-            >
-              {isPopular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-[0.22em] px-3.5 py-1.5 rounded-full whitespace-nowrap"
-                  style={{ background: "#fff", color: "#0A0A0A", boxShadow: "0 6px 18px -6px rgba(0,0,0,0.4)" }}>
-                  Most Popular
-                </div>
-              )}
-              {isPro && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-[10px] font-bold uppercase tracking-[0.22em] px-3.5 py-1.5 rounded-full whitespace-nowrap"
-                  style={{ background: "linear-gradient(90deg, #0EA5E9, #0284C7)", boxShadow: "0 8px 20px -6px rgba(14,165,233,0.6)" }}>
-                  Best Value · {p.discount}
+            <div key={p.id} className="relative flex">
+              {/* BEST VALUE top tab */}
+              {isBest && (
+                <div
+                  className="absolute left-0 right-0 -top-9 mx-auto text-center text-[11px] font-extrabold uppercase tracking-[0.18em] text-white py-2.5 rounded-t-2xl z-10"
+                  style={{ background: OCEAN_DEEP }}
+                >
+                  Best Value
                 </div>
               )}
 
-              {/* Plan name */}
-              <h3 className="font-display text-[15px] font-bold uppercase tracking-[0.18em] text-white/70 mb-4">
-                {p.name}
-              </h3>
-
-              {/* Price block */}
-              <div className="flex items-baseline gap-1.5 mb-2">
-                <span className="font-display text-[44px] font-extrabold text-white tabular-nums leading-none tracking-tight">
-                  {p.price}
-                </span>
-                <span className="text-[13px] font-medium text-white/45">/month</span>
-              </div>
-
-              {p.oldPrice && (
-                <p className="text-[12px] text-white/40 line-through mb-2 tabular-nums">was {p.oldPrice}/mo</p>
-              )}
-
-              {/* Tagline */}
-              <p
-                className="text-[14px] font-semibold mb-6 leading-snug"
+              <div
+                className="relative flex flex-col w-full bg-white"
                 style={{
-                  background: "linear-gradient(90deg, #7DD3FC, #0EA5E9)",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  color: "transparent",
+                  border: isBest ? `2px solid ${OCEAN_DEEP}` : "1px solid #E5E7EB",
+                  borderRadius: isBest ? 16 : 12,
+                  marginTop: isBest ? 0 : 1,
+                  boxShadow: isBest ? "0 24px 60px -28px rgba(2,132,199,0.45)" : "none",
+                  zIndex: isBest ? 5 : 1,
                 }}
               >
-                {p.tagline}
-              </p>
+                <div className="p-7 pb-6 flex flex-col flex-1">
+                  {/* Name + tagline */}
+                  <h3 className="font-display text-[22px] font-extrabold text-slate-900 leading-tight">
+                    {p.name}
+                  </h3>
+                  <p className="mt-1.5 text-[13.5px] text-slate-600 leading-snug min-h-[40px]">
+                    {p.tagline}
+                  </p>
 
-              {/* CTA */}
-              <a
-                href={p.href}
-                onClick={go(p)}
-                className="w-full py-3.5 px-4 mb-7 rounded-full font-semibold text-[14px] text-center inline-block transition-all duration-200 hover:scale-[1.02]"
-                style={
-                  isPro
-                    ? {
-                        background: "linear-gradient(90deg, #38BDF8, #0284C7)",
-                        color: "#fff",
-                        boxShadow: "0 12px 28px -10px rgba(14,165,233,0.7)",
-                      }
-                    : {
-                        background: "#fff",
-                        color: "#0A0A0A",
-                        boxShadow: "0 6px 18px -8px rgba(255,255,255,0.4)",
-                      }
-                }
-              >
-                {user || p.id === "free" ? p.cta : `Sign in to ${p.cta}`}
-              </a>
+                  {/* Promo pill */}
+                  <div className="mt-5 h-7 flex items-center">
+                    {p.promo && (
+                      <span
+                        className="inline-flex items-center text-[10.5px] font-bold uppercase tracking-[0.14em] px-2.5 py-1 rounded-full"
+                        style={{
+                          color: OCEAN_DEEP,
+                          background: "rgba(2,132,199,0.10)",
+                          border: "1px solid rgba(2,132,199,0.25)",
+                        }}
+                      >
+                        {p.promo}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Divider label */}
-              <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40 mb-3">
-                What's included
-              </div>
+                  {/* Price block */}
+                  <div className="mt-3 min-h-[68px]">
+                    {isContact ? (
+                      <div className="flex items-center gap-2">
+                        <span className="font-display text-[26px] font-extrabold text-slate-900 leading-none">
+                          {p.price}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-baseline gap-2">
+                        {p.oldPrice && (
+                          <span className="font-display text-[22px] font-extrabold text-slate-400 line-through leading-none tabular-nums">
+                            {p.oldPrice}
+                          </span>
+                        )}
+                        <span className="font-display text-[40px] font-extrabold text-slate-900 leading-none tabular-nums tracking-tight">
+                          {p.price}
+                        </span>
+                        <span className="text-[12px] font-semibold text-slate-500">USD</span>
+                      </div>
+                    )}
+                    <p className="mt-2 text-[12px] text-slate-500 flex items-center gap-1.5">
+                      {p.unit}
+                      {!isContact && <Info size={12} className="text-slate-400" />}
+                    </p>
+                  </div>
 
-              {/* Features */}
-              <ul className="flex-1 flex flex-col gap-2.5">
-                {p.features.map((f, i) => (
-                  <li
-                    key={i}
-                    className={`flex items-start gap-2.5 text-[13.5px] leading-snug ${
-                      f.icon === "x" ? "text-white/35" : "text-white/85"
-                    }`}
+                  {/* CTA */}
+                  <a
+                    href={p.href}
+                    onClick={go(p)}
+                    className="mt-5 w-full text-center py-3 rounded-full font-bold text-[13px] tracking-wide uppercase transition-all duration-200"
+                    style={
+                      isBest
+                        ? {
+                            background: OCEAN_DEEP,
+                            color: "#fff",
+                            border: `2px solid ${OCEAN_DEEP}`,
+                          }
+                        : {
+                            background: "transparent",
+                            color: OCEAN_DEEP,
+                            border: `2px solid ${OCEAN}`,
+                          }
+                    }
                   >
-                    <span
-                      className="mt-[3px] shrink-0 w-4 h-4 rounded-full grid place-items-center text-[10px] font-bold"
-                      style={
-                        f.icon === "x"
-                          ? { background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)" }
-                          : f.icon === "infinity"
-                          ? { background: "linear-gradient(135deg, #38BDF8, #0284C7)", color: "#fff" }
-                          : { background: "rgba(14,165,233,0.18)", color: "#7DD3FC" }
-                      }
-                    >
-                      {f.icon === "x" ? "✕" : f.icon === "infinity" ? "∞" : "✓"}
-                    </span>
-                    <span className={f.icon === "x" ? "line-through" : ""}>{f.text}</span>
-                  </li>
-                ))}
-              </ul>
+                    {p.cta}
+                  </a>
+
+                  {/* Features */}
+                  <ul className="mt-6 space-y-3 flex-1">
+                    {p.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2.5 text-[13.5px] text-slate-700 leading-snug">
+                        <Check size={16} className="mt-0.5 shrink-0" style={{ color: OCEAN_DEEP }} strokeWidth={3} />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Tinted footer row */}
+                <div
+                  className="px-7 py-3.5 flex items-center gap-2 text-[12.5px] font-semibold"
+                  style={{
+                    background: isBest ? "rgba(2,132,199,0.10)" : "rgba(2,132,199,0.05)",
+                    color: OCEAN_DEEP,
+                    borderTop: "1px solid rgba(2,132,199,0.15)",
+                    borderBottomLeftRadius: isBest ? 14 : 11,
+                    borderBottomRightRadius: isBest ? 14 : 11,
+                  }}
+                >
+                  <Sparkles size={14} />
+                  {p.footerLabel}
+                </div>
+              </div>
             </div>
           );
         })}
       </div>
 
       {!user && (
-        <p className="text-center text-[13px] text-white/45 mt-10">
+        <p className="text-center text-[13px] text-slate-500 mt-10">
           You'll need to sign in or create an account to purchase a paid plan.
         </p>
       )}
