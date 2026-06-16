@@ -388,7 +388,7 @@ function CustomizePage() {
                 <Field label={`Opacity · ${watermarkOpacity}%`}>
                   <input type="range" min={0} max={100} value={watermarkOpacity} onChange={(e) => setWatermarkOpacity(Number(e.target.value))} className="w-full accent-sky-500" />
                 </Field>
-                <Toggle label='Show "Powered by Ecomify" watermark' on={showPlatformWatermark} onChange={setShowPlatformWatermark} />
+                <Toggle label='Show "Powered by Easibie" watermark' on={showPlatformWatermark} onChange={setShowPlatformWatermark} />
               </Section>
 
               {/* Alternatives */}
@@ -431,7 +431,7 @@ function CustomizePage() {
                 )}
               </Section>
 
-              <Toggle label='Show "Powered by Ecomify" badge on viewer' on={showBranding} onChange={setShowBranding} />
+              <Toggle label='Show "Powered by Easibie" badge on viewer' on={showBranding} onChange={setShowBranding} />
 
           <div className="flex gap-2 pt-2 sticky bottom-0 bg-card -mx-6 px-6 pb-2">
             <button onClick={save} disabled={saving} className="btn-primary flex-1 justify-center">

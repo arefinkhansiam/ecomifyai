@@ -19,9 +19,9 @@ import demoAfter from "@/assets/demo-after.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Ecomify — AI Photo Try-On for E-Commerce" },
+      { title: "Easibie — AI Photo Try-On for E-Commerce" },
       { name: "description", content: "Upload product photos. Shoppers upload their own photo. Our AI generates a photoreal try-on in seconds — fashion, jewellery, furniture and makeup." },
-      { property: "og:title", content: "Ecomify — AI Photo Try-On for E-Commerce" },
+      { property: "og:title", content: "Easibie — AI Photo Try-On for E-Commerce" },
       { property: "og:description", content: "Photoreal try-on from a single photo. No app, no complex modeling." },
     ],
   }),
@@ -127,7 +127,7 @@ function Landing() {
       <section id="how" className="py-24" style={{ background: "linear-gradient(180deg, transparent, rgba(2,132,199,0.06), transparent)" }}>
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-gradient-ocean">How Ecomify Works</h2>
+            <h2 className="text-gradient-ocean">How Easibie Works</h2>
             <p className="mt-4">Three photos. One AI. Zero hardware.</p>
           </div>
           <div className="mt-16 relative">
@@ -270,7 +270,7 @@ function Landing() {
               {[
                 { label: "Try-On products", free: "1", pro: "Unlimited" },
                 { label: "Access to all features", free: false, pro: true },
-                { label: "Remove Ecomify branding", free: false, pro: true },
+                { label: "Remove Easibie branding", free: false, pro: true },
                 { label: "Custom viewer skin", free: false, pro: true },
                 { label: "Brand colours & gradient", free: false, pro: true },
                 { label: "Same-category recommendations", free: false, pro: true },
@@ -357,7 +357,7 @@ function Landing() {
           <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl text-white leading-[1.05]">
             Community of <span style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>10,000+ </span>stores
           </h2>
-          <p className="mt-3 text-sm text-white/60">Real results from real Ecomify users.</p>
+          <p className="mt-3 text-sm text-white/60">Real results from real Easibie users.</p>
         </div>
         <ReviewCarousel />
       </section>
@@ -392,7 +392,7 @@ function Landing() {
       {/* SOCIAL PROOF */}
       <section className="py-20" style={{ background: "linear-gradient(135deg, rgba(2,132,199,0.10), rgba(6,182,212,0.05))" }}>
         <div className="mx-auto max-w-6xl px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
-          <StatCounter target={10247} suffix="+" label="Stores Using Ecomify" />
+          <StatCounter target={10247} suffix="+" label="Stores Using Easibie" />
           <StatCounter target={2400000} suffix="+" label="Try-Ons Delivered" />
           <div className="text-center">
             <div className="font-display font-extrabold text-gradient-ocean text-4xl md:text-5xl">4.9 / 5</div>
@@ -406,7 +406,7 @@ function Landing() {
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 1000px 400px at center, rgba(255,255,255,0.10), transparent)" }} />
         <div className="mx-auto max-w-3xl px-6 text-center relative">
           <h2 className="text-white">Start Selling Try-Ons Today</h2>
-          <p className="mt-4 text-white/80">Join 10,000+ stores already using Ecomify. Your first try-on product is free forever.</p>
+          <p className="mt-4 text-white/80">Join 10,000+ stores already using Easibie. Your first try-on product is free forever.</p>
           <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-3">
             <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)", minWidth: 220 }}>
               Create Free Account
@@ -442,7 +442,7 @@ function PromoTicket() {
       >
         <div className="py-3 text-center text-[12px] sm:text-[13px] font-bold tracking-wide flex items-center justify-center gap-2"
           style={{ background: "rgba(0,0,0,0.25)", color: "#fde047" }}>
-          <CheckIcon size={14} strokeWidth={3} /> <span className="text-white/90"><span style={{ color: "#fde047" }} className="font-extrabold">ecomify_promo</span> is applied</span>
+          <CheckIcon size={14} strokeWidth={3} /> <span className="text-white/90"><span style={{ color: "#fde047" }} className="font-extrabold">easibie_promo</span> is applied</span>
         </div>
         <div className="grid grid-cols-2 relative">
           <div className="absolute left-1/2 top-2 bottom-2 border-l-2 border-dashed" style={{ borderColor: "rgba(255,255,255,0.35)" }} />

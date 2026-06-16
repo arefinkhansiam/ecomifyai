@@ -90,7 +90,7 @@ export function Footer() {
         className="mx-auto max-w-7xl px-6 mt-8 pt-6 flex flex-col md:flex-row justify-between gap-3 text-[13px]"
         style={{ color: "rgba(255,255,255,0.35)", borderTop: "1px solid rgba(255,255,255,0.08)" }}
       >
-        <div>2025 Ecomify. All rights reserved.</div>
+        <div>2025 Easibie. All rights reserved.</div>
         <div className="flex gap-6">
           <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
           <a href="#" className="hover:text-white transition-colors">Terms of Service</a>

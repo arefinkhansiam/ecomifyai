@@ -61,7 +61,7 @@ export function Navbar() {
                 letterSpacing: "-0.02em",
               }}
             >
-              ECOMIFY
+              EASIBIE
             </span>
           </Link>
 

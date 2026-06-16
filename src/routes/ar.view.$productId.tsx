@@ -6,9 +6,9 @@ export const Route = createFileRoute("/ar/view/$productId")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Try-On Viewer — Ecomify" },
+      { title: "Try-On Viewer — Easibie" },
       { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" },
-      { name: "description", content: "Try this product on virtually with Ecomify." },
+      { name: "description", content: "Try this product on virtually with Easibie." },
     ],
   }),
   loader: async ({ params }) => {
@@ -331,7 +331,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       // Build watermark text
       const lines: string[] = [];
       if (cust.watermarkText) lines.push(cust.watermarkText);
-      if (cust.showPlatformWatermark) lines.push("Powered by Ecomify");
+      if (cust.showPlatformWatermark) lines.push("Powered by Easibie");
 
       if (lines.length > 0) {
         const pad = Math.round(Math.min(c.width, c.height) * 0.025);
@@ -380,7 +380,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     if (!wm) return;
     const a = document.createElement("a");
     a.href = wm.url;
-    a.download = `${product.product_name || "ecomify-tryon"}.png`;
+    a.download = `${product.product_name || "easibie-tryon"}.png`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(wm.url), 5000);
   };
@@ -389,7 +389,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     logEvent("share");
     const wm = await composeWatermarkedBlob();
     if (!wm) return;
-    const file = new File([wm.blob], `${product.product_name || "ecomify-tryon"}.png`, { type: "image/png" });
+    const file = new File([wm.blob], `${product.product_name || "easibie-tryon"}.png`, { type: "image/png" });
     try {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: product.product_name, text: "Check out my virtual try-on" });
@@ -424,7 +424,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
   const saveToWishlist = () => {
     try {
-      const key = "ecomify_wishlist";
+      const key = "easibie_wishlist";
       const cur = JSON.parse(localStorage.getItem(key) || "[]");
       if (!cur.includes(product.id)) {
         cur.push(product.id);
@@ -624,7 +624,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
       {product.show_branding !== false && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70" style={{ background: cust.overlay, color: cust.fontColor }}>
-          Powered by <span className="font-bold" style={{ color: cust.accent }}>Ecomify</span>
+          Powered by <span className="font-bold" style={{ color: cust.accent }}>Easibie</span>
         </div>
       )}
     </div>

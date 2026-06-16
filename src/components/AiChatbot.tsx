@@ -5,7 +5,7 @@ import { MessageCircle, X, Send, Sparkles, Loader2, GripVertical } from "lucide-
 import ReactMarkdown from "react-markdown";
 import { motion, useDragControls } from "framer-motion";
 
-const STORAGE_KEY = "ecomify_help_chat_v1";
+const STORAGE_KEY = "easibie_help_chat_v1";
 
 function loadInitial(): UIMessage[] {
   if (typeof window === "undefined") return [];
@@ -26,7 +26,7 @@ const SUGGESTIONS = [
   "How do I customize the button color?",
 ];
 
-const POS_KEY = "ecomify_chat_pos_v1";
+const POS_KEY = "easibie_chat_pos_v1";
 
 function loadPosition() {
   if (typeof window === "undefined") return { x: 0, y: 0 };
@@ -52,7 +52,7 @@ export function AiChatbot() {
 
   const transport = useRef(new DefaultChatTransport({ api: "/api/chat" })).current;
   const { messages, sendMessage, status, setMessages } = useChat({
-    id: "ecomify-help",
+    id: "easibie-help",
     messages: initial,
     transport,
     onError: (e) => console.error("chat error", e),
@@ -119,7 +119,7 @@ export function AiChatbot() {
               <Sparkles size={15} />
             </span>
             <div className="min-w-0 flex-1">
-              <div className="text-[13px] font-semibold leading-tight">Ecomify Assistant</div>
+              <div className="text-[13px] font-semibold leading-tight">Easibie Assistant</div>
               <div className="text-[10.5px]" style={{ color: "rgba(255,255,255,0.75)" }}>AI · usually replies instantly</div>
             </div>
             {messages.length > 0 && (
@@ -134,7 +134,7 @@ export function AiChatbot() {
             {messages.length === 0 && (
               <div>
                 <div className="rounded-xl p-3 text-[12.5px] leading-relaxed" style={{ background: "#fff", border: "1px solid #E2E8F0", color: "#0B1220" }}>
-                  Hi! I'm here to help you with Ecomify — setup, embedding, analytics, billing, anything. Pick a question or type your own.
+                  Hi! I'm here to help you with Easibie — setup, embedding, analytics, billing, anything. Pick a question or type your own.
                 </div>
                 <div className="mt-3 grid gap-1.5">
                   {SUGGESTIONS.map((s) => (

@@ -12,8 +12,8 @@ export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Sign in to Ecomify" },
-      { name: "description", content: "Sign in or create your Ecomify account to launch AI-powered Try-On experiences in minutes." },
+      { title: "Sign in to Easibie" },
+      { name: "description", content: "Sign in or create your Easibie account to launch AI-powered Try-On experiences in minutes." },
     ],
   }),
   component: AuthPage,
@@ -85,7 +85,7 @@ function AuthPage() {
         });
         if (error) throw error;
         if (data.session) {
-          toast.success("Welcome to Ecomify!");
+          toast.success("Welcome to Easibie!");
           done();
         } else {
           // Email confirmation required — try direct sign in
@@ -94,7 +94,7 @@ function AuthPage() {
             toast.success("Account created. Please check your email to confirm, then sign in.");
             setMode("signin");
           } else {
-            toast.success("Welcome to Ecomify!");
+            toast.success("Welcome to Easibie!");
             done();
           }
         }
@@ -194,7 +194,7 @@ function AuthPage() {
             <>Already have an account?{" "}
               <button onClick={() => setMode("signin")} className="font-semibold underline underline-offset-4" style={{ color: "#7dd3fc" }}>Sign in</button></>
           ) : (
-            <>New to Ecomify?{" "}
+            <>New to Easibie?{" "}
               <button onClick={() => setMode("signup")} className="font-semibold underline underline-offset-4" style={{ color: "#7dd3fc" }}>Create a free account</button></>
           )}
         </div>

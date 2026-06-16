@@ -20,7 +20,7 @@ function EmbedPage() {
   const [products, setProducts] = useState<{ id: string; product_name: string }[]>([]);
   const [selected, setSelected] = useState<string>("");
   const [qrData, setQrData] = useState<string | null>(null);
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://ecomify.com";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://easibie.com";
 
   useEffect(() => {
     if (!user) return;
@@ -40,9 +40,9 @@ function EmbedPage() {
 
   const url = selected ? `${origin}/ar/view/${selected}` : "";
   const embedCode = `<iframe src="${url}" width="100%" height="640" style="border:0;border-radius:16px" allow="xr-spatial-tracking; camera"></iframe>`;
-  const widgetSnippet = `<!-- Ecomify Try-On button — paste anywhere on your website -->\n<script src="${origin}/widget.js" data-product-id="${selected}" async></script>`;
-  const shopifyLiquid = `{% comment %} Ecomify Try-On button — Shopify {% endcomment %}\n{% comment %} Paste in your product template (e.g. sections/main-product.liquid) {% endcomment %}\n<div class="ecomify-tryon" style="margin-top:12px;">\n  <script src="${origin}/widget.js" data-product-id="${selected}" async></script>\n</div>`;
-  const platformSnippet = `<!-- Ecomify Try-On link -->\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
+  const widgetSnippet = `<!-- Easibie Try-On button — paste anywhere on your website -->\n<script src="${origin}/widget.js" data-product-id="${selected}" async></script>`;
+  const shopifyLiquid = `{% comment %} Easibie Try-On button — Shopify {% endcomment %}\n{% comment %} Paste in your product template (e.g. sections/main-product.liquid) {% endcomment %}\n<div class="easibie-tryon" style="margin-top:12px;">\n  <script src="${origin}/widget.js" data-product-id="${selected}" async></script>\n</div>`;
+  const platformSnippet = `<!-- Easibie Try-On link -->\n<a href="${url}" target="_blank" rel="noreferrer">Try it on</a>`;
 
   const copy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -75,7 +75,7 @@ function EmbedPage() {
           {qrData ? (
             <>
               <img src={qrData} alt="QR" className="mt-4 w-56 h-56 rounded-xl p-3" style={{ background: "linear-gradient(135deg,#0B1220,#0369A1)" }} />
-              <a href={qrData} download={`ecomify-qr.png`} className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}><Download size={12} /> Download PNG</a>
+              <a href={qrData} download={`easibie-qr.png`} className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}><Download size={12} /> Download PNG</a>
             </>
           ) : <div className="mt-4 w-56 h-56 rounded-xl bg-slate-100 animate-pulse" />}
         </div>

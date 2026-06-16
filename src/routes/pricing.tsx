@@ -7,7 +7,7 @@ import { PricingCards } from "@/components/PricingCards";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Ecomify Pricing — Free, Starter, Growth, Pro" },
+      { title: "Easibie Pricing — Free, Starter, Growth, Pro" },
       { name: "description", content: "Simple plans for stores of every size. Start free and upgrade when you scale." },
     ],
   }),
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/pricing")({
 const COMPARE: { label: string; free: boolean | string; pro: boolean | string }[] = [
   { label: "Try-On products", free: "1", pro: "Unlimited" },
   { label: "Access to all features", free: false, pro: true },
-  { label: "Remove Ecomify branding", free: false, pro: true },
+  { label: "Remove Easibie branding", free: false, pro: true },
   { label: "Custom viewer skin", free: false, pro: true },
   { label: "Brand colours & gradient", free: false, pro: true },
   { label: "Same-category recommendations", free: false, pro: true },

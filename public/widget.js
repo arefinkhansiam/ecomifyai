@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  // Ecomify Try-On Widget - drop-in script for any website
+  // Easibie Try-On Widget - drop-in script for any website
   var SUPABASE_URL = "https://ygsaduwfmycbrvjqbdbu.supabase.co";
   var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlnc2FkdXdmbXljYnJ2anFiZGJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTc1MTYsImV4cCI6MjA5NjM5MzUxNn0.H_sQ0JmPLfR62HXaJ5NrXWmVcm1s8xk5a1ez2XhF8M0";
 
@@ -11,7 +11,7 @@
 
   var productId = currentScript.getAttribute("data-product-id");
   if (!productId) {
-    console.warn("[Ecomify] Missing data-product-id");
+    console.warn("[Easibie] Missing data-product-id");
     return;
   }
   var overrideLabel = currentScript.getAttribute("data-label");
@@ -66,8 +66,8 @@
     } catch (e) {}
     fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(function () {});
   }
-  window.__ecomifyMarkInteract = markInteract;
-  window.__ecomifyEndSession = endSession;
+  window.__easibieMarkInteract = markInteract;
+  window.__easibieEndSession = endSession;
 
   function render(cfg) {
     var label = overrideLabel || cfg.button_label || "View Try-On";
@@ -100,7 +100,7 @@
       glow
         ? "box-shadow:0 0 0 0 " + accent + "33, 0 8px 28px -6px " + accent + "88, 0 0 24px " + accent + "66"
         : "box-shadow:0 6px 20px -6px rgba(2,132,199,0.45)",
-      glow ? "animation:ecomifyGlow 2.4s ease-in-out infinite" : ""
+      glow ? "animation:easibieGlow 2.4s ease-in-out infinite" : ""
     ].join(";");
     btn.onmouseenter = function () {
       btn.style.transform = "translateY(-2px) scale(1.02)";
@@ -113,9 +113,9 @@
     btn.onclick = function () { openTryOn(productId); };
     placeholder.appendChild(btn);
 
-    if (glow && !document.getElementById("ecomify-glow-kf")) {
-      var s = document.createElement("style"); s.id = "ecomify-glow-kf";
-      s.textContent = "@keyframes ecomifyGlow{" +
+    if (glow && !document.getElementById("easibie-glow-kf")) {
+      var s = document.createElement("style"); s.id = "easibie-glow-kf";
+      s.textContent = "@keyframes easibieGlow{" +
         "0%,100%{box-shadow:0 8px 28px -6px " + accent + "88,0 0 18px " + accent + "55}" +
         "50%{box-shadow:0 10px 36px -6px " + accent + "cc,0 0 36px " + accent + "aa}" +
         "}";
@@ -133,7 +133,7 @@
       return;
     }
     var wrap = document.createElement("div");
-    wrap.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(11,18,32,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;animation:ecomifyFade .25s ease both;";
+    wrap.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(11,18,32,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;animation:easibieFade .25s ease both;";
     var inner = document.createElement("div");
     inner.style.cssText = "position:relative;width:min(440px,92vw);height:min(820px,92vh);border-radius:28px;overflow:hidden;box-shadow:0 40px 100px -30px rgba(0,0,0,.6);background:#000";
     var iframe = document.createElement("iframe");
@@ -146,9 +146,9 @@
     close.onclick = function () { endSession(true); wrap.remove(); };
     inner.appendChild(iframe); inner.appendChild(close); wrap.appendChild(inner);
     document.body.appendChild(wrap);
-    if (!document.getElementById("ecomify-kf")) {
-      var st = document.createElement("style"); st.id = "ecomify-kf";
-      st.textContent = "@keyframes ecomifyFade{from{opacity:0}to{opacity:1}}";
+    if (!document.getElementById("easibie-kf")) {
+      var st = document.createElement("style"); st.id = "easibie-kf";
+      st.textContent = "@keyframes easibieFade{from{opacity:0}to{opacity:1}}";
       document.head.appendChild(st);
     }
   }

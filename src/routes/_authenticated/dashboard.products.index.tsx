@@ -153,10 +153,10 @@ function ShareDialog({ product, viewerUrl }: { product: Product; viewerUrl: stri
   }, [open, viewerUrl]);
 
   const snippets = useMemo(() => {
-    const universal = `<!-- Ecomify Try-On — works on ANY website -->
+    const universal = `<!-- Easibie Try-On — works on ANY website -->
 <script src="${typeof window !== "undefined" ? window.location.origin : ""}/widget.js" data-product-id="${product.id}" async></script>`;
-    const shopify = `{% comment %} Ecomify Try-On — paste in sections/main-product.liquid {% endcomment %}
-<div class="ecomify-tryon" data-product-handle="{{ product.handle }}">
+    const shopify = `{% comment %} Easibie Try-On — paste in sections/main-product.liquid {% endcomment %}
+<div class="easibie-tryon" data-product-handle="{{ product.handle }}">
   <script src="${typeof window !== "undefined" ? window.location.origin : ""}/widget.js"
           data-product-id="${product.id}"
           data-shopify-product="{{ product.id }}" async></script>
