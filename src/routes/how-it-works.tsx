@@ -5,8 +5,8 @@ import { UploadCloud, ImagePlus, Wand2, Share2, Sparkles, BarChart2, ShieldCheck
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How Ecomify Works — AI Photo Try-On in Seconds" },
-      { name: "description", content: "From product photo to photoreal AI try-on in under a minute. See exactly how Ecomify turns a single photo into a shareable try-on shoppers love." },
+      { title: "How Easibie Works — AI Photo Try-On in Seconds" },
+      { name: "description", content: "From product photo to photoreal AI try-on in under a minute. See exactly how Easibie turns a single photo into a shareable try-on shoppers love." },
     ],
   }),
   component: HowItWorks,

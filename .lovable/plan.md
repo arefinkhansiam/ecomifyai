@@ -1,5 +1,5 @@
 
-# Ecomify v2 — Customization, Conversion & Analytics Overhaul
+# Easibie v2 — Customization, Conversion & Analytics Overhaul
 
 This is a large multi-area change. I'll ship it in clearly-scoped phases so you can review as we go. Confirming the plan first so we agree on scope and order before I touch code.
 
@@ -50,7 +50,7 @@ Expanded customize dashboard with:
 - "Download Photo" button on Try-On viewer
 - Canvas-composited export (jpg)
 - Vendor watermark: logo or name; position (BR/BL/center); opacity slider
-- "Powered by Ecomify" watermark — default OFF, vendor toggle
+- "Powered by Easibie" watermark — default OFF, vendor toggle
 - Settings live on `tryon_branding`
 
 ## Phase 7 — Like / Not For Me + Alternatives

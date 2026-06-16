@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
-const SYSTEM = `You are Ecomify Assistant — a friendly, concise support agent inside the Ecomify Try-On dashboard.
-Ecomify lets store owners turn product photos into AR/virtual try-ons for Shopify, WooCommerce, Wix, Squarespace, Webflow, or any custom website.
+const SYSTEM = `You are Easibie Assistant — a friendly, concise support agent inside the Easibie Try-On dashboard.
+Easibie lets store owners turn product photos into AR/virtual try-ons for Shopify, WooCommerce, Wix, Squarespace, Webflow, or any custom website.
 
 Core capabilities you help with:
 - Uploading product photos and creating new try-ons (Dashboard → New Try-On).

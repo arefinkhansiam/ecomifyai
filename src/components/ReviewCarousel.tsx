@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 
 const reviews = [
   { title: "Shipped my first campaign", text: "Went from concept to final cut over a weekend. My agency clients assume I have a full team behind me now.", name: "Noah Becker", initials: "NB", stars: 4 },
-  { title: "Replaced three tools", text: "Dropped my photo editor, a video tool, and a stock subscription. Ecomify does all three, and the try-on is unreal.", name: "Lina Vázquez", initials: "LV", stars: 4 },
+  { title: "Replaced three tools", text: "Dropped my photo editor, a video tool, and a stock subscription. Easibie does all three, and the try-on is unreal.", name: "Lina Vázquez", initials: "LV", stars: 4 },
   { title: "Worth the upgrade", text: "I sat on Free for a week, upgraded on Monday, and booked my first paid ad spot by Friday. Paid for itself.", name: "Trevor Iverson", initials: "TI", stars: 5 },
   { title: "Sharp on-brand visuals", text: "Try-ons match our brand colors and lighting. Revision cycles dropped from days to minutes.", name: "Mira Lindqvist", initials: "ML", stars: 5 },
   { title: "Conversions doubled", text: "Two weeks in, our product page conversion rate doubled. The try-on closes the deal for hesitant shoppers.", name: "Rahul Mehta", initials: "RM", stars: 5 },

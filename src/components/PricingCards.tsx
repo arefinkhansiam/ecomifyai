@@ -31,7 +31,7 @@ export const PLANS: Plan[] = [
       "Works on any device",
     ],
     excluded: [
-      "Ecomify branding shown",
+      "Easibie branding shown",
       "Analytics dashboard",
       "Custom brand colours",
       "Priority support",
@@ -47,7 +47,7 @@ export const PLANS: Plan[] = [
     unit: "/month",
     features: [
       "10 Try-On products",
-      "Remove Ecomify branding",
+      "Remove Easibie branding",
       "Analytics dashboard",
       "Shareable link & QR code",
       "Email support",
@@ -70,7 +70,7 @@ export const PLANS: Plan[] = [
       "Custom brand colours & gradient",
       "3 team seats",
       "Analytics dashboard",
-      "Remove Ecomify branding",
+      "Remove Easibie branding",
       "Same-category recommendations",
     ],
     excluded: [

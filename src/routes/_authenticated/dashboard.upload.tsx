@@ -271,7 +271,7 @@ function UploadPage() {
   const origin = typeof window !== "undefined" ? window.location.origin : "https://your-domain.com";
   const productId = createdId ?? "PRODUCT_ID";
   const htmlSnippet = `<script src="${origin}/widget.js" data-product-id="${productId}"></script>`;
-  const liquidSnippet = `{% comment %} Ecomify Try-On — paste in product template {% endcomment %}\n<script\n  src="${origin}/widget.js"\n  data-product-id="${productId}"\n  data-label="${label}"\n></script>`;
+  const liquidSnippet = `{% comment %} Easibie Try-On — paste in product template {% endcomment %}\n<script\n  src="${origin}/widget.js"\n  data-product-id="${productId}"\n  data-label="${label}"\n></script>`;
 
   const sizePad = useMemo(() => size === "small" ? "10px 18px" : size === "large" ? "18px 36px" : "14px 28px", [size]);
   const sizeFs = useMemo(() => size === "small" ? "13px" : size === "large" ? "17px" : "15px", [size]);
@@ -441,7 +441,7 @@ function UploadPage() {
             </div>
 
             <div className="p-4 rounded-xl" style={{ background: "linear-gradient(135deg, rgba(2,132,199,0.06), rgba(56,189,248,0.06))", border: "1px solid rgba(2,132,199,0.15)" }}>
-              <Toggle label='Show "Powered by Ecomify"' checked={showBranding} onChange={setShowBranding} hint="Controls the viewer and store button badge." />
+              <Toggle label='Show "Powered by Easibie"' checked={showBranding} onChange={setShowBranding} hint="Controls the viewer and store button badge." />
             </div>
 
             {/* Try-On Page customization */}

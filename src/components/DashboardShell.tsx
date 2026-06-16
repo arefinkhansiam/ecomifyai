@@ -107,7 +107,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
             </div>
             <div className="min-w-0 flex-1 text-left">
               <div className="text-[13px] font-semibold truncate">{displayName}</div>
-              <div className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.5)" }}>Ecomify Studio</div>
+              <div className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.5)" }}>Easibie Studio</div>
             </div>
             <ChevronDown size={14} className="opacity-60" style={{ transform: storeMenuOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
           </button>
@@ -211,7 +211,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
               <div className="absolute right-0 top-12 w-80 rounded-xl overflow-hidden z-50" style={{ background: "#fff", border: "1px solid #E1E3E5", boxShadow: "0 20px 50px -20px rgba(2,132,199,0.35)" }}>
                 <div className="px-4 py-3 text-[13px] font-semibold" style={{ background: "linear-gradient(135deg,#0B1220,#0369A1)", color: "#fff" }}>Notifications</div>
                 <div className="divide-y" style={{ borderColor: "#F1F2F4" }}>
-                  <NotifItem title="Welcome to Ecomify" body="Upload your first product to start tracking try-ons." />
+                  <NotifItem title="Welcome to Easibie" body="Upload your first product to start tracking try-ons." />
                   <NotifItem title="Tip: Glowing button" body="Turn on the glowing CTA in product customize for higher CTR." />
                   <NotifItem title="Analytics live" body="Customer engagement is now being tracked in real time." />
                 </div>
@@ -233,7 +233,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
                     </details>
                   ))}
                 </div>
-                <a href="mailto:support@ecomify.app" className="block px-4 py-2.5 text-center text-[12px] font-semibold" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", color: "#fff" }}>Contact support</a>
+                <a href="mailto:support@easibie.app" className="block px-4 py-2.5 text-center text-[12px] font-semibold" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", color: "#fff" }}>Contact support</a>
               </div>
             )}
             {openMenu === "profile" && (
