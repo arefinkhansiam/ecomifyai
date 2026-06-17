@@ -33,6 +33,7 @@ const NAV_MAIN = [
 ] as const;
 
 const NAV_SALES = [
+  { to: "/dashboard/shopify", label: "Shopify", icon: ShoppingBag },
   { to: "/dashboard/embed", label: "Embed & Share", icon: LinkIcon },
   { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { to: "/dashboard/settings", label: "Profile", icon: Settings },
