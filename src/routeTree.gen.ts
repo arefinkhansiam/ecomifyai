@@ -29,6 +29,7 @@ import { Route as ApiPublicTryonDemoRouteImport } from './routes/api/public/tryo
 import { Route as ApiPublicTrackArSessionRouteImport } from './routes/api/public/track-ar-session'
 import { Route as ApiPublicArComposeRouteImport } from './routes/api/public/ar-compose'
 import { Route as AuthenticatedDashboardUploadRouteImport } from './routes/_authenticated/dashboard.upload'
+import { Route as AuthenticatedDashboardShopifyRouteImport } from './routes/_authenticated/dashboard.shopify'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardProductsRouteImport } from './routes/_authenticated/dashboard.products'
 import { Route as AuthenticatedDashboardEmbedRouteImport } from './routes/_authenticated/dashboard.embed'
@@ -142,6 +143,12 @@ const AuthenticatedDashboardUploadRoute =
     path: '/dashboard/upload',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardShopifyRoute =
+  AuthenticatedDashboardShopifyRouteImport.update({
+    id: '/dashboard/shopify',
+    path: '/dashboard/shopify',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardSettingsRoute =
   AuthenticatedDashboardSettingsRouteImport.update({
     id: '/dashboard/settings',
@@ -223,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRouteWithChildren
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
+  '/dashboard/shopify': typeof AuthenticatedDashboardShopifyRoute
   '/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
@@ -254,6 +262,7 @@ export interface FileRoutesByTo {
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
+  '/dashboard/shopify': typeof AuthenticatedDashboardShopifyRoute
   '/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
@@ -288,6 +297,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/embed': typeof AuthenticatedDashboardEmbedRoute
   '/_authenticated/dashboard/products': typeof AuthenticatedDashboardProductsRouteWithChildren
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
+  '/_authenticated/dashboard/shopify': typeof AuthenticatedDashboardShopifyRoute
   '/_authenticated/dashboard/upload': typeof AuthenticatedDashboardUploadRoute
   '/api/public/ar-compose': typeof ApiPublicArComposeRoute
   '/api/public/track-ar-session': typeof ApiPublicTrackArSessionRoute
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/dashboard/embed'
     | '/dashboard/products'
     | '/dashboard/settings'
+    | '/dashboard/shopify'
     | '/dashboard/upload'
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
@@ -353,6 +364,7 @@ export interface FileRouteTypes {
     | '/dashboard/billing'
     | '/dashboard/embed'
     | '/dashboard/settings'
+    | '/dashboard/shopify'
     | '/dashboard/upload'
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
@@ -386,6 +398,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/embed'
     | '/_authenticated/dashboard/products'
     | '/_authenticated/dashboard/settings'
+    | '/_authenticated/dashboard/shopify'
     | '/_authenticated/dashboard/upload'
     | '/api/public/ar-compose'
     | '/api/public/track-ar-session'
@@ -569,6 +582,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardUploadRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/shopify': {
+      id: '/_authenticated/dashboard/shopify'
+      path: '/dashboard/shopify'
+      fullPath: '/dashboard/shopify'
+      preLoaderRoute: typeof AuthenticatedDashboardShopifyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/settings': {
       id: '/_authenticated/dashboard/settings'
       path: '/dashboard/settings'
@@ -674,6 +694,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardEmbedRoute: typeof AuthenticatedDashboardEmbedRoute
   AuthenticatedDashboardProductsRoute: typeof AuthenticatedDashboardProductsRouteWithChildren
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
+  AuthenticatedDashboardShopifyRoute: typeof AuthenticatedDashboardShopifyRoute
   AuthenticatedDashboardUploadRoute: typeof AuthenticatedDashboardUploadRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
@@ -686,6 +707,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardProductsRoute:
     AuthenticatedDashboardProductsRouteWithChildren,
   AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
+  AuthenticatedDashboardShopifyRoute: AuthenticatedDashboardShopifyRoute,
   AuthenticatedDashboardUploadRoute: AuthenticatedDashboardUploadRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
 }
