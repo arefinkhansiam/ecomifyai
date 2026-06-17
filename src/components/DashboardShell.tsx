@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Box, BarChart2, Link as LinkIcon, CreditCard, Settings, Bell, HelpCircle, Crown, Activity, Upload, ChevronDown, BookOpen, MessageCircleQuestion } from "lucide-react";
+import { LayoutDashboard, Box, BarChart2, Link as LinkIcon, CreditCard, Settings, Bell, HelpCircle, Crown, Activity, Upload, ChevronDown, BookOpen, MessageCircleQuestion, ShoppingBag } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +33,7 @@ const NAV_MAIN = [
 ] as const;
 
 const NAV_SALES = [
+  { to: "/dashboard/shopify", label: "Shopify", icon: ShoppingBag },
   { to: "/dashboard/embed", label: "Embed & Share", icon: LinkIcon },
   { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { to: "/dashboard/settings", label: "Profile", icon: Settings },

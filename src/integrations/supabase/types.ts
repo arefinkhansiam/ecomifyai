@@ -557,6 +557,137 @@ export type Database = {
           },
         ]
       }
+      shopify_products: {
+        Row: {
+          created_at: string
+          currency: string | null
+          description: string | null
+          handle: string | null
+          id: string
+          images: Json
+          price_max: number | null
+          price_min: number | null
+          product_type: string | null
+          shopify_product_id: string
+          status: string | null
+          store_id: string
+          synced_at: string
+          title: string
+          total_inventory: number | null
+          tryon_category: string | null
+          tryon_enabled: boolean
+          updated_at: string
+          user_id: string
+          variants: Json
+          vendor: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          handle?: string | null
+          id?: string
+          images?: Json
+          price_max?: number | null
+          price_min?: number | null
+          product_type?: string | null
+          shopify_product_id: string
+          status?: string | null
+          store_id: string
+          synced_at?: string
+          title: string
+          total_inventory?: number | null
+          tryon_category?: string | null
+          tryon_enabled?: boolean
+          updated_at?: string
+          user_id: string
+          variants?: Json
+          vendor?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          handle?: string | null
+          id?: string
+          images?: Json
+          price_max?: number | null
+          price_min?: number | null
+          product_type?: string | null
+          shopify_product_id?: string
+          status?: string | null
+          store_id?: string
+          synced_at?: string
+          title?: string
+          total_inventory?: number | null
+          tryon_category?: string | null
+          tryon_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+          variants?: Json
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_products_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "shopify_stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shopify_stores: {
+        Row: {
+          access_token: string
+          created_at: string
+          currency: string | null
+          id: string
+          installed_at: string
+          last_synced_at: string | null
+          scopes: string | null
+          shop_domain: string
+          shop_email: string | null
+          shop_name: string | null
+          sync_status: string
+          uninstalled_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          installed_at?: string
+          last_synced_at?: string | null
+          scopes?: string | null
+          shop_domain: string
+          shop_email?: string | null
+          shop_name?: string | null
+          sync_status?: string
+          uninstalled_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          installed_at?: string
+          last_synced_at?: string | null
+          scopes?: string | null
+          shop_domain?: string
+          shop_email?: string | null
+          shop_name?: string | null
+          sync_status?: string
+          uninstalled_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tryon_branding: {
         Row: {
           accent_color: string
