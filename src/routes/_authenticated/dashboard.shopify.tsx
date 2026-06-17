@@ -81,9 +81,17 @@ function ShopifyPage() {
       toast.error("Please sign in");
       return;
     }
-    const cleaned = shopInput.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-    if (!cleaned) {
-      toast.error("Enter your Shopify store domain");
+    const raw = shopInput.trim().toLowerCase().replace(/^https?:\/\//, "");
+    let cleaned = "";
+    const adminMatch = raw.match(/^admin\.shopify\.com\/store\/([a-z0-9-]+)/);
+    if (adminMatch) {
+      cleaned = `${adminMatch[1]}.myshopify.com`;
+    } else {
+      cleaned = raw.replace(/\/.*$/, "");
+      if (cleaned && !cleaned.includes(".")) cleaned = `${cleaned}.myshopify.com`;
+    }
+    if (!cleaned || !cleaned.endsWith(".myshopify.com")) {
+      toast.error("Enter a .myshopify.com domain or admin.shopify.com/store/<handle> link");
       return;
     }
     const params = new URLSearchParams({ shop: cleaned, user_id: user.id });
