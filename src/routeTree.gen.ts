@@ -36,6 +36,7 @@ import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardBehaviourRouteImport } from './routes/_authenticated/dashboard.behaviour'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardProductsIndexRouteImport } from './routes/_authenticated/dashboard.products.index'
+import { Route as ApiPublicShopifyWebhookRouteImport } from './routes/api/public/shopify.webhook'
 import { Route as ApiPublicShopifyInstallRouteImport } from './routes/api/public/shopify.install'
 import { Route as ApiPublicShopifyCallbackRouteImport } from './routes/api/public/shopify.callback'
 import { Route as AuthenticatedDashboardProductsIdCustomizeRouteImport } from './routes/_authenticated/dashboard.products.$id.customize'
@@ -183,6 +184,11 @@ const AuthenticatedDashboardProductsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedDashboardProductsRoute,
   } as any)
+const ApiPublicShopifyWebhookRoute = ApiPublicShopifyWebhookRouteImport.update({
+  id: '/api/public/shopify/webhook',
+  path: '/api/public/shopify/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicShopifyInstallRoute = ApiPublicShopifyInstallRouteImport.update({
   id: '/api/public/shopify/install',
   path: '/api/public/shopify/install',
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/install': typeof ApiPublicShopifyInstallRoute
+  '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/dashboard/products/': typeof AuthenticatedDashboardProductsIndexRoute
   '/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
 }
@@ -259,6 +266,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/install': typeof ApiPublicShopifyInstallRoute
+  '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsIndexRoute
   '/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
 }
@@ -292,6 +300,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/install': typeof ApiPublicShopifyInstallRoute
+  '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/_authenticated/dashboard/products/': typeof AuthenticatedDashboardProductsIndexRoute
   '/_authenticated/dashboard/products/$id/customize': typeof AuthenticatedDashboardProductsIdCustomizeRoute
 }
@@ -325,6 +334,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/install'
+    | '/api/public/shopify/webhook'
     | '/dashboard/products/'
     | '/dashboard/products/$id/customize'
   fileRoutesByTo: FileRoutesByTo
@@ -355,6 +365,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/install'
+    | '/api/public/shopify/webhook'
     | '/dashboard/products'
     | '/dashboard/products/$id/customize'
   id:
@@ -387,6 +398,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/install'
+    | '/api/public/shopify/webhook'
     | '/_authenticated/dashboard/products/'
     | '/_authenticated/dashboard/products/$id/customize'
   fileRoutesById: FileRoutesById
@@ -412,6 +424,7 @@ export interface RootRouteChildren {
   ArViewProductIdRoute: typeof ArViewProductIdRoute
   ApiPublicShopifyCallbackRoute: typeof ApiPublicShopifyCallbackRoute
   ApiPublicShopifyInstallRoute: typeof ApiPublicShopifyInstallRoute
+  ApiPublicShopifyWebhookRoute: typeof ApiPublicShopifyWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -605,6 +618,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardProductsIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardProductsRoute
     }
+    '/api/public/shopify/webhook': {
+      id: '/api/public/shopify/webhook'
+      path: '/api/public/shopify/webhook'
+      fullPath: '/api/public/shopify/webhook'
+      preLoaderRoute: typeof ApiPublicShopifyWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/shopify/install': {
       id: '/api/public/shopify/install'
       path: '/api/public/shopify/install'
@@ -694,6 +714,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArViewProductIdRoute: ArViewProductIdRoute,
   ApiPublicShopifyCallbackRoute: ApiPublicShopifyCallbackRoute,
   ApiPublicShopifyInstallRoute: ApiPublicShopifyInstallRoute,
+  ApiPublicShopifyWebhookRoute: ApiPublicShopifyWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
