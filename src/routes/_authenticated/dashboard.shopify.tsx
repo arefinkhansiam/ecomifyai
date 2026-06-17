@@ -117,14 +117,19 @@ function ShopifyPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-[var(--ink-soft)]">
-                Enter your Shopify <code className="px-1 py-0.5 bg-black/5 rounded">.myshopify.com</code> domain (not your custom domain). You can find it in Shopify admin → Settings → Domains, listed as your "primary myshopify domain".
+                Paste any of these:
               </p>
+              <ul className="text-sm text-[var(--ink-soft)] list-disc pl-5 space-y-1">
+                <li>Admin link: <code className="px-1 py-0.5 bg-black/5 rounded">https://admin.shopify.com/store/your-handle</code></li>
+                <li>Myshopify domain: <code className="px-1 py-0.5 bg-black/5 rounded">yourstore.myshopify.com</code></li>
+                <li>Just the store handle: <code className="px-1 py-0.5 bg-black/5 rounded">your-handle</code></li>
+              </ul>
               <div className="grid gap-2">
-                <Label htmlFor="shop">Shopify store domain</Label>
+                <Label htmlFor="shop">Shopify store</Label>
                 <div className="flex gap-2">
                   <Input
                     id="shop"
-                    placeholder="yourstore.myshopify.com"
+                    placeholder="admin.shopify.com/store/your-handle or yourstore.myshopify.com"
                     value={shopInput}
                     onChange={(e) => setShopInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && startInstall()}
