@@ -109,7 +109,7 @@ function ShopifyPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-[var(--ink-soft)]">
-                Enter your <code className="px-1 py-0.5 bg-black/5 rounded">.myshopify.com</code> domain. You'll be redirected to Shopify to approve access — no passwords leave their side.
+                Enter your Shopify <code className="px-1 py-0.5 bg-black/5 rounded">.myshopify.com</code> domain (not your custom domain). You can find it in Shopify admin → Settings → Domains, listed as your "primary myshopify domain".
               </p>
               <div className="grid gap-2">
                 <Label htmlFor="shop">Shopify store domain</Label>
