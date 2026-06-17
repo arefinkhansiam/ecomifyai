@@ -1,0 +1,52 @@
+# Shopify App configuration — used by Shopify CLI for App Store submission.
+# Docs: https://shopify.dev/docs/apps/build/cli-for-apps/app-configuration
+
+name = "Easibie — Virtual Try-On & AR"
+handle = "easibie"
+client_id = "REPLACE_WITH_SHOPIFY_CLIENT_ID"             # same value as SHOPIFY_API_KEY
+application_url = "https://easibie.com/dashboard/shopify"
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = false
+dev_store_url = ""                                        # set during local dev
+include_config_on_deploy = true
+
+[webhooks]
+api_version = "2025-01"
+
+  [[webhooks.subscriptions]]
+  topics = [ "products/create", "products/update", "products/delete" ]
+  uri = "https://easibie.com/api/public/shopify/webhook"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "https://easibie.com/api/public/shopify/webhook"
+
+  [[webhooks.subscriptions]]
+  # Mandatory GDPR compliance webhooks — required for App Store approval.
+  topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+  uri = "https://easibie.com/api/public/shopify/webhook"
+
+[access_scopes]
+# Least-privilege scopes. Add scopes only when a feature actually needs them.
+scopes = "read_products,read_inventory,read_orders,write_script_tags"
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [
+  "https://easibie.com/api/public/shopify/callback",
+  "https://www.easibie.com/api/public/shopify/callback",
+]
+
+[pos]
+embedded = false
+
+[app_proxy]
+# Optional — only enable if we serve AR try-on assets through Shopify's storefront proxy.
+# url = "https://easibie.com/api/public/shopify/proxy"
+# subpath = "tryon"
+# prefix = "apps"
+
+[app_preferences]
+url = "https://easibie.com/dashboard/shopify"
