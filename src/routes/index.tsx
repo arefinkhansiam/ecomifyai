@@ -218,6 +218,56 @@ function Landing() {
         </div>
       </section>
 
+      {/* SMART WEARING & CUSTOMIZE — colorful 3D feature grid */}
+      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #FDF4FF 50%, #ECFEFF 100%)" }}>
+        <div aria-hidden className="absolute -top-20 left-1/4 w-[300px] h-[300px] blob opacity-30" style={{ background: "radial-gradient(circle,#A78BFA,#EC4899)" }} />
+        <div aria-hidden className="absolute bottom-0 right-1/4 w-[360px] h-[360px] blob opacity-30" style={{ background: "radial-gradient(circle,#34D399,#06B6D4)", animationDelay: "-9s" }} />
+        <div className="mx-auto max-w-7xl px-6 relative">
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] uppercase tracking-[0.18em] font-bold text-white gradient-shift" style={{ backgroundImage: "linear-gradient(90deg,#EC4899,#A78BFA,#0EA5E9)" }}>
+              <Sparkles size={12} /> New · Smart Wearing
+            </span>
+            <h2 className="mt-5 font-display font-extrabold tracking-tight text-4xl sm:text-5xl" style={{ backgroundImage: "linear-gradient(135deg,#0B1220 0%,#7C3AED 40%,#0EA5E9 80%,#10B981 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+              Smart Wearing &amp; Total Customization
+            </h2>
+            <p className="mt-4 text-slate-600">A complete creative toolkit — AI fitting, brand styling, gestures and live preview.</p>
+          </div>
+          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { icon: Cpu, t: "Smart Wearing AI", d: "Auto-detects body, pose and skin tone to fit garments naturally with correct drape and shadow.", g: "linear-gradient(135deg,#0EA5E9,#7C3AED)" },
+              { icon: Palette, t: "Brand Color Studio", d: "Tune primary, accent and gradient — your viewer matches your store's identity perfectly.", g: "linear-gradient(135deg,#EC4899,#F97316)" },
+              { icon: Layers, t: "Outfit Mix &amp; Match", d: "Stack tops, bottoms and accessories in one composed try-on. One shopper, full look.", g: "linear-gradient(135deg,#10B981,#06B6D4)" },
+              { icon: Wand, t: "One-Tap Restyle", d: "Re-render the same try-on in a new color, fabric or pattern without re-uploading.", g: "linear-gradient(135deg,#A78BFA,#EC4899)" },
+              { icon: Eye, t: "Live Preview Engine", d: "See AI compositions stream in as they generate — no awkward loading wait.", g: "linear-gradient(135deg,#F59E0B,#EF4444)" },
+              { icon: MousePointer2, t: "Drag-to-Place", d: "Drag jewellery, glasses or decor exactly where you want — pixel-precise control.", g: "linear-gradient(135deg,#06B6D4,#0369A1)" },
+              { icon: Zap, t: "Instant Variant Swap", d: "Sync product variants from Shopify — shoppers swap colors in the try-on instantly.", g: "linear-gradient(135deg,#FBBF24,#EC4899)" },
+              { icon: Globe2, t: "Multi-Language Viewer", d: "Auto-translates the try-on UI to your shopper's browser locale. 20+ languages.", g: "linear-gradient(135deg,#34D399,#0EA5E9)" },
+              { icon: Share2, t: "Shareable Looks", d: "Shoppers share their AI try-on to social — branded watermark drives traffic back.", g: "linear-gradient(135deg,#7C3AED,#0EA5E9)" },
+            ].map((f, i) => (
+              <motion.div
+                key={f.t}
+                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                transition={{ delay: i * 0.06, duration: 0.5 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                className="group relative rounded-2xl p-6 overflow-hidden"
+                style={{ background: "rgba(255,255,255,0.95)", border: "1px solid rgba(2,132,199,0.12)", boxShadow: "0 20px 50px -28px rgba(15,23,42,0.25)" }}
+              >
+                <div aria-hidden className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-15 group-hover:opacity-30 transition-opacity" style={{ background: f.g, filter: "blur(20px)" }} />
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-xl grid place-items-center text-white shadow-lg" style={{ background: f.g }}>
+                    <f.icon size={20} strokeWidth={2.2} />
+                  </div>
+                  <h3 className="mt-4 font-display font-bold text-[17px] text-slate-900">{f.t}</h3>
+                  <p className="mt-1.5 text-sm text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: f.d }} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+
       {/* PROOF / WHY IT WORKS */}
       <section className="py-24">
         <div className="mx-auto max-w-5xl px-6">
