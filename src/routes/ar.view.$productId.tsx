@@ -273,11 +273,14 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     streamRef.current?.getTracks().forEach((t) => t.stop());
     setPhase("processing");
     logEvent("tryon_started", { mode });
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 90_000);
     try {
       const r = await fetch("/api/public/ar-compose", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId: product.id, captureBase64: dataUrl, mode, subtype }),
+        signal: ctrl.signal,
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.error || `Error (${r.status})`);
@@ -286,9 +289,14 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       logEvent("tryon_completed");
     } catch (e: any) {
       setResultUrl(dataUrl);
-      setErrorMsg(e?.message || "AI unavailable — showing your photo so the flow completes.");
+      const msg = e?.name === "AbortError"
+        ? "AI is taking too long — showing your photo. Tap retake to try again."
+        : (e?.message || "AI unavailable — showing your photo so the flow completes.");
+      setErrorMsg(msg);
       setPhase("result");
       logEvent("tryon_completed", { fallback: true, reason: e?.message || "request_failed" });
+    } finally {
+      clearTimeout(timer);
     }
   };
 
