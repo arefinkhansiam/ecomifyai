@@ -81,8 +81,22 @@ export function InlineTryOnDemo({ compact = false }: { compact?: boolean }) {
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.error || `AI error (${r.status})`);
+      if (j?.fallback) {
+        const reason: string = j?.reason || "";
+        const friendly =
+          reason === "credits_exhausted"
+            ? "AI try-on is temporarily unavailable (out of credits). Please try again later."
+            : reason === "busy"
+            ? "AI is busy right now — please try again in a moment."
+            : "AI try-on couldn't complete. Please try again.";
+        setErr(friendly);
+        setPhase("idle");
+        setUserPhoto(null);
+        return;
+      }
       setResult(j.imageUrl);
       setPhase("result");
+
     } catch (e: any) {
       setResult(captureBase64);
       const msg = e?.name === "AbortError"
