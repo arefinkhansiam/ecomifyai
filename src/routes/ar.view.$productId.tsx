@@ -492,7 +492,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       {phase === "result" && resultUrl ? (
         <img src={resultUrl} alt="Try-on result" className="absolute inset-0 w-full h-full object-contain bg-black transition-opacity duration-500" />
       ) : (
-        <video ref={videoRef} playsInline muted className="absolute inset-0 w-full h-full object-cover" style={{ transform: facing === "user" ? "scaleX(-1)" : undefined }} />
+        <video ref={videoRef} playsInline autoPlay muted className="absolute inset-0 w-full h-full object-cover" style={{ transform: facing === "user" ? "scaleX(-1)" : undefined }} />
       )}
       <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.35), transparent 30%, transparent 60%, rgba(0,0,0,0.55))" }} />
 
