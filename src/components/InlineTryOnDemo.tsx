@@ -10,6 +10,23 @@ const DEMOS: Record<DemoKey, { label: string; img: string; icon: any; hint: stri
 };
 
 async function downscale(file: File, maxDim = 1280): Promise<string> {
+  // Prefer EXIF-aware createImageBitmap when available
+  if (typeof createImageBitmap === "function") {
+    try {
+      const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" } as any);
+      const s = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+      const w = Math.round(bitmap.width * s);
+      const h = Math.round(bitmap.height * s);
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      const ctx = c.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(bitmap, 0, 0, w, h);
+        bitmap.close?.();
+        return c.toDataURL("image/jpeg", 0.85);
+      }
+    } catch { /* fall back below */ }
+  }
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -33,27 +50,34 @@ async function downscale(file: File, maxDim = 1280): Promise<string> {
   });
 }
 
+const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
 export function InlineTryOnDemo({ compact = false }: { compact?: boolean }) {
   const [demo, setDemo] = useState<DemoKey>("tshirt");
   const [phase, setPhase] = useState<"idle" | "processing" | "result" | "error">("idle");
   const [result, setResult] = useState<string | null>(null);
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const d = DEMOS[demo];
 
   const onPick = async (f: File | null) => {
-    if (!f || !/^image\//.test(f.type)) return;
+    if (!f) return;
+    if (!ALLOWED_TYPES.includes(f.type.toLowerCase())) { setErr("Unsupported format. Use JPG, PNG, or WEBP."); return; }
     if (f.size > 15 * 1024 * 1024) { setErr("Image too large (max 15MB)"); return; }
     setErr(null);
     const captureBase64 = await downscale(f);
     setUserPhoto(captureBase64);
     setPhase("processing");
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 90_000);
     try {
       const r = await fetch("/api/public/tryon-demo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ demo, captureBase64 }),
+        signal: ctrl.signal,
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.error || `AI error (${r.status})`);
@@ -61,8 +85,13 @@ export function InlineTryOnDemo({ compact = false }: { compact?: boolean }) {
       setPhase("result");
     } catch (e: any) {
       setResult(captureBase64);
-      setErr(e?.message || "AI unavailable — showing your uploaded photo so the flow completes.");
+      const msg = e?.name === "AbortError"
+        ? "AI is taking too long — showing your photo so the flow completes."
+        : (e?.message || "AI unavailable — showing your uploaded photo so the flow completes.");
+      setErr(msg);
       setPhase("result");
+    } finally {
+      clearTimeout(timer);
     }
   };
 
