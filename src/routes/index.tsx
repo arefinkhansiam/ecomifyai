@@ -6,6 +6,7 @@ import { Tag, Check as CheckIcon } from "lucide-react";
 import {
   Sparkles, Play, Star, UploadCloud, ImagePlus, Wand2, Share2,
   Shirt, Sofa, Gem, Brush, Smartphone, BarChart2, Link as LinkIcon, ShieldCheck,
+  Palette, Layers, Zap, Eye, Cpu, Globe2, Wand, MousePointer2,
 } from "lucide-react";
 import { MarketingShell } from "@/components/MarketingShell";
 import { FeatureCard } from "@/components/FeatureCard";
