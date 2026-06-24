@@ -198,18 +198,53 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     setErrorMsg(null);
     try {
       streamRef.current?.getTracks().forEach((t) => t.stop());
+      if (typeof window !== "undefined" && window.isSecureContext === false) {
+        setErrorMsg("Camera requires a secure (HTTPS) connection.");
+        setPhase("unsupported"); return;
+      }
       if (!navigator.mediaDevices?.getUserMedia) { setPhase("unsupported"); return; }
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: m }, width: { ideal: 1280 }, height: { ideal: 1280 } },
-        audio: false,
-      });
+
+      const tryGet = async (constraints: MediaStreamConstraints) =>
+        navigator.mediaDevices.getUserMedia(constraints);
+
+      let stream: MediaStream;
+      try {
+        stream = await tryGet({
+          video: { facingMode: { ideal: m }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
+      } catch (e: any) {
+        // Fall back to basic constraints on OverconstrainedError / NotFoundError
+        if (e?.name === "OverconstrainedError" || e?.name === "NotFoundError") {
+          stream = await tryGet({ video: true, audio: false });
+        } else {
+          throw e;
+        }
+      }
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute("playsinline", "true");
+        videoRef.current.muted = true;
         await videoRef.current.play().catch(() => {});
       }
       setPhase("ready");
-    } catch { setPhase("denied"); }
+    } catch (e: any) {
+      const name = e?.name || "";
+      if (name === "NotAllowedError" || name === "SecurityError" || name === "PermissionDeniedError") {
+        setErrorMsg("Camera permission denied. Enable it in your browser settings and retry.");
+        setPhase("denied");
+      } else if (name === "NotReadableError" || name === "TrackStartError") {
+        setErrorMsg("Camera is in use by another app. Close it and retry.");
+        setPhase("denied");
+      } else if (name === "NotFoundError" || name === "OverconstrainedError") {
+        setErrorMsg("No usable camera found on this device.");
+        setPhase("unsupported");
+      } else {
+        setErrorMsg(e?.message || "Could not start the camera.");
+        setPhase("denied");
+      }
+    }
   };
 
   useEffect(() => {
