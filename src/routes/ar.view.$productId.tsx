@@ -198,18 +198,53 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     setErrorMsg(null);
     try {
       streamRef.current?.getTracks().forEach((t) => t.stop());
+      if (typeof window !== "undefined" && window.isSecureContext === false) {
+        setErrorMsg("Camera requires a secure (HTTPS) connection.");
+        setPhase("unsupported"); return;
+      }
       if (!navigator.mediaDevices?.getUserMedia) { setPhase("unsupported"); return; }
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: m }, width: { ideal: 1280 }, height: { ideal: 1280 } },
-        audio: false,
-      });
+
+      const tryGet = async (constraints: MediaStreamConstraints) =>
+        navigator.mediaDevices.getUserMedia(constraints);
+
+      let stream: MediaStream;
+      try {
+        stream = await tryGet({
+          video: { facingMode: { ideal: m }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
+      } catch (e: any) {
+        // Fall back to basic constraints on OverconstrainedError / NotFoundError
+        if (e?.name === "OverconstrainedError" || e?.name === "NotFoundError") {
+          stream = await tryGet({ video: true, audio: false });
+        } else {
+          throw e;
+        }
+      }
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute("playsinline", "true");
+        videoRef.current.muted = true;
         await videoRef.current.play().catch(() => {});
       }
       setPhase("ready");
-    } catch { setPhase("denied"); }
+    } catch (e: any) {
+      const name = e?.name || "";
+      if (name === "NotAllowedError" || name === "SecurityError" || name === "PermissionDeniedError") {
+        setErrorMsg("Camera permission denied. Enable it in your browser settings and retry.");
+        setPhase("denied");
+      } else if (name === "NotReadableError" || name === "TrackStartError") {
+        setErrorMsg("Camera is in use by another app. Close it and retry.");
+        setPhase("denied");
+      } else if (name === "NotFoundError" || name === "OverconstrainedError") {
+        setErrorMsg("No usable camera found on this device.");
+        setPhase("unsupported");
+      } else {
+        setErrorMsg(e?.message || "Could not start the camera.");
+        setPhase("denied");
+      }
+    }
   };
 
   useEffect(() => {
@@ -238,11 +273,14 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     streamRef.current?.getTracks().forEach((t) => t.stop());
     setPhase("processing");
     logEvent("tryon_started", { mode });
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 90_000);
     try {
       const r = await fetch("/api/public/ar-compose", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId: product.id, captureBase64: dataUrl, mode, subtype }),
+        signal: ctrl.signal,
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.error || `Error (${r.status})`);
@@ -251,9 +289,14 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       logEvent("tryon_completed");
     } catch (e: any) {
       setResultUrl(dataUrl);
-      setErrorMsg(e?.message || "AI unavailable — showing your photo so the flow completes.");
+      const msg = e?.name === "AbortError"
+        ? "AI is taking too long — showing your photo. Tap retake to try again."
+        : (e?.message || "AI unavailable — showing your photo so the flow completes.");
+      setErrorMsg(msg);
       setPhase("result");
       logEvent("tryon_completed", { fallback: true, reason: e?.message || "request_failed" });
+    } finally {
+      clearTimeout(timer);
     }
   };
 
@@ -280,16 +323,39 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
   const onPickPhoto = async (file: File | null) => {
     if (!file) return;
-    if (!/^image\//.test(file.type)) { setErrorMsg("Please pick an image file"); return; }
+    const okTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!okTypes.includes(file.type.toLowerCase())) {
+      setErrorMsg("Unsupported format. Use JPG, PNG, or WEBP.");
+      return;
+    }
     if (file.size > 15 * 1024 * 1024) { setErrorMsg("Image too large (max 15MB)"); return; }
     tracker.markInteract();
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const src = String(reader.result || "");
-      try {
+    try {
+      // Use createImageBitmap for EXIF-correct orientation when available.
+      let bitmap: ImageBitmap | null = null;
+      if (typeof createImageBitmap === "function") {
+        try { bitmap = await createImageBitmap(file, { imageOrientation: "from-image" } as any); } catch { bitmap = null; }
+      }
+      const maxDim = 1280;
+      if (bitmap) {
+        const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+        const w = Math.round(bitmap.width * scale);
+        const h = Math.round(bitmap.height * scale);
+        const c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        const cx = c.getContext("2d");
+        if (!cx) { setErrorMsg("Could not read the image."); return; }
+        cx.drawImage(bitmap, 0, 0, w, h);
+        bitmap.close?.();
+        await composeWith(c.toDataURL("image/jpeg", 0.85));
+        return;
+      }
+      // Fallback for browsers without createImageBitmap
+      const reader = new FileReader();
+      reader.onload = () => {
+        const src = String(reader.result || "");
         const img = new Image();
         img.onload = async () => {
-          const maxDim = 1280;
           const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
           const w = Math.round(img.width * scale);
           const h = Math.round(img.height * scale);
@@ -302,9 +368,12 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
         };
         img.onerror = () => composeWith(src);
         img.src = src;
-      } catch { await composeWith(src); }
-    };
-    reader.readAsDataURL(file);
+      };
+      reader.onerror = () => setErrorMsg("Could not read the file.");
+      reader.readAsDataURL(file);
+    } catch (e: any) {
+      setErrorMsg(e?.message || "Could not read the file.");
+    }
   };
 
   const retake = () => {
@@ -457,7 +526,7 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       {phase === "result" && resultUrl ? (
         <img src={resultUrl} alt="Try-on result" className="absolute inset-0 w-full h-full object-contain bg-black transition-opacity duration-500" />
       ) : (
-        <video ref={videoRef} playsInline muted className="absolute inset-0 w-full h-full object-cover" style={{ transform: facing === "user" ? "scaleX(-1)" : undefined }} />
+        <video ref={videoRef} playsInline autoPlay muted className="absolute inset-0 w-full h-full object-cover" style={{ transform: facing === "user" ? "scaleX(-1)" : undefined }} />
       )}
       <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.35), transparent 30%, transparent 60%, rgba(0,0,0,0.55))" }} />
 
