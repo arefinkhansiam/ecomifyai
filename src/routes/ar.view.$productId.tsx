@@ -315,16 +315,39 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
 
   const onPickPhoto = async (file: File | null) => {
     if (!file) return;
-    if (!/^image\//.test(file.type)) { setErrorMsg("Please pick an image file"); return; }
+    const okTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!okTypes.includes(file.type.toLowerCase())) {
+      setErrorMsg("Unsupported format. Use JPG, PNG, or WEBP.");
+      return;
+    }
     if (file.size > 15 * 1024 * 1024) { setErrorMsg("Image too large (max 15MB)"); return; }
     tracker.markInteract();
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const src = String(reader.result || "");
-      try {
+    try {
+      // Use createImageBitmap for EXIF-correct orientation when available.
+      let bitmap: ImageBitmap | null = null;
+      if (typeof createImageBitmap === "function") {
+        try { bitmap = await createImageBitmap(file, { imageOrientation: "from-image" } as any); } catch { bitmap = null; }
+      }
+      const maxDim = 1280;
+      if (bitmap) {
+        const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+        const w = Math.round(bitmap.width * scale);
+        const h = Math.round(bitmap.height * scale);
+        const c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        const cx = c.getContext("2d");
+        if (!cx) { setErrorMsg("Could not read the image."); return; }
+        cx.drawImage(bitmap, 0, 0, w, h);
+        bitmap.close?.();
+        await composeWith(c.toDataURL("image/jpeg", 0.85));
+        return;
+      }
+      // Fallback for browsers without createImageBitmap
+      const reader = new FileReader();
+      reader.onload = () => {
+        const src = String(reader.result || "");
         const img = new Image();
         img.onload = async () => {
-          const maxDim = 1280;
           const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
           const w = Math.round(img.width * scale);
           const h = Math.round(img.height * scale);
@@ -337,9 +360,12 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
         };
         img.onerror = () => composeWith(src);
         img.src = src;
-      } catch { await composeWith(src); }
-    };
-    reader.readAsDataURL(file);
+      };
+      reader.onerror = () => setErrorMsg("Could not read the file.");
+      reader.readAsDataURL(file);
+    } catch (e: any) {
+      setErrorMsg(e?.message || "Could not read the file.");
+    }
   };
 
   const retake = () => {
