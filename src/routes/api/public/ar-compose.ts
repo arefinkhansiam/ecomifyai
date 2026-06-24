@@ -119,18 +119,23 @@ export const Route = createFileRoute("/api/public/ar-compose")({
             }),
           });
 
-          if (r.status === 429) return successfulFallback(captureDataUrl, "busy");
-          if (r.status === 402) return successfulFallback(captureDataUrl, "credits_exhausted");
+          if (r.status === 429) { console.warn("[ar-compose] gateway 429 busy"); return successfulFallback(captureDataUrl, "busy"); }
+          if (r.status === 402) { console.warn("[ar-compose] gateway 402 credits"); return successfulFallback(captureDataUrl, "credits_exhausted"); }
           if (!r.ok) {
             const t = await r.text().catch(() => "");
+            console.error("[ar-compose] gateway error", r.status, t.slice(0, 400));
             return successfulFallback(captureDataUrl, `AI error (${r.status}): ${t.slice(0, 120)}`);
           }
           const j = await r.json();
           const msg = j?.choices?.[0]?.message;
           const imageUrl: string | undefined =
             msg?.images?.[0]?.image_url?.url ?? msg?.images?.[0]?.url ?? undefined;
-          if (!imageUrl) return successfulFallback(captureDataUrl, "no_image_returned");
+          if (!imageUrl) {
+            console.error("[ar-compose] no image in response", JSON.stringify(j).slice(0, 500));
+            return successfulFallback(captureDataUrl, "no_image_returned");
+          }
           return Response.json({ imageUrl, anglesUsed: productDataUrls.length }, { headers: CORS });
+
         } catch (e: any) {
           const fallback = (parsedBody as any)?.captureBase64 ? normalizeCapture(String((parsedBody as any).captureBase64)) : null;
           if (fallback) return successfulFallback(fallback, e?.message ?? "Bad request");

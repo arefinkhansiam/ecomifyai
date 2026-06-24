@@ -285,10 +285,26 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.error || `Error (${r.status})`);
+      if (j?.fallback) {
+        // AI did not actually run (no credits / busy / no image). Do NOT pretend the
+        // user's own photo is the try-on result — surface the real reason.
+        const reason: string = j?.reason || "";
+        const friendly =
+          reason === "credits_exhausted"
+            ? "AI try-on is temporarily unavailable (out of credits). Please try again later."
+            : reason === "busy"
+            ? "AI is busy right now — please try again in a moment."
+            : "AI try-on couldn't complete. Please try again.";
+        setErrorMsg(friendly);
+        setPhase("ready");
+        await startCamera(facing);
+        logEvent("tryon_completed", { fallback: true, reason });
+        return;
+      }
       setResultUrl(j.imageUrl);
       setPhase("result");
-      if (j?.fallback) setErrorMsg("AI is busy right now — tap retake to try again.");
-      logEvent("tryon_completed", { fallback: !!j?.fallback });
+      logEvent("tryon_completed", { fallback: false });
+
     } catch (e: any) {
       setResultUrl(dataUrl);
       const msg = e?.name === "AbortError"
