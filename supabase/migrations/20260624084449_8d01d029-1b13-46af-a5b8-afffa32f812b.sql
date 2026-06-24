@@ -1,0 +1,1 @@
+REVOKE SELECT (embed_token) ON public.ar_products FROM anon;
