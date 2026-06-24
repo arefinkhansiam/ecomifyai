@@ -248,4 +248,40 @@
     50% { box-shadow: 0 0 50px rgba(168,85,247,0.5), 0 0 90px rgba(56,189,248,0.4); }
   }
   .pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
+
+  /* Site-wide black + ocean blue enforcement (excludes dashboard) */
+  body :not(.dashboard-mono):not(.dashboard-mono *).bg-white,
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="bg-slate-50"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="bg-gray-50"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="bg-sky-50"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="bg-blue-50"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="bg-neutral-50"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="bg-stone-50"] {
+    background-color: #000000 !important;
+  }
+  body :not(.dashboard-mono):not(.dashboard-mono *).text-black,
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-slate-900"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-gray-900"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-neutral-900"] {
+    color: #F1F5F9 !important;
+  }
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-slate-700"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-slate-800"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-gray-700"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-gray-800"] {
+    color: #CBD5E1 !important;
+  }
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-slate-500"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-slate-600"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-gray-500"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="text-gray-600"] {
+    color: #94A3B8 !important;
+  }
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="border-slate-100"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="border-slate-200"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="border-gray-100"],
+  body :not(.dashboard-mono):not(.dashboard-mono *)[class*="border-gray-200"] {
+    border-color: #1E293B !important;
+  }
 }
+
