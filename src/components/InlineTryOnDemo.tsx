@@ -148,17 +148,30 @@ export function InlineTryOnDemo({ compact = false }: { compact?: boolean }) {
         </div>
 
         {/* User / result panel */}
-        <div className="p-6 grid place-items-center min-h-[300px] relative bg-white">
+        <div
+          className="p-6 grid place-items-center min-h-[300px] relative bg-white"
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            const f = e.dataTransfer.files?.[0];
+            if (f) onPick(f);
+          }}
+          style={dragOver ? { background: "rgba(56,189,248,0.08)", outline: "2px dashed #38BDF8", outlineOffset: "-12px" } : undefined}
+        >
           {phase === "idle" && (
             <label className="cursor-pointer text-center group">
-              <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => onPick(e.target.files?.[0] ?? null)} />
+              <input ref={fileRef} type="file" accept="image/jpeg,image/jpg,image/png,image/webp" hidden onChange={(e) => onPick(e.target.files?.[0] ?? null)} />
               <div className="w-20 h-20 mx-auto rounded-2xl grid place-items-center mb-4 transition-transform group-hover:scale-105"
                 style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)", boxShadow: "0 14px 30px -8px rgba(2,132,199,0.45)" }}>
                 <UploadCloud size={32} color="white" />
               </div>
               <div className="font-display font-bold text-lg text-ink">Try it on yourself</div>
               <p className="text-sm text-muted mt-1 max-w-xs mx-auto">{d.hint}</p>
-              <span className="inline-flex mt-4 btn-primary"><Sparkles size={14} /> Upload Photo</span>
+              <p className="text-[11px] text-muted mt-1">Drop a JPG, PNG or WEBP here, or</p>
+              <span className="inline-flex mt-2 btn-primary"><Sparkles size={14} /> Upload Photo</span>
+              {err && <p className="text-xs text-error mt-3">{err}</p>}
             </label>
           )}
 
