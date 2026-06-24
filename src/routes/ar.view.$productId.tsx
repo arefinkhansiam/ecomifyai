@@ -274,7 +274,8 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     setPhase("processing");
     logEvent("tryon_started", { mode });
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 90_000);
+    // Image generation can take a while — give it real headroom before we fall back.
+    const timer = setTimeout(() => ctrl.abort(), 150_000);
     try {
       const r = await fetch("/api/public/ar-compose", {
         method: "POST",
@@ -286,7 +287,8 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       if (!r.ok) throw new Error(j?.error || `Error (${r.status})`);
       setResultUrl(j.imageUrl);
       setPhase("result");
-      logEvent("tryon_completed");
+      if (j?.fallback) setErrorMsg("AI is busy right now — tap retake to try again.");
+      logEvent("tryon_completed", { fallback: !!j?.fallback });
     } catch (e: any) {
       setResultUrl(dataUrl);
       const msg = e?.name === "AbortError"
@@ -300,16 +302,40 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     }
   };
 
+  // Wait until the video element actually has frame data we can draw.
+  const waitForVideoFrame = (v: HTMLVideoElement, timeoutMs = 4000) => new Promise<boolean>((resolve) => {
+    if (v.readyState >= 2 && v.videoWidth > 0 && v.videoHeight > 0) return resolve(true);
+    const t = setTimeout(() => { cleanup(); resolve(false); }, timeoutMs);
+    const onReady = () => {
+      if (v.videoWidth > 0 && v.videoHeight > 0) { cleanup(); resolve(true); }
+    };
+    const cleanup = () => {
+      clearTimeout(t);
+      v.removeEventListener("loadeddata", onReady);
+      v.removeEventListener("loadedmetadata", onReady);
+      v.removeEventListener("canplay", onReady);
+    };
+    v.addEventListener("loadeddata", onReady);
+    v.addEventListener("loadedmetadata", onReady);
+    v.addEventListener("canplay", onReady);
+  });
+
   const capture = async () => {
     if (!videoRef.current) return;
     tracker.markInteract();
-    setPhase("capturing");
     const v = videoRef.current;
-    const w = v.videoWidth || 720;
-    const h = v.videoHeight || 1280;
+    // Ensure the camera frame is actually ready before sampling pixels.
+    const ready = await waitForVideoFrame(v);
+    if (!ready || !v.videoWidth || !v.videoHeight) {
+      setErrorMsg("Camera is still warming up — wait a moment and tap the shutter again.");
+      return;
+    }
+    setPhase("capturing");
+    const w = v.videoWidth;
+    const h = v.videoHeight;
     const canvas = canvasRef.current ?? document.createElement("canvas");
     canvasRef.current = canvas;
-    const maxDim = 1024;
+    const maxDim = 1280;
     const scale = Math.min(1, maxDim / Math.max(w, h));
     canvas.width = Math.round(w * scale);
     canvas.height = Math.round(h * scale);
@@ -317,9 +343,16 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
     if (!ctx) { setPhase("ready"); return; }
     if (facing === "user") { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
     ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+    // Guard against blank captures (some browsers return a 1-byte data URL when the frame isn't decoded yet)
+    if (!dataUrl || dataUrl.length < 2000) {
+      setErrorMsg("Capture failed — please try again.");
+      setPhase("ready");
+      return;
+    }
     await composeWith(dataUrl);
   };
+
 
   const onPickPhoto = async (file: File | null) => {
     if (!file) return;
