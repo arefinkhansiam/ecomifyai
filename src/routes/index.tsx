@@ -39,8 +39,21 @@ function Landing() {
     <MarketingShell>
       {/* HERO — white → ocean-blue gradient */}
       <section className="relative min-h-[calc(100vh-72px)] flex items-center overflow-hidden" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #E0F2FE 45%, #7DD3FC 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 900px 600px at 50% 0%, rgba(255,255,255,0.9), transparent 70%)" }} />
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 600px 400px at 80% 80%, rgba(3,105,161,0.25), transparent 70%)" }} />
+        {/* 3D animated blobs */}
+        <div aria-hidden className="absolute -top-32 -left-24 w-[420px] h-[420px] blob opacity-60" style={{ background: "radial-gradient(circle at 30% 30%, #38BDF8, #0369A1 70%)" }} />
+        <div aria-hidden className="absolute -bottom-32 -right-24 w-[480px] h-[480px] blob opacity-50" style={{ background: "radial-gradient(circle at 60% 40%, #A78BFA, #EC4899 70%)", animationDelay: "-6s" }} />
+        <div aria-hidden className="absolute top-1/3 right-10 w-[260px] h-[260px] blob opacity-40 hidden md:block" style={{ background: "radial-gradient(circle at 50% 50%, #34D399, #06B6D4 70%)", animationDelay: "-12s" }} />
+        {/* floating 3D shapes */}
+        <motion.div aria-hidden className="absolute top-24 right-[12%] hidden md:block" animate={{ y: [0, -18, 0], rotate: [0, 10, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}>
+          <div className="w-20 h-20 rounded-2xl shadow-2xl gradient-shift" style={{ backgroundImage: "linear-gradient(135deg,#0EA5E9,#A78BFA,#EC4899)", transform: "rotate(15deg) perspective(600px) rotateY(20deg)" }} />
+        </motion.div>
+        <motion.div aria-hidden className="absolute bottom-32 left-[8%] hidden md:block" animate={{ y: [0, 16, 0], rotate: [0, -8, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}>
+          <div className="w-16 h-16 rounded-full pulse-glow" style={{ background: "linear-gradient(135deg,#FBBF24,#F97316)" }} />
+        </motion.div>
+        <motion.div aria-hidden className="absolute top-40 left-[14%] hidden lg:block spin-slow" animate={{ y: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
+          <div className="w-12 h-12 rounded-xl gradient-shift" style={{ backgroundImage: "linear-gradient(135deg,#34D399,#06B6D4,#0369A1)" }} />
+        </motion.div>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 900px 600px at 50% 0%, rgba(255,255,255,0.7), transparent 70%)" }} />
         <div className="mx-auto max-w-6xl px-6 pt-32 md:pt-36 pb-20 text-center relative w-full">
           <motion.h1
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
