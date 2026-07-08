@@ -1,481 +1,146 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/use-auth";
-import { Tag, Check as CheckIcon } from "lucide-react";
-import {
-  Sparkles, Play, Star, UploadCloud, ImagePlus, Wand2, Share2,
-  Shirt, Sofa, Gem, Brush, Smartphone, BarChart2, Link as LinkIcon, ShieldCheck,
-  Palette, Layers, Zap, Eye, Cpu, Globe2, Wand, MousePointer2,
-} from "lucide-react";
 import { MarketingShell } from "@/components/MarketingShell";
-import { FeatureCard } from "@/components/FeatureCard";
-import { PricingCards } from "@/components/PricingCards";
-import { StatCounter } from "@/components/StatCounter";
-import { ReviewCarousel } from "@/components/ReviewCarousel";
-import { InlineTryOnDemo } from "@/components/InlineTryOnDemo";
-import demoBefore from "@/assets/demo-before.jpg";
-import demoAfter from "@/assets/demo-after.jpg";
+import {
+  Search, Bell, Moon, LayoutDashboard, ShoppingBag, Heart, Users, Compass,
+  FileText, Lock, TrendingUp, TrendingDown, ChevronDown, ArrowUpRight,
+  Shield, Smartphone, BarChart3, Link as LinkIcon,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Easibie — AI Photo Try-On for E-Commerce" },
-      { name: "description", content: "Upload product photos. Shoppers upload their own photo. Our AI generates a photoreal try-on in seconds — fashion, jewellery, furniture and makeup." },
+      { name: "description", content: "The ultimate AI try-on platform designed to revolutionize the way you sell fashion, jewellery, furniture and makeup online." },
       { property: "og:title", content: "Easibie — AI Photo Try-On for E-Commerce" },
-      { property: "og:description", content: "Photoreal try-on from a single photo. No app, no complex modeling." },
+      { property: "og:description", content: "Precision AI try-on at your fingertips." },
     ],
   }),
   component: Landing,
 });
 
-const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
-
 function Landing() {
   const { user, loading } = useAuth();
-  // Signed-in users land directly in the dashboard
   if (!loading && user) return <Navigate to="/dashboard" replace />;
   return (
     <MarketingShell>
-      {/* HERO — white → ocean-blue gradient */}
-      <section className="relative min-h-[calc(100vh-72px)] flex items-center overflow-hidden" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #E0F2FE 45%, #7DD3FC 100%)" }}>
-        {/* 3D animated blobs */}
-        <div aria-hidden className="absolute -top-32 -left-24 w-[420px] h-[420px] blob opacity-60" style={{ background: "radial-gradient(circle at 30% 30%, #38BDF8, #0369A1 70%)" }} />
-        <div aria-hidden className="absolute -bottom-32 -right-24 w-[480px] h-[480px] blob opacity-50" style={{ background: "radial-gradient(circle at 60% 40%, #A78BFA, #EC4899 70%)", animationDelay: "-6s" }} />
-        <div aria-hidden className="absolute top-1/3 right-10 w-[260px] h-[260px] blob opacity-40 hidden md:block" style={{ background: "radial-gradient(circle at 50% 50%, #34D399, #06B6D4 70%)", animationDelay: "-12s" }} />
-        {/* floating 3D shapes */}
-        <motion.div aria-hidden className="absolute top-24 right-[12%] hidden md:block" animate={{ y: [0, -18, 0], rotate: [0, 10, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}>
-          <div className="w-20 h-20 rounded-2xl shadow-2xl gradient-shift" style={{ backgroundImage: "linear-gradient(135deg,#0EA5E9,#A78BFA,#EC4899)", transform: "rotate(15deg) perspective(600px) rotateY(20deg)" }} />
-        </motion.div>
-        <motion.div aria-hidden className="absolute bottom-32 left-[8%] hidden md:block" animate={{ y: [0, 16, 0], rotate: [0, -8, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}>
-          <div className="w-16 h-16 rounded-full pulse-glow" style={{ background: "linear-gradient(135deg,#FBBF24,#F97316)" }} />
-        </motion.div>
-        <motion.div aria-hidden className="absolute top-40 left-[14%] hidden lg:block spin-slow" animate={{ y: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
-          <div className="w-12 h-12 rounded-xl gradient-shift" style={{ backgroundImage: "linear-gradient(135deg,#34D399,#06B6D4,#0369A1)" }} />
-        </motion.div>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 900px 600px at 50% 0%, rgba(255,255,255,0.7), transparent 70%)" }} />
-        <div className="mx-auto max-w-6xl px-6 pt-32 md:pt-36 pb-20 text-center relative w-full">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.05 }}
-            className="font-display font-extrabold uppercase tracking-tight leading-[0.95] text-[44px] sm:text-[68px] md:text-[88px] order-1"
-            style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}
-          >
-            Try It On.<br/>From One Photo.
-          </motion.h1>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }}
-            className="mx-auto mt-12 relative rounded-3xl overflow-hidden max-w-2xl"
-            style={{ boxShadow: "0 60px 120px -30px rgba(3,105,161,0.45)", border: "1px solid rgba(3,105,161,0.2)" }}
-          >
-            <div className="grid grid-cols-2">
-              <img src={demoBefore} alt="Shopper photo" className="w-full h-[260px] sm:h-[340px] object-cover" />
-              <img src={demoAfter} alt="AI try-on result" className="w-full h-[260px] sm:h-[340px] object-cover" />
-            </div>
-            <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-white" style={{ background: "rgba(2,6,12,0.7)", backdropFilter: "blur(8px)" }}>Before</div>
-            <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-white" style={{ background: GRAD }}>After</div>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.45 }}
-            className="mt-8 max-w-2xl mx-auto text-[16px] sm:text-[18px] text-slate-700"
-          >
-            The best AI try-on for e-commerce — turn product photos into photoreal try-ons your shoppers can see on themselves in seconds.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6 }}
-            className="mt-10 flex justify-center"
-          >
-            <Link
-              to="/try-ar"
-              className="inline-flex items-center gap-3 rounded-full font-bold text-base px-8 py-4 transition-transform hover:-translate-y-0.5"
-              style={{ background: GRAD, color: "#fff", boxShadow: "0 25px 60px -15px rgba(56,189,248,0.7), 0 0 0 2px rgba(56,189,248,0.4)" }}
-            >
-              Try it yourself <Play size={16} fill="currentColor" />
-            </Link>
-          </motion.div>
-
-          <div className="mt-12 flex items-center justify-center gap-4 flex-wrap">
-            <div className="flex -space-x-3">
-              {[
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=faces",
-                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=faces",
-                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=faces",
-                "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80&h=80&fit=crop&crop=faces",
-                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=faces",
-              ].map((src, i) => (
-                <img key={i} src={src} alt="" loading="lazy" className="w-9 h-9 rounded-full object-cover border-2" style={{ borderColor: "#ffffff" }} />
-              ))}
-            </div>
-            <div className="text-sm font-medium text-slate-700">10,000+ stores</div>
-            <div className="flex gap-1">{[0,1,2,3,4].map(i => <Star key={i} size={14} style={{ color: "#0369A1" }} fill="currentColor" />)}</div>
+      {/* HERO */}
+      <section className="px-4 pt-4">
+        <div className="mx-auto max-w-6xl rounded-[28px] bg-white border border-[#EEF0F3] px-6 md:px-14 pt-16 md:pt-24 pb-10">
+          <h1 className="text-center text-ink font-black leading-[1.05] tracking-[-0.035em]">
+            Precision Try-On at<br />
+            <span className="text-[#2563EB]">Your Fingertips</span>
+          </h1>
+          <p className="mt-6 text-center text-[15px] md:text-[16px] text-[#6B7280] max-w-xl mx-auto">
+            The ultimate AI Try-On platform designed to revolutionize
+            the way you sell online.
+          </p>
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Get Started</Link>
+            <Link to="/about" className="px-5 py-3 rounded-full bg-white border border-[#E5E7EB] text-[14px] font-semibold text-ink hover:border-[#9CA3AF] transition">Contact Us</Link>
           </div>
-        </div>
 
-      </section>
-
-      {/* STATS */}
-      <section className="bg-surface/60 backdrop-blur-sm py-16">
-        <div className="mx-auto max-w-6xl px-6 grid grid-cols-2 md:grid-cols-4 gap-10">
-          <StatCounter target={10000} suffix="+" label="Active Stores" />
-          <StatCounter target={2400000} suffix="+" label="Try-Ons Generated" />
-          <StatCounter target={30} suffix="%" label="Avg Sales Increase" />
-          <StatCounter target={5} suffix="s" label="To Generate a Try-On" />
-        </div>
-      </section>
-
-      {/* LIVE TRY-IT-YOURSELF DEMO */}
-      <section id="demo" className="py-20" style={{ background: "linear-gradient(180deg, transparent, rgba(2,132,199,0.08), transparent)" }}>
-        <div className="mx-auto max-w-5xl px-6">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-          <h2 className="mt-5 text-gradient-ocean">Try It Yourself, Right Here.</h2>
-            <p className="mt-4">Pick a sample product, upload one photo of yourself or your room — see the AI result in seconds.</p>
-          </div>
-          <InlineTryOnDemo />
-        </div>
-      </section>
-
-
-      {/* HOW IT WORKS */}
-      <section id="how" className="py-24" style={{ background: "linear-gradient(180deg, transparent, rgba(2,132,199,0.06), transparent)" }}>
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-gradient-ocean">How Easibie Works</h2>
-            <p className="mt-4">Three photos. One AI. Zero hardware.</p>
-          </div>
-          <div className="mt-16 relative">
-            <div className="hidden md:block absolute top-7 left-[16.66%] right-[16.66%] h-[2px]" style={{ background: "linear-gradient(90deg, #0B1220, #0369A1, #38BDF8)" }} />
-            <div className="md:hidden absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[2px]" style={{ background: "linear-gradient(180deg, #0B1220, #0369A1, #38BDF8)" }} />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6 relative">
-              {[
-                { n: 1, icon: UploadCloud, title: "Upload product photos", desc: "Add front, back, side and detail shots. More angles = a more accurate try-on." },
-                { n: 2, icon: ImagePlus, title: "Shopper adds their photo", desc: "They snap or upload one photo of themselves, their face, or their room." },
-                { n: 3, icon: Wand2, title: "AI generates the try-on", desc: "Gemini composes a photorealistic result in seconds — share, embed, sell." },
-              ].map((s, i) => (
-                <motion.div key={s.n} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }}
-                  className="flex flex-col items-center text-center relative">
-                  <div className="w-14 h-14 rounded-full grid place-items-center font-display font-extrabold text-xl text-white relative z-10"
-                    style={{ background: GRAD, boxShadow: "0 14px 30px -8px rgba(2,132,199,0.55)", border: "4px solid #ffffff" }}>{s.n}</div>
-                  <div className="mt-6 w-full rounded-2xl p-6"
-                    style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(14px)", border: "1px solid rgba(2,132,199,0.18)", boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)" }}>
-                    <div className="w-12 h-12 rounded-xl grid place-items-center mx-auto" style={{ background: GRAD, boxShadow: "0 12px 28px -10px rgba(2,132,199,0.55)" }}>
-                      <s.icon size={22} color="#ffffff" strokeWidth={2.2} />
-                    </div>
-                    <h3 className="mt-4 font-display font-bold text-[18px] leading-tight"
-                      style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>{s.title}</h3>
-                    <p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>{s.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+          {/* Dashboard mock */}
+          <div className="mt-14">
+            <DashboardMock />
           </div>
         </div>
       </section>
 
-      {/* USE CASES */}
-      <section className="py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-gradient-ocean">Built for Every Catalogue</h2>
-            <p className="mt-4">One pipeline. Four ways to try on.</p>
-          </div>
-          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { icon: Shirt, t: "Fashion", d: "T-shirts, dresses, jackets, bottoms — fit them onto the shopper's own photo." },
-              { icon: Gem, t: "Jewellery & Accessories", d: "Place necklaces, rings, watches, bags and glasses with realistic scale and shadow." },
-              { icon: Sofa, t: "Furniture & Decor", d: "Drop sofas, chairs and lamps into a photo of the shopper's actual room." },
-              { icon: Brush, t: "Makeup", d: "Match lipstick, eyeshadow and blush shades to a selfie — finish and opacity preserved." },
-            ].map((u) => (
-              <div key={u.t} className="rounded-2xl p-5"
-                style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(14px)", border: "1px solid rgba(2,132,199,0.18)", boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)" }}>
-                <div className="w-11 h-11 rounded-xl grid place-items-center text-white" style={{ background: GRAD }}>
-                  <u.icon size={18} />
-                </div>
-                <div className="mt-3 font-display font-bold text-ink">{u.t}</div>
-                <p className="mt-1 text-sm" style={{ color: "var(--ink-soft)" }}>{u.d}</p>
-              </div>
-            ))}
-          </div>
+      {/* Trusted by */}
+      <section className="px-4 py-20">
+        <h2 className="text-center text-ink">
+          Trusted by these<br />
+          <span className="text-[#2563EB]">& 1000 More</span>
+        </h2>
+        <div className="mt-12 mx-auto max-w-5xl grid grid-cols-3 md:grid-cols-6 gap-8 items-center justify-items-center opacity-70">
+          {["Framer","slack","GitHub","asana","Google","stripe"].map((b) => (
+            <div key={b} className="text-[22px] font-bold text-[#9CA3AF]">{b}</div>
+          ))}
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className="py-24" style={{ background: "linear-gradient(180deg, transparent, rgba(2,132,199,0.06), transparent)" }}>
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-gradient-ocean">Everything You Need to Sell</h2>
-            <p className="mt-4">No complex pipeline. No specialist. Just upload and share.</p>
-          </div>
-          <div className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard icon={UploadCloud} title="Multi-Angle Capture" description="Add as many angles as you have — front, back, side, detail. Our AI uses them all to render an accurate try-on." accent="primary" delay={0} />
-            <FeatureCard icon={Wand2} title="AI Photo Composition" description="Powered by Google Gemini. Photorealistic results that preserve the shopper's face, pose, lighting and background." accent="cyan" delay={0.1} />
-            <FeatureCard icon={Smartphone} title="Works On Any Phone" description="No headset. No app install. Shoppers upload a photo from any browser and see results in seconds." accent="primary" delay={0.2} />
-            <FeatureCard icon={LinkIcon} title="One Link + QR Per Product" description="Share a try-on link or scan-to-try QR code. Embed the widget on any online store." accent="cyan" delay={0.3} />
-            <FeatureCard icon={BarChart2} title="Try-On Analytics" description="Track sessions, devices, conversions and bounce — see which products move the needle." accent="primary" delay={0.4} />
-            <FeatureCard icon={ShieldCheck} title="Private & Secure" description="Shopper photos are processed for the try-on and never used for training. Enterprise-grade storage." accent="cyan" delay={0.5} />
-          </div>
+      {/* Discover better experience */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-6xl text-center">
+          <h2 className="text-ink">Discover a Better Experience</h2>
+          <p className="mt-4 text-[15px] text-[#6B7280] max-w-md mx-auto">
+            The ultimate AI Try-On platform designed to revolutionize the way you sell online.
+          </p>
         </div>
-      </section>
 
-      {/* SMART WEARING & CUSTOMIZE — colorful 3D feature grid */}
-      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #FDF4FF 50%, #ECFEFF 100%)" }}>
-        <div aria-hidden className="absolute -top-20 left-1/4 w-[300px] h-[300px] blob opacity-30" style={{ background: "radial-gradient(circle,#A78BFA,#EC4899)" }} />
-        <div aria-hidden className="absolute bottom-0 right-1/4 w-[360px] h-[360px] blob opacity-30" style={{ background: "radial-gradient(circle,#34D399,#06B6D4)", animationDelay: "-9s" }} />
-        <div className="mx-auto max-w-7xl px-6 relative">
-          <div className="text-center max-w-2xl mx-auto">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] uppercase tracking-[0.18em] font-bold text-white gradient-shift" style={{ backgroundImage: "linear-gradient(90deg,#EC4899,#A78BFA,#0EA5E9)" }}>
-              <Sparkles size={12} /> New · Smart Wearing
-            </span>
-            <h2 className="mt-5 font-display font-extrabold tracking-tight text-4xl sm:text-5xl" style={{ backgroundImage: "linear-gradient(135deg,#0B1220 0%,#7C3AED 40%,#0EA5E9 80%,#10B981 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
-              Smart Wearing &amp; Total Customization
-            </h2>
-            <p className="mt-4 text-slate-600">A complete creative toolkit — AI fitting, brand styling, gestures and live preview.</p>
-          </div>
-          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[
-              { icon: Cpu, t: "Smart Wearing AI", d: "Auto-detects body, pose and skin tone to fit garments naturally with correct drape and shadow.", g: "linear-gradient(135deg,#0EA5E9,#7C3AED)" },
-              { icon: Palette, t: "Brand Color Studio", d: "Tune primary, accent and gradient — your viewer matches your store's identity perfectly.", g: "linear-gradient(135deg,#EC4899,#F97316)" },
-              { icon: Layers, t: "Outfit Mix &amp; Match", d: "Stack tops, bottoms and accessories in one composed try-on. One shopper, full look.", g: "linear-gradient(135deg,#10B981,#06B6D4)" },
-              { icon: Wand, t: "One-Tap Restyle", d: "Re-render the same try-on in a new color, fabric or pattern without re-uploading.", g: "linear-gradient(135deg,#A78BFA,#EC4899)" },
-              { icon: Eye, t: "Live Preview Engine", d: "See AI compositions stream in as they generate — no awkward loading wait.", g: "linear-gradient(135deg,#F59E0B,#EF4444)" },
-              { icon: MousePointer2, t: "Drag-to-Place", d: "Drag jewellery, glasses or decor exactly where you want — pixel-precise control.", g: "linear-gradient(135deg,#06B6D4,#0369A1)" },
-              { icon: Zap, t: "Instant Variant Swap", d: "Sync product variants from Shopify — shoppers swap colors in the try-on instantly.", g: "linear-gradient(135deg,#FBBF24,#EC4899)" },
-              { icon: Globe2, t: "Multi-Language Viewer", d: "Auto-translates the try-on UI to your shopper's browser locale. 20+ languages.", g: "linear-gradient(135deg,#34D399,#0EA5E9)" },
-              { icon: Share2, t: "Shareable Looks", d: "Shoppers share their AI try-on to social — branded watermark drives traffic back.", g: "linear-gradient(135deg,#7C3AED,#0EA5E9)" },
-            ].map((f, i) => (
-              <motion.div
-                key={f.t}
-                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                transition={{ delay: i * 0.06, duration: 0.5 }}
-                whileHover={{ y: -6, scale: 1.02 }}
-                className="group relative rounded-2xl p-6 overflow-hidden"
-                style={{ background: "rgba(255,255,255,0.95)", border: "1px solid rgba(2,132,199,0.12)", boxShadow: "0 20px 50px -28px rgba(15,23,42,0.25)" }}
-              >
-                <div aria-hidden className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-15 group-hover:opacity-30 transition-opacity" style={{ background: f.g, filter: "blur(20px)" }} />
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-xl grid place-items-center text-white shadow-lg" style={{ background: f.g }}>
-                    <f.icon size={20} strokeWidth={2.2} />
-                  </div>
-                  <h3 className="mt-4 font-display font-bold text-[17px] text-slate-900">{f.t}</h3>
-                  <p className="mt-1.5 text-sm text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: f.d }} />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* PROOF / WHY IT WORKS */}
-      <section className="py-24">
-        <div className="mx-auto max-w-5xl px-6">
-          <div className="rounded-3xl p-8 md:p-14 relative overflow-hidden"
-            style={{ background: "linear-gradient(135deg, #0B1220 0%, #0369A1 55%, #38BDF8 100%)", boxShadow: "0 40px 100px -30px rgba(2,132,199,0.55)" }}>
-            <div className="relative">
-              <span className="pill" style={{ background: "rgba(255,255,255,0.14)", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)" }}>Why photo try-on wins</span>
-              <h2 className="mt-6 text-white">Better than camera filters. Easier than a fitting room.</h2>
-              <p className="mt-5 text-white/85 text-[17px] leading-relaxed max-w-3xl">
-                Camera-based previews are fiddly: shoppers have to install apps, stand a certain distance away and hold still. Photo try-on just works — one photo of the shopper, one photo of your product, one shareable result.
-              </p>
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { t: "Higher conversion", d: "Shoppers who see themselves wearing a product convert at significantly higher rates." },
-                  { t: "Fewer returns", d: "Realistic fit and shade preview cuts wrong-size and wrong-colour returns." },
-                  { t: "Zero friction", d: "No app, no special device support required. If the shopper can upload a photo, they can try on." },
-                ].map((f) => (
-                  <div key={f.t} className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)", backdropFilter: "blur(8px)" }}>
-                    <div className="font-display font-bold text-white">{f.t}</div>
-                    <p className="mt-2 text-sm text-white/85">{f.d}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)" }}>Start Free — No Card</Link>
-                <Link to="/try-ar" className="btn-ghost" style={{ background: "transparent", color: "#fff", borderColor: "rgba(255,255,255,0.35)" }}>See It in Action</Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PRICING — white, monday/slack inspired */}
-      <section id="pricing" className="py-24 relative" style={{ background: "#FFFFFF" }}>
-        <div className="mx-auto max-w-7xl px-6 relative">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="font-display font-extrabold tracking-tight text-slate-900 text-4xl sm:text-6xl leading-[1.05]">
-              Choose a plan built for your store.
-            </h2>
-            <p className="mt-5 text-[17px] text-slate-600">
-              Or start with the basics for free, and upgrade at any time.
+        <div className="mt-16 mx-auto max-w-6xl grid md:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 className="text-ink">The Best Dashboard you'll ever use.</h2>
+            <p className="mt-4 text-[15px] text-[#6B7280] max-w-md">
+              Join countless satisfied users who have embraced Easibie as the go-to solution for
+              maximizing productivity and efficiency.
             </p>
-          </div>
-          <PricingCards />
-          <p className="text-center text-sm text-slate-500 mt-10">All paid plans include a 7-day free trial. Sign in required to purchase.</p>
-        </div>
-      </section>
-
-
-
-
-      {/* UNLOCK FULL TRY-ON CAPABILITIES — comparison table */}
-      <section className="py-20 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 800px 500px at 50% 0%, rgba(56,189,248,0.10), transparent 70%)" }} />
-        <div className="mx-auto max-w-4xl px-6 relative">
-          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
-            Unlock Full Try-On Capabilities
-          </h2>
-          <div className="mt-12 relative">
-            <div className="grid grid-cols-[1.6fr_1fr_1fr] items-center text-sm">
-              <div className="text-slate-500 font-semibold uppercase tracking-wider text-xs py-4">What you'll get</div>
-              <div className="text-center font-bold text-slate-600 py-4">Free</div>
-              <div className="text-center font-bold py-4 rounded-t-2xl" style={{ color: "#0284C7", background: "linear-gradient(180deg, rgba(56,189,248,0.10), transparent)", border: "1.5px solid #38BDF8", borderBottom: "none", boxShadow: "0 -10px 40px -10px rgba(56,189,248,0.25)" }}>Pro</div>
-              {[
-                { label: "Try-On products", free: "1", pro: "Unlimited" },
-                { label: "Access to all features", free: false, pro: true },
-                { label: "Remove Easibie branding", free: false, pro: true },
-                { label: "Custom viewer skin", free: false, pro: true },
-                { label: "Brand colours & gradient", free: false, pro: true },
-                { label: "Same-category recommendations", free: false, pro: true },
-                { label: "Analytics dashboard", free: false, pro: true },
-                { label: "Watermarked downloads", free: false, pro: true },
-                { label: "Priority support", free: false, pro: true },
-                { label: "Team seats", free: "1", pro: "Unlimited" },
-              ].map((row, i, arr) => (
-                <div key={row.label} className="contents">
-                  <div className="py-4 text-slate-700 border-t" style={{ borderColor: "rgba(2,132,199,0.10)" }}>{row.label}</div>
-                  <div className="py-4 text-center text-slate-400 border-t" style={{ borderColor: "rgba(2,132,199,0.10)" }}>
-                    {typeof row.free === "boolean" ? (row.free ? <span style={{ color: "#0284C7" }}>✓</span> : <span>–</span>) : row.free}
-                  </div>
-                  <div
-                    className="py-4 text-center"
-                    style={{
-                      borderLeft: "1.5px solid #38BDF8",
-                      borderRight: "1.5px solid #38BDF8",
-                      borderTop: "1px solid rgba(56,189,248,0.12)",
-                      borderBottom: i === arr.length - 1 ? "1.5px solid #38BDF8" : undefined,
-                      background: "linear-gradient(180deg, rgba(56,189,248,0.04), rgba(56,189,248,0.01))",
-                      borderBottomLeftRadius: i === arr.length - 1 ? 16 : 0,
-                      borderBottomRightRadius: i === arr.length - 1 ? 16 : 0,
-                    }}
-                  >
-                    {typeof row.pro === "boolean" ? (row.pro ? <span style={{ color: "#0284C7" }}>✓</span> : <span className="text-slate-400">–</span>) : <span className="text-slate-800 font-semibold">{row.pro}</span>}
-                  </div>
-                </div>
+            <ul className="mt-6 space-y-3">
+              {["Engagement","Productivity","Retention"].map((t) => (
+                <li key={t} className="flex items-center gap-3 text-[15px] text-ink font-medium">
+                  <span className="w-5 h-5 rounded-full bg-[#2563EB] text-white grid place-items-center text-[11px]">✓</span>
+                  {t}
+                </li>
               ))}
+            </ul>
+            <button className="mt-8 btn-primary">Learn More</button>
+          </div>
+          <div>
+            <DashboardMock compact />
+          </div>
+        </div>
+
+        <div className="mt-24 mx-auto max-w-6xl grid md:grid-cols-2 gap-16 items-center">
+          <div className="order-2 md:order-1">
+            <CircleStat />
+          </div>
+          <div className="order-1 md:order-2">
+            <h2 className="text-ink">Enjoy the Convenience of Modern Tools, Including Video Genius</h2>
+            <p className="mt-4 text-[15px] text-[#6B7280] max-w-md">
+              Join countless satisfied users who have embraced Easibie as the go-to solution for
+              maximizing productivity and efficiency.
+            </p>
+            <button className="mt-8 btn-primary">Learn More</button>
+          </div>
+        </div>
+      </section>
+
+      {/* Best Feature Always */}
+      <section className="px-4 py-20 bg-[#F3F4F6]">
+        <div className="mx-auto max-w-6xl text-center">
+          <h2 className="text-ink">Best Feature <span className="text-[#2563EB]">Always</span></h2>
+          <p className="mt-4 text-[15px] text-[#6B7280] max-w-lg mx-auto">
+            Easibie protects your brand with a world-class try-on system that detects fit issues
+            and prevents returns. Safeguard your account.
+          </p>
+        </div>
+
+        <div className="mt-14 mx-auto max-w-6xl grid md:grid-cols-3 gap-6">
+          <FeatureCard title="Secure Interface" desc="Gain a comparative edge with our AI try-on tools, ensuring your store converts.">
+            <div className="flex items-center justify-center">
+              <CircleStat small />
             </div>
-          </div>
-          <div className="mt-10 flex items-center justify-center gap-2 text-xs text-slate-500">
-            <ShieldCheck size={14} style={{ color: "#0284C7" }} /> 7-day free trial · cancel anytime · pay safe & secure
-          </div>
+          </FeatureCard>
+          <FeatureCard title="Multi-Device Access" desc="Gain a comparative edge with our AI try-on tools, ensuring your store converts.">
+            <TeamGraph />
+          </FeatureCard>
+          <FeatureCard title="90% Accurate Report" desc="Gain a comparative edge with our AI try-on tools, ensuring your store converts.">
+            <MiniEarnings />
+          </FeatureCard>
         </div>
       </section>
 
-
-      {/* BEST PRICES IN INDUSTRY — professional table */}
-      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 50%, #FFFFFF 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 700px 400px at 50% 0%, rgba(56,189,248,0.12), transparent 70%)" }} />
-        <div className="mx-auto max-w-4xl px-6 relative">
-          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl leading-[1.05]">
-            <span className="block" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Best Prices</span>
-            <span className="block" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>In Try-On Industry</span>
-          </h2>
-          <p className="mt-4 text-center text-slate-600 max-w-xl mx-auto">Create more with the lowest cost per try-on. Transparent pricing — no hidden fees.</p>
-
-          <div className="mt-12 rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.95)", boxShadow: "0 30px 80px -25px rgba(56,189,248,0.25)", border: "1px solid rgba(224,242,254,0.80)" }}>
-            <div className="grid grid-cols-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500" style={{ background: "rgba(224,242,254,0.60)" }}>
-              <div className="px-3 sm:px-5 py-4">Plan</div>
-              <div className="px-3 sm:px-5 py-4 text-center">Monthly</div>
-              <div className="px-3 sm:px-5 py-4 text-center">Per try-on</div>
-              <div className="px-3 sm:px-5 py-4 text-center">Value</div>
-            </div>
-            {[
-              { plan: "Free", monthly: "$0", per: "$0.00", value: "1 try-on", highlight: false },
-              { plan: "Starter", monthly: "$10", per: "$0.05", value: "20 / $1", highlight: false },
-              { plan: "Growth", monthly: "$39", per: "$0.043", value: "23 / $1", highlight: false },
-              { plan: "Pro", monthly: "$49", per: "$0.020", value: "50 / $1", highlight: true },
-            ].map((row) => (
-              <div key={row.plan} className="grid grid-cols-4 text-sm items-center" style={{
-                borderTop: "1px solid rgba(2,132,199,0.08)",
-                background: row.highlight ? "linear-gradient(90deg, rgba(56,189,248,0.08), rgba(3,105,161,0.10))" : "transparent",
-              }}>
-                <div className="px-3 sm:px-5 py-4 font-display font-bold text-slate-800 flex items-center gap-2">
-                  {row.plan}
-                  {row.highlight && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider" style={{ background: GRAD, color: "#fff" }}>Best</span>}
-                </div>
-                <div className="px-3 sm:px-5 py-4 text-center text-slate-700 tabular-nums">{row.monthly}</div>
-                <div className="px-3 sm:px-5 py-4 text-center tabular-nums font-semibold" style={{ color: row.highlight ? "#0284C7" : "rgba(15,23,42,0.85)" }}>{row.per}</div>
-                <div className="px-3 sm:px-5 py-4 text-center text-slate-600 tabular-nums text-xs sm:text-sm">{row.value}</div>
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 text-center text-xs text-slate-500">Pro delivers up to <span style={{ color: "#0284C7" }} className="font-bold">2.3× more try-ons per dollar</span> than Starter.</p>
-        </div>
-      </section>
-
-
-      {/* REVIEWS — dark Higgsfield-style */}
-      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #02060c 0%, #050d1a 100%)" }}>
-        <div className="mx-auto max-w-6xl px-6 mb-10 text-center">
-          <h2 className="font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl text-white leading-[1.05]">
-            Community of <span style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>10,000+ </span>stores
-          </h2>
-          <p className="mt-3 text-sm text-white/60">Real results from real Easibie users.</p>
-        </div>
-        <ReviewCarousel />
-      </section>
-
-      {/* FAQ */}
-      <section className="py-20 relative" style={{ background: "linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)" }}>
-        <div className="mx-auto max-w-3xl px-6">
-          <h2 className="text-center font-display font-extrabold uppercase tracking-tight text-3xl sm:text-5xl mb-10 leading-[1.05]" style={{ backgroundImage: "linear-gradient(180deg, #0B1220 0%, #0369A1 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-3">
-            {[
-              { q: "How does the free trial work?", a: "Every paid plan starts with a 7-day free trial. No card required up front — you only pay when the trial ends." },
-              { q: "Can I change my plan later?", a: "Yes. Upgrade or downgrade anytime from your dashboard. Changes apply at the next billing cycle." },
-              { q: "How many try-ons can I generate?", a: "Free plan covers 1 product. Starter covers 10, Growth covers 50, Pro is unlimited." },
-              { q: "Will the try-ons work on my store?", a: "Yes. We provide a one-line embed snippet that works on Shopify, WooCommerce, Wix, Squarespace and any custom site." },
-              { q: "Is my shopper data safe?", a: "Yes. Shopper photos are processed for the try-on only and never used for training. Enterprise-grade storage." },
-              { q: "Do you offer refunds?", a: "If something is broken, contact support and we'll make it right. Otherwise, cancel anytime to stop future charges." },
-            ].map((f) => (
-              <details key={f.q} className="group rounded-2xl px-5 py-4" style={{ background: "rgba(255,255,255,0.95)", border: "1px solid rgba(56,189,248,0.20)", boxShadow: "0 4px 20px -8px rgba(2,132,199,0.15)" }}>
-                <summary className="flex items-center justify-between cursor-pointer list-none text-slate-800 font-semibold">
-                  {f.q}
-                  <span className="text-slate-400 group-open:rotate-180 transition-transform">⌄</span>
-                </summary>
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SOCIAL PROOF */}
-      <section className="py-20" style={{ background: "linear-gradient(135deg, rgba(2,132,199,0.10), rgba(6,182,212,0.05))" }}>
-        <div className="mx-auto max-w-6xl px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
-          <StatCounter target={10247} suffix="+" label="Stores Using Easibie" />
-          <StatCounter target={2400000} suffix="+" label="Try-Ons Delivered" />
-          <div className="text-center">
-            <div className="font-display font-extrabold text-gradient-ocean text-4xl md:text-5xl">4.9 / 5</div>
-            <div className="mt-2 text-sm text-muted">Average Customer Rating</div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-24 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #02060c 0%, #0a1929 30%, #0369A1 70%, #38BDF8 100%)" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 1000px 400px at center, rgba(255,255,255,0.10), transparent)" }} />
-        <div className="mx-auto max-w-3xl px-6 text-center relative">
-          <h2 className="text-white">Start Selling Try-Ons Today</h2>
-          <p className="mt-4 text-white/80">Join 10,000+ stores already using Easibie. Your first try-on product is free forever.</p>
-          <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-3">
-            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)", minWidth: 220 }}>
-              Create Free Account
-            </Link>
-            <Link to="/pricing" className="text-sm font-semibold text-white/90 hover:text-white underline-offset-4 hover:underline px-4 py-2">See pricing →</Link>
+      {/* Scale your Business */}
+      <section className="px-4 py-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <h2 className="text-ink">Scale your <span className="text-[#2563EB]">Business</span></h2>
+          <p className="mt-4 text-[15px] text-[#6B7280] max-w-md mx-auto">
+            The ultimate AI Try-On platform designed to revolutionize the way you sell online.
+          </p>
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Get Started</Link>
+            <Link to="/about" className="px-5 py-3 rounded-full bg-white border border-[#E5E7EB] text-[14px] font-semibold text-ink hover:border-[#9CA3AF] transition">Contact Us</Link>
           </div>
         </div>
       </section>
@@ -483,44 +148,160 @@ function Landing() {
   );
 }
 
-function PromoTicket() {
-  const [s, setS] = useState(15 * 60);
-  useEffect(() => {
-    const id = setInterval(() => setS((v) => (v > 0 ? v - 1 : 15 * 60)), 1000);
-    return () => clearInterval(id);
-  }, []);
-  const m = Math.floor(s / 60).toString().padStart(2, "0");
-  const sec = (s % 60).toString().padStart(2, "0");
-
+function DashboardMock({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="mt-10 mx-auto max-w-xl relative">
-      {/* perforated ticket */}
-      <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full" style={{ background: "#02060c" }} />
-      <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full" style={{ background: "#02060c" }} />
-      <div
-        className="rounded-2xl overflow-hidden relative"
-        style={{
-          background: "linear-gradient(135deg, #7f1d1d 0%, #dc2626 55%, #ef4444 100%)",
-          boxShadow: "0 30px 70px -20px rgba(239,68,68,0.55), 0 0 0 1px rgba(255,255,255,0.08)",
-        }}
-      >
-        <div className="py-3 text-center text-[12px] sm:text-[13px] font-bold tracking-wide flex items-center justify-center gap-2"
-          style={{ background: "rgba(0,0,0,0.25)", color: "#fde047" }}>
-          <CheckIcon size={14} strokeWidth={3} /> <span className="text-white/90"><span style={{ color: "#fde047" }} className="font-extrabold">easibie_promo</span> is applied</span>
-        </div>
-        <div className="grid grid-cols-2 relative">
-          <div className="absolute left-1/2 top-2 bottom-2 border-l-2 border-dashed" style={{ borderColor: "rgba(255,255,255,0.35)" }} />
-          <div className="py-6 sm:py-7 text-center">
-            <div className="font-display font-extrabold text-3xl sm:text-4xl tracking-tight" style={{ color: "#fde047", textShadow: "0 2px 18px rgba(253,224,71,0.45)" }}>21% OFF</div>
-            <div className="mt-1 text-[11px] text-white/75">With limited-offer promocode</div>
+    <div className="rounded-2xl border border-[#EEF0F3] bg-white shadow-[0_20px_50px_-30px_rgba(15,23,42,0.15)] overflow-hidden">
+      <div className="flex">
+        {/* sidebar */}
+        <aside className="w-[180px] shrink-0 border-r border-[#F1F2F5] p-4">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-7 h-7 rounded-lg bg-[#E9E5FF] grid place-items-center text-[#7C6BE8] text-xs font-bold">◐</div>
+            <span className="font-bold text-ink text-[15px]">Fintech</span>
           </div>
-          <div className="py-6 sm:py-7 text-center">
-            <div className="font-display font-extrabold text-3xl sm:text-4xl text-white tabular-nums tracking-tight">
-              {m} <span className="text-white/60">:</span> {sec}
+          <ul className="space-y-1 text-[13px]">
+            {[
+              { icon: LayoutDashboard, label: "Dashboard", active: true },
+              { icon: ShoppingBag, label: "Sale" },
+              { icon: Heart, label: "Favorite" },
+              { icon: Users, label: "Community" },
+              { icon: Compass, label: "Explore" },
+              { icon: FileText, label: "Document" },
+              { icon: Lock, label: "Privacy" },
+            ].map(({ icon: Icon, label, active }) => (
+              <li key={label}>
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${active ? "bg-[#EDE7FF] text-[#7C6BE8] font-semibold" : "text-[#6B7280]"}`}>
+                  <Icon size={15} />
+                  {label}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        {/* main */}
+        <div className="flex-1 p-5">
+          {/* search bar */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border border-[#F1F2F5] bg-[#FAFAFB]">
+              <Search size={14} className="text-[#9CA3AF]" />
+              <input placeholder="Search (Ctrl+/)" className="bg-transparent outline-none text-[13px] flex-1 text-[#6B7280]" />
             </div>
-            <div className="mt-1 flex items-center justify-center gap-6 text-[10px] uppercase tracking-[0.18em] text-white/70">
-              <span>minutes</span><span>seconds</span>
+            <div className="flex items-center gap-2">
+              <button className="w-8 h-8 rounded-full border border-[#F1F2F5] grid place-items-center"><Moon size={14} className="text-[#6B7280]" /></button>
+              <button className="w-8 h-8 rounded-full border border-[#F1F2F5] grid place-items-center relative">
+                <Bell size={14} className="text-[#6B7280]" />
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#EF4444] text-white text-[9px] grid place-items-center font-bold">4</span>
+              </button>
+              <div className="w-8 h-8 rounded-full bg-[#E5E7EB]" />
             </div>
+          </div>
+
+          <div className={`grid ${compact ? "grid-cols-1" : "grid-cols-2"} gap-4`}>
+            {/* Earnings card */}
+            <div className="rounded-xl border border-[#F1F2F5] p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="font-bold text-ink text-[14px]">Earning Reports</div>
+                  <div className="text-[11px] text-[#9CA3AF] mt-0.5">Weekly Earnings Overview</div>
+                </div>
+                <div className="text-[#9CA3AF]">⋯</div>
+              </div>
+              <div className="mt-4 flex items-end gap-4">
+                <div>
+                  <div className="text-[22px] font-black text-ink">$468.780</div>
+                  <div className="text-[11px] text-[#10B981] font-semibold mt-1">↑ 4.2%</div>
+                </div>
+                <div className="flex-1 flex items-end justify-end gap-1 h-16">
+                  {[30,50,40,60,45,90,55].map((h,i)=>(
+                    <div key={i} className="w-3 rounded-t-sm" style={{ height: `${h}%`, background: i===5?"#2563EB":"#E9E5FF" }} />
+                  ))}
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-[11px]">
+                {[
+                  { l: "Earnings", v: "$545.69", c: "#F59E0B" },
+                  { l: "Profit", v: "$256.34", c: "#10B981" },
+                  { l: "Expense", v: "$74.19", c: "#EF4444" },
+                ].map((s) => (
+                  <div key={s.l} className="rounded-lg border border-[#F1F2F5] p-2">
+                    <div className="text-[#9CA3AF]">{s.l}</div>
+                    <div className="font-bold text-ink text-[13px] mt-0.5">{s.v}</div>
+                    <div className="h-0.5 mt-2 rounded-full" style={{ background: s.c }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tracker card */}
+            {!compact && (
+              <div className="rounded-xl border border-[#F1F2F5] p-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="font-bold text-ink text-[14px]">Tracker list</div>
+                    <div className="text-[11px] text-[#9CA3AF] mt-0.5">Last 7 Days</div>
+                  </div>
+                  <div className="text-[#9CA3AF]">⋯</div>
+                </div>
+                <div className="mt-3 flex items-center gap-4">
+                  <div className="flex-1 space-y-2 text-[11px]">
+                    <div className="font-black text-[22px] text-ink leading-none">164</div>
+                    <div className="text-[#9CA3AF]">Total Tickets</div>
+                    <Row label="New Tickets" v="142" />
+                    <Row label="Open Tickets" v="28" />
+                    <Row label="Response Time" v="1 Day" />
+                  </div>
+                  <CircleStat small />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {!compact && (
+            <div className="mt-4 rounded-xl border border-[#F1F2F5] p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="font-bold text-ink text-[14px]">Projects</div>
+                <div className="flex-1 max-w-[200px] ml-4 flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#F1F2F5]">
+                  <Search size={12} className="text-[#9CA3AF]" />
+                  <input placeholder="Search" className="bg-transparent outline-none text-[12px] flex-1" />
+                </div>
+              </div>
+              <div className="grid grid-cols-[24px_1fr_120px_120px_120px] gap-3 text-[11px] text-[#9CA3AF] pb-2 border-b border-[#F1F2F5]">
+                <div /><div>Name ⇅</div><div>Leader ⇅</div><div>Team</div><div>Status ⇅</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Row({ label, v }: { label: string; v: string }) {
+  return (
+    <div className="flex items-center justify-between border-t border-[#F1F2F5] pt-1.5">
+      <span className="text-[#6B7280]">{label}</span>
+      <span className="font-semibold text-ink">{v}</span>
+    </div>
+  );
+}
+
+function CircleStat({ small = false }: { small?: boolean }) {
+  const size = small ? 96 : 160;
+  const stroke = small ? 8 : 12;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="grid place-items-center">
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg width={size} height={size} className="-rotate-90">
+          <circle cx={size/2} cy={size/2} r={r} stroke="#EEF0F3" strokeWidth={stroke} fill="none" />
+          <circle cx={size/2} cy={size/2} r={r} stroke="#A78BFA" strokeWidth={stroke} fill="none"
+            strokeDasharray={c} strokeDashoffset={c*0.15} strokeLinecap="round" strokeDasharray-="6 6" style={{ strokeDasharray: "6 8" }} />
+        </svg>
+        <div className="absolute inset-0 grid place-items-center">
+          <div className="text-center">
+            <div className={`font-black text-ink ${small ? "text-lg" : "text-3xl"}`}>85%</div>
+            {!small && <div className="text-[11px] text-[#9CA3AF] mt-1">Completed Task</div>}
           </div>
         </div>
       </div>
@@ -528,3 +309,49 @@ function PromoTicket() {
   );
 }
 
+function FeatureCard({ title, desc, children }: { title: string; desc: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl bg-white border border-[#EEF0F3] p-6">
+      <div className="h-40 mb-6">{children}</div>
+      <div className="flex items-center gap-2 mb-2">
+        <LinkIcon size={14} className="text-[#2563EB]" />
+        <h3 className="text-[16px] font-bold text-ink">{title}</h3>
+      </div>
+      <p className="text-[13px] text-[#6B7280]">{desc}</p>
+    </div>
+  );
+}
+
+function TeamGraph() {
+  return (
+    <div className="h-full grid place-items-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 rounded-full bg-[#E5E7EB] grid place-items-center text-[10px] text-[#6B7280]">Shakib</div>
+        <div className="flex gap-8">
+          <div className="w-10 h-10 rounded-full bg-[#E5E7EB] grid place-items-center text-[9px] text-[#6B7280]">Hazard</div>
+          <div className="w-10 h-10 rounded-full bg-[#E5E7EB] grid place-items-center text-[9px] text-[#6B7280]">David L</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MiniEarnings() {
+  return (
+    <div className="h-full rounded-xl border border-[#F1F2F5] p-3">
+      <div className="text-[12px] font-bold text-ink">Earning Reports</div>
+      <div className="text-[10px] text-[#9CA3AF]">Weekly Earnings Overview</div>
+      <div className="mt-2 flex items-end gap-3">
+        <div>
+          <div className="text-[16px] font-black text-ink">$468.780</div>
+          <div className="text-[9px] text-[#10B981] font-semibold">↑ 4.2%</div>
+        </div>
+        <div className="flex-1 flex items-end justify-end gap-1 h-10">
+          {[30,50,40,60,45,90,55].map((h,i)=>(
+            <div key={i} className="w-2 rounded-t-sm" style={{ height: `${h}%`, background: i===5?"#2563EB":"#E9E5FF" }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
