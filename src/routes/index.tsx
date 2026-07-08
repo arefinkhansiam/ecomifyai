@@ -296,7 +296,8 @@ function CircleStat({ small = false }: { small?: boolean }) {
         <svg width={size} height={size} className="-rotate-90">
           <circle cx={size/2} cy={size/2} r={r} stroke="#EEF0F3" strokeWidth={stroke} fill="none" />
           <circle cx={size/2} cy={size/2} r={r} stroke="#A78BFA" strokeWidth={stroke} fill="none"
-            strokeDasharray={c} strokeDashoffset={c*0.15} strokeLinecap="round" strokeDasharray-="6 6" style={{ strokeDasharray: "6 8" }} />
+            strokeDashoffset={c*0.15} strokeLinecap="round" style={{ strokeDasharray: "6 8" }} />
+
         </svg>
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-center">
