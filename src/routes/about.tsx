@@ -1,18 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MarketingShell } from "@/components/MarketingShell";
-import { Sparkles, Heart, Zap, Globe } from "lucide-react";
+import { Sparkles, Heart, Zap, Globe, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About Easibie — AI Photo Try-On, for Every Store" },
-      { name: "description", content: "We're building the AI try-on layer of e-commerce so every store — big or small — can let shoppers see themselves wearing or using the product before they buy." },
+      { name: "description", content: "We're building the AI try-on layer of e-commerce so every store can let shoppers see themselves wearing or using the product before they buy." },
     ],
   }),
   component: About,
 });
-
-const GRAD = "linear-gradient(135deg, #0B1220 0%, #0369A1 50%, #38BDF8 100%)";
 
 function About() {
   const values = [
@@ -22,64 +20,73 @@ function About() {
   ];
   return (
     <MarketingShell>
-      <section className="relative">
-        <div className="absolute inset-0 -z-10 opacity-70" style={{ background: "radial-gradient(ellipse 900px 500px at 50% 0%, rgba(14,165,233,0.22), transparent 70%)" }} />
-        <div className="mx-auto max-w-3xl px-6 pt-20 pb-12 text-center">
-          <span className="pill"><Sparkles size={14} /> About Easibie</span>
-          <h1 className="mt-5 text-gradient-ocean">AI try-on, for every store.</h1>
-          <p className="mt-6 text-lg" style={{ color: "var(--ink-soft)" }}>
-            Easibie was founded with a simple belief: every online shopper deserves to see themselves with the product before they buy. We made that possible from a single photo — no headsets, no complex modelling, no developer team.
-          </p>
+      {/* HERO */}
+      <section className="px-4 pt-6">
+        <div className="mx-auto max-w-6xl card-soft px-6 md:px-14 pt-20 pb-14 text-center relative overflow-hidden">
+          <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #C7BEEB, transparent 70%)" }} />
+          <div className="absolute -bottom-32 -right-24 w-96 h-96 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #A99BF0, transparent 70%)" }} />
+          <div className="relative">
+            <span className="pill"><Sparkles size={12} /> About Easibie</span>
+            <h1 className="mt-5 text-ink">AI try-on,<br /><span className="italic">for every store.</span></h1>
+            <p className="mt-6 text-[16px] text-[#6B6689] max-w-2xl mx-auto">
+              Easibie was founded with a simple belief: every online shopper deserves to see themselves with the product before they buy. We made that possible from a single photo — no headsets, no complex modelling, no developer team.
+            </p>
+          </div>
         </div>
       </section>
 
-      <section className="pb-10">
-        <div className="mx-auto max-w-5xl px-6 grid grid-cols-1 md:grid-cols-3 gap-5">
+      {/* STATS */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-5">
           {[
             { k: "10k+", v: "Active stores" },
             { k: "2.4M", v: "Try-ons delivered" },
             { k: "30%", v: "Avg sales lift" },
           ].map((x) => (
-            <div key={x.k} className="rounded-2xl p-6 text-center" style={{ background: "rgba(255,255,255,0.92)", border: "1px solid rgba(2,132,199,0.18)", boxShadow: "0 18px 40px -22px rgba(2,132,199,0.35)" }}>
-              <div className="font-display text-5xl font-extrabold" style={{ backgroundImage: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>{x.k}</div>
-              <div className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>{x.v}</div>
+            <div key={x.k} className="card-tile p-8 text-center">
+              <div className="text-[54px] font-extrabold tracking-[-0.04em] text-ink">{x.k}</div>
+              <div className="mt-2 text-[13px] text-[#6B6689]">{x.v}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="py-16" style={{ background: "linear-gradient(180deg, transparent, rgba(2,132,199,0.06), transparent)" }}>
-        <div className="mx-auto max-w-5xl px-6">
-          <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-gradient-ocean">What we believe.</h2>
-          </div>
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5">
-            {values.map((v) => (
-              <div key={v.t} className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.92)", border: "1px solid rgba(2,132,199,0.18)", boxShadow: "0 14px 30px -18px rgba(2,132,199,0.3)" }}>
-                <div className="w-12 h-12 rounded-xl grid place-items-center text-white" style={{ background: GRAD }}><v.icon size={20} /></div>
-                <div className="mt-3 font-display font-bold text-ink text-lg">{v.t}</div>
-                <p className="mt-1 text-sm" style={{ color: "var(--ink-soft)" }}>{v.d}</p>
-              </div>
-            ))}
-          </div>
+      {/* VALUES */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-4xl text-center mb-12">
+          <span className="pill">Our principles</span>
+          <h2 className="mt-5 text-ink">What we believe</h2>
+        </div>
+        <div className="mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-5">
+          {values.map((v) => (
+            <div key={v.t} className="card-tile p-6">
+              <div className="w-11 h-11 rounded-xl bg-[#F3F0FE] grid place-items-center text-[#1F1747]"><v.icon size={18} /></div>
+              <h4 className="mt-5 text-ink">{v.t}</h4>
+              <p className="mt-2 text-[13px] text-[#6B6689]">{v.d}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="mx-auto max-w-3xl px-6 space-y-5 text-[17px]" style={{ color: "var(--ink-soft)" }}>
-          <p>We're a small team of designers, engineers and ex-store owners. We obsess over conversion, latency, and the smallest details of every try-on we render.</p>
-          <p>Our mission is to make online shopping feel real — wherever your customers happen to be.</p>
+      {/* STORY */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-4xl card-soft p-10 md:p-14">
+          <h2 className="text-ink">A small team, <span className="italic">obsessed</span> with the details.</h2>
+          <p className="mt-6 text-[15px] text-[#4B4368]">We're a small team of designers, engineers and ex-store owners. We obsess over conversion, latency, and the smallest details of every try-on we render.</p>
+          <p className="mt-4 text-[15px] text-[#4B4368]">Our mission is to make online shopping feel real — wherever your customers happen to be.</p>
         </div>
       </section>
 
-      <section className="py-20 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #02060c 0%, #0a1929 30%, #0369A1 70%, #38BDF8 100%)" }}>
-        <div className="mx-auto max-w-3xl px-6 text-center relative">
-          <h2 className="text-white">Join 10,000+ stores using Easibie.</h2>
-          <div className="mt-7 flex flex-col sm:flex-row justify-center items-center gap-3">
-            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary" style={{ background: "#fff", color: "var(--primary)", minWidth: 220 }}>
-              Start Free
-            </Link>
-            <Link to="/pricing" className="text-sm font-semibold text-white/90 hover:text-white underline-offset-4 hover:underline px-4 py-2">See pricing →</Link>
+      {/* CTA */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-4xl card-soft p-14 text-center relative overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #C7BEEB, transparent 70%)" }} />
+          <div className="relative">
+            <h2 className="text-ink">Join 10,000+ <span className="italic">stores</span> using Easibie</h2>
+            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+              <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Start Free <ArrowRight size={14} /></Link>
+              <Link to="/pricing" className="btn-ghost">See pricing</Link>
+            </div>
           </div>
         </div>
       </section>
