@@ -2,18 +2,17 @@ import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/use-auth";
 import { MarketingShell } from "@/components/MarketingShell";
 import {
-  Search, Bell, Moon, LayoutDashboard, ShoppingBag, Heart, Users, Compass,
-  FileText, Lock, TrendingUp, TrendingDown, ChevronDown, ArrowUpRight,
-  Shield, Smartphone, BarChart3, Link as LinkIcon,
+  Sparkles, Camera, Wand2, Share2, ArrowRight, Check, Star, Shield,
+  Palette, Layers, BarChart3, Globe, Users, Zap, MessageCircle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Easibie — AI Photo Try-On for E-Commerce" },
-      { name: "description", content: "The ultimate AI try-on platform designed to revolutionize the way you sell fashion, jewellery, furniture and makeup online." },
-      { property: "og:title", content: "Easibie — AI Photo Try-On for E-Commerce" },
-      { property: "og:description", content: "Precision AI try-on at your fingertips." },
+      { title: "Easibie — AI Try-On, Simplified" },
+      { name: "description", content: "AI-powered virtual try-on for modern commerce. Turn a single product photo into a photoreal try-on experience — in seconds." },
+      { property: "og:title", content: "Easibie — AI Try-On, Simplified" },
+      { property: "og:description", content: "AI-powered virtual try-on for modern commerce." },
     ],
   }),
   component: Landing,
@@ -24,123 +23,149 @@ function Landing() {
   if (!loading && user) return <Navigate to="/dashboard" replace />;
   return (
     <MarketingShell>
-      {/* HERO */}
-      <section className="px-4 pt-4">
-        <div className="mx-auto max-w-6xl rounded-[28px] bg-white border border-[#EEF0F3] px-6 md:px-14 pt-16 md:pt-24 pb-10">
-          <h1 className="text-center text-ink font-black leading-[1.05] tracking-[-0.035em]">
-            Precision Try-On at<br />
-            <span className="text-[#2563EB]">Your Fingertips</span>
-          </h1>
-          <p className="mt-6 text-center text-[15px] md:text-[16px] text-[#6B7280] max-w-xl mx-auto">
-            The ultimate AI Try-On platform designed to revolutionize
-            the way you sell online.
-          </p>
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Get Started</Link>
-            <Link to="/about" className="px-5 py-3 rounded-full bg-white border border-[#E5E7EB] text-[14px] font-semibold text-ink hover:border-[#9CA3AF] transition">Contact Us</Link>
+      {/* ─────────── HERO ─────────── */}
+      <section className="px-4 pt-6">
+        <div className="mx-auto max-w-6xl card-soft px-6 md:px-14 pt-16 md:pt-20 pb-12 relative overflow-hidden">
+          <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #C7BEEB, transparent 70%)" }} />
+          <div className="absolute -bottom-32 -right-24 w-96 h-96 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #A99BF0, transparent 70%)" }} />
+
+          <div className="text-center relative">
+            <div className="inline-flex items-center gap-2 text-[13px] font-semibold text-ink">
+              <span className="rating-stars text-[13px]">★★★★★</span>
+              <span className="text-[#6B6689]">1200+ Reviews</span>
+            </div>
+            <h1 className="mt-5 text-ink font-extrabold leading-[1.02] tracking-[-0.04em]">
+              AI-powered try-on<br />simplified with <span className="italic">Easibie</span>
+            </h1>
+            <p className="mt-6 text-[16px] text-[#6B6689] max-w-xl mx-auto">
+              Enhance your storefront by leveraging AI to let shoppers see themselves in the product — driving conversion, cutting returns, and delighting every customer.
+            </p>
+            <div className="mt-8">
+              <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Get started for free</Link>
+            </div>
           </div>
 
-          {/* Dashboard mock */}
-          <div className="mt-14">
-            <DashboardMock />
+          {/* Product mock grid */}
+          <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-4 rise">
+            <CalendarCard />
+            <TryOnTypeCard />
+            <TimeSlotCard />
+          </div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_1.6fr] gap-4">
+            <SessionCard />
+            <StylePanel />
           </div>
         </div>
       </section>
 
-      {/* Trusted by */}
-      <section className="px-4 py-20">
-        <h2 className="text-center text-ink">
-          Trusted by these<br />
-          <span className="text-[#2563EB]">& 1000 More</span>
-        </h2>
-        <div className="mt-12 mx-auto max-w-5xl grid grid-cols-3 md:grid-cols-6 gap-8 items-center justify-items-center opacity-70">
-          {["Framer","slack","GitHub","asana","Google","stripe"].map((b) => (
-            <div key={b} className="text-[22px] font-bold text-[#9CA3AF]">{b}</div>
+      {/* ─────────── ONE STOP SOLUTION ─────────── */}
+      <section className="px-4 py-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <span className="pill"><Sparkles size={12} /> One Stop Solution</span>
+          <h2 className="mt-5 text-ink">Why Easibie?</h2>
+          <p className="mt-5 text-[15px] text-[#6B6689] max-w-xl mx-auto">
+            Whether you're a solo boutique or a 10,000-SKU brand, Easibie streamlines every try-on with an easy-to-use, maintainable system.
+          </p>
+        </div>
+
+        <div className="mt-14 mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6">
+          <WhyCard title="Effortless, direct connections" desc="Make seamless connections that enhance collaboration, streamline communication, and boost efficiency in every interaction.">
+            <ConnectionsGraphic />
+          </WhyCard>
+          <WhyCard title="Automatically detects context" desc="Do you sell in the US and ship to Europe? Easibie auto-detects locale, currency, sizing and skin-tone diversity — you have it covered.">
+            <WorldGraphic />
+          </WhyCard>
+          <WhyCard title="Add team members" desc="Carefully crafted and fine-tuned for a seamless, intuitive, and exceptional multi-user experience.">
+            <TeamGraphic />
+          </WhyCard>
+        </div>
+      </section>
+
+      {/* ─────────── LODGING-STYLE USE-CASE ─────────── */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-6xl card-soft p-8 md:p-12 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 items-center">
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              {[
+                { icon: Palette, label: "Fashion", active: true },
+                { icon: Layers, label: "Furniture" },
+                { icon: Sparkles, label: "Beauty" },
+                { icon: Users, label: "Retail" },
+              ].map((t, i) => (
+                <div key={i} className={`flex flex-col items-center gap-1 ${t.active ? "text-ink" : "text-[#8A83AB]"}`}>
+                  <div className={`w-11 h-11 rounded-xl grid place-items-center ${t.active ? "bg-[#1F1747] text-white" : "bg-white border border-[#E4DEF7]"}`}>
+                    <t.icon size={17} />
+                  </div>
+                  <span className="text-[11px] font-semibold">{t.label}</span>
+                </div>
+              ))}
+            </div>
+            <h2 className="text-ink">Fashion and lifestyle try-on made effortless.</h2>
+            <p className="mt-4 text-[15px] text-[#6B6689] max-w-md">
+              Streamline your storefront with Easibie — automate try-on links, embed on any product page, and boost revenue with high-converting AI previews.
+            </p>
+            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary mt-7">Get started for free</Link>
+          </div>
+          <PropertyMock />
+        </div>
+      </section>
+
+      {/* ─────────── SOME MORE FEATURES ─────────── */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <span className="pill"><Check size={12} /> Everything Covered</span>
+          <h2 className="mt-5 text-ink">Some more Easibie features</h2>
+        </div>
+        <div className="mx-auto max-w-6xl mt-12 grid grid-cols-1 md:grid-cols-3 gap-5">
+          {FEATS.map((f) => (
+            <FeatureTile key={f.title} {...f} />
           ))}
         </div>
       </section>
 
-      {/* Discover better experience */}
-      <section className="px-4 py-16">
-        <div className="mx-auto max-w-6xl text-center">
-          <h2 className="text-ink">Discover a Better Experience</h2>
-          <p className="mt-4 text-[15px] text-[#6B7280] max-w-md mx-auto">
-            The ultimate AI Try-On platform designed to revolutionize the way you sell online.
-          </p>
-        </div>
-
-        <div className="mt-16 mx-auto max-w-6xl grid md:grid-cols-2 gap-16 items-center">
-          <div>
-            <h2 className="text-ink">The Best Dashboard you'll ever use.</h2>
-            <p className="mt-4 text-[15px] text-[#6B7280] max-w-md">
-              Join countless satisfied users who have embraced Easibie as the go-to solution for
-              maximizing productivity and efficiency.
-            </p>
-            <ul className="mt-6 space-y-3">
-              {["Engagement","Productivity","Retention"].map((t) => (
-                <li key={t} className="flex items-center gap-3 text-[15px] text-ink font-medium">
-                  <span className="w-5 h-5 rounded-full bg-[#2563EB] text-white grid place-items-center text-[11px]">✓</span>
-                  {t}
-                </li>
-              ))}
-            </ul>
-            <button className="mt-8 btn-primary">Learn More</button>
-          </div>
-          <div>
-            <DashboardMock compact />
-          </div>
-        </div>
-
-        <div className="mt-24 mx-auto max-w-6xl grid md:grid-cols-2 gap-16 items-center">
-          <div className="order-2 md:order-1">
-            <CircleStat />
-          </div>
-          <div className="order-1 md:order-2">
-            <h2 className="text-ink">Enjoy the Convenience of Modern Tools, Including Video Genius</h2>
-            <p className="mt-4 text-[15px] text-[#6B7280] max-w-md">
-              Join countless satisfied users who have embraced Easibie as the go-to solution for
-              maximizing productivity and efficiency.
-            </p>
-            <button className="mt-8 btn-primary">Learn More</button>
-          </div>
-        </div>
-      </section>
-
-      {/* Best Feature Always */}
-      <section className="px-4 py-20 bg-[#F3F4F6]">
-        <div className="mx-auto max-w-6xl text-center">
-          <h2 className="text-ink">Best Feature <span className="text-[#2563EB]">Always</span></h2>
-          <p className="mt-4 text-[15px] text-[#6B7280] max-w-lg mx-auto">
-            Easibie protects your brand with a world-class try-on system that detects fit issues
-            and prevents returns. Safeguard your account.
-          </p>
-        </div>
-
-        <div className="mt-14 mx-auto max-w-6xl grid md:grid-cols-3 gap-6">
-          <FeatureCard title="Secure Interface" desc="Gain a comparative edge with our AI try-on tools, ensuring your store converts.">
-            <div className="flex items-center justify-center">
-              <CircleStat small />
-            </div>
-          </FeatureCard>
-          <FeatureCard title="Multi-Device Access" desc="Gain a comparative edge with our AI try-on tools, ensuring your store converts.">
-            <TeamGraph />
-          </FeatureCard>
-          <FeatureCard title="90% Accurate Report" desc="Gain a comparative edge with our AI try-on tools, ensuring your store converts.">
-            <MiniEarnings />
-          </FeatureCard>
-        </div>
-      </section>
-
-      {/* Scale your Business */}
-      <section className="px-4 py-24">
+      {/* ─────────── PRICING ─────────── */}
+      <section className="px-4 pb-24">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-ink">Scale your <span className="text-[#2563EB]">Business</span></h2>
-          <p className="mt-4 text-[15px] text-[#6B7280] max-w-md mx-auto">
-            The ultimate AI Try-On platform designed to revolutionize the way you sell online.
+          <span className="pill"><Zap size={12} /> Pay as you grow</span>
+          <h2 className="mt-5 text-ink">Pricing</h2>
+          <p className="mt-4 text-[15px] text-[#6B6689] max-w-lg mx-auto">
+            Choose a plan that fits your needs, offering flexibility and value to support your growth and success with Easibie.
           </p>
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Get Started</Link>
-            <Link to="/about" className="px-5 py-3 rounded-full bg-white border border-[#E5E7EB] text-[14px] font-semibold text-ink hover:border-[#9CA3AF] transition">Contact Us</Link>
+        </div>
+        <div className="mx-auto max-w-6xl mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {TIERS.map((t) => (
+            <PricingTile key={t.name} {...t} />
+          ))}
+        </div>
+      </section>
+
+      {/* ─────────── TESTIMONIALS ─────────── */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <span className="pill"><MessageCircle size={12} /> Reviews</span>
+          <h2 className="mt-5 text-ink">What people say about Easibie</h2>
+          <p className="mt-4 text-[15px] text-[#6B6689] max-w-lg mx-auto">
+            Hear from our satisfied customers who have transformed their storefront experience and boosted efficiency with Easibie's powerful engine.
+          </p>
+        </div>
+        <div className="mx-auto max-w-6xl mt-12 grid grid-cols-1 md:grid-cols-3 gap-5">
+          {TESTIMONIALS.map((t) => (
+            <TestimonialCard key={t.name} {...t} />
+          ))}
+        </div>
+      </section>
+
+      {/* ─────────── CTA ─────────── */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-4xl card-soft p-14 text-center relative overflow-hidden">
+          <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #C7BEEB, transparent 70%)" }} />
+          <div className="absolute -bottom-24 -right-16 w-80 h-80 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #A99BF0, transparent 70%)" }} />
+          <div className="relative">
+            <h2 className="text-ink">Scale your <span className="italic">business</span></h2>
+            <p className="mt-4 text-[15px] text-[#6B6689] max-w-md mx-auto">
+              The ultimate AI try-on platform designed to revolutionize the way you sell online.
+            </p>
+            <Link to="/auth" search={{ mode: "signup" }} className="btn-primary mt-8">Get started for free</Link>
           </div>
         </div>
       </section>
@@ -148,211 +173,319 @@ function Landing() {
   );
 }
 
-function DashboardMock({ compact = false }: { compact?: boolean }) {
+/* ─────────── HERO MOCKS ─────────── */
+
+function CalendarCard() {
+  const days = Array.from({ length: 28 }, (_, i) => i + 1);
   return (
-    <div className="rounded-2xl border border-[#EEF0F3] bg-white shadow-[0_20px_50px_-30px_rgba(15,23,42,0.15)] overflow-hidden">
-      <div className="flex">
-        {/* sidebar */}
-        <aside className="w-[180px] shrink-0 border-r border-[#F1F2F5] p-4">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-7 h-7 rounded-lg bg-[#E9E5FF] grid place-items-center text-[#7C6BE8] text-xs font-bold">◐</div>
-            <span className="font-bold text-ink text-[15px]">Fintech</span>
+    <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
+      <div className="flex items-center justify-between mb-3">
+        <button className="w-7 h-7 rounded-full border border-[#E4DEF7] grid place-items-center text-[#6B6689]">‹</button>
+        <div className="text-[13px] font-bold text-ink">January 2026</div>
+        <button className="w-7 h-7 rounded-full border border-[#E4DEF7] grid place-items-center text-[#6B6689]">›</button>
+      </div>
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-[#8A83AB] font-semibold mb-2">
+        {["S","M","T","W","T","F","S"].map((d,i)=><div key={i}>{d}</div>)}
+      </div>
+      <div className="grid grid-cols-7 gap-1 text-[11px] text-[#4B4368]">
+        {days.map((d) => (
+          <div key={d} className={`h-7 grid place-items-center rounded-full ${d===6 ? "bg-[#1F1747] text-white font-bold" : ""}`}>{d}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TryOnTypeCard() {
+  return (
+    <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5 flex flex-col">
+      <div className="text-[13px] font-bold text-ink mb-4">Type of Try-On</div>
+      <label className="flex items-start gap-3 p-3 rounded-xl border border-[#E4DEF7] mb-2 cursor-pointer">
+        <span className="w-4 h-4 rounded-full border-[3px] border-[#1F1747] mt-0.5" />
+        <div>
+          <div className="text-[12.5px] font-semibold text-ink">Instant try-on</div>
+          <div className="text-[11px] text-[#8A83AB]">Use this type of try-on when you need customers to visualize instantly.</div>
+        </div>
+      </label>
+      <label className="flex items-start gap-3 p-3 rounded-xl cursor-pointer">
+        <span className="w-4 h-4 rounded-full border-2 border-[#C7BEEB] mt-0.5" />
+        <div>
+          <div className="text-[12.5px] font-semibold text-ink">Scheduled preview</div>
+          <div className="text-[11px] text-[#8A83AB]">Batched preview no checkout.</div>
+        </div>
+      </label>
+      <div className="mt-auto pt-4">
+        <button className="w-full bg-[#F3F0FE] border border-[#E4DEF7] rounded-xl px-3 py-2.5 text-[12px] font-semibold text-ink flex items-center justify-between">
+          Start your journey with AI
+          <span className="w-6 h-6 rounded-full bg-[#1F1747] text-white grid place-items-center"><ArrowRight size={12} /></span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TimeSlotCard() {
+  const times = ["09:30", "10:30", "11:30", "12:30", "01:30"];
+  return (
+    <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-[13px] font-bold text-ink">Book a 30m Preview</div>
+      </div>
+      <div className="flex items-center justify-between text-[11px] text-[#8A83AB] mb-2">
+        What time works best
+        <span className="w-8 h-4 rounded-full bg-[#1F1747] relative"><span className="absolute right-0.5 top-0.5 w-3 h-3 rounded-full bg-white" /></span>
+      </div>
+      <div className="space-y-2">
+        {times.map((t, i) => (
+          <div key={t} className={`px-3 py-2 rounded-xl text-[12px] font-semibold text-center ${i===0 ? "bg-[#1F1747] text-white" : "bg-white border border-[#E4DEF7] text-[#4B4368]"}`}>
+            {t}
           </div>
-          <ul className="space-y-1 text-[13px]">
-            {[
-              { icon: LayoutDashboard, label: "Dashboard", active: true },
-              { icon: ShoppingBag, label: "Sale" },
-              { icon: Heart, label: "Favorite" },
-              { icon: Users, label: "Community" },
-              { icon: Compass, label: "Explore" },
-              { icon: FileText, label: "Document" },
-              { icon: Lock, label: "Privacy" },
-            ].map(({ icon: Icon, label, active }) => (
-              <li key={label}>
-                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${active ? "bg-[#EDE7FF] text-[#7C6BE8] font-semibold" : "text-[#6B7280]"}`}>
-                  <Icon size={15} />
-                  {label}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </aside>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-        {/* main */}
-        <div className="flex-1 p-5">
-          {/* search bar */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border border-[#F1F2F5] bg-[#FAFAFB]">
-              <Search size={14} className="text-[#9CA3AF]" />
-              <input placeholder="Search (Ctrl+/)" className="bg-transparent outline-none text-[13px] flex-1 text-[#6B7280]" />
-            </div>
-            <div className="flex items-center gap-2">
-              <button className="w-8 h-8 rounded-full border border-[#F1F2F5] grid place-items-center"><Moon size={14} className="text-[#6B7280]" /></button>
-              <button className="w-8 h-8 rounded-full border border-[#F1F2F5] grid place-items-center relative">
-                <Bell size={14} className="text-[#6B7280]" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#EF4444] text-white text-[9px] grid place-items-center font-bold">4</span>
-              </button>
-              <div className="w-8 h-8 rounded-full bg-[#E5E7EB]" />
-            </div>
+function SessionCard() {
+  return (
+    <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
+      <div className="flex items-center gap-2 text-[12px] font-semibold text-ink mb-3">
+        <Camera size={13} /> 28 April, 2026
+      </div>
+      <div className="flex gap-2">
+        {["12:30","02:30","03:30"].map((t,i)=>(
+          <div key={t} className={`px-4 py-2 rounded-full text-[12px] font-semibold ${i===0 ? "bg-white border border-[#1F1747] text-ink" : "text-[#8A83AB]"}`}>
+            {t}
           </div>
+        ))}
+      </div>
+      <div className="mt-4 flex items-center gap-3 pt-4 border-t border-[#E4DEF7]">
+        <div className="w-9 h-9 rounded-full bg-[#C7BEEB]" />
+        <div>
+          <div className="text-[13px] font-bold text-ink">Shane Watson</div>
+          <div className="text-[11px] text-[#8A83AB]">Sun–Fri, 09am – 06pm</div>
+        </div>
+        <span className="ml-auto text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-[#F3F0FE] text-[#1F1747]">Admin</span>
+      </div>
+    </div>
+  );
+}
 
-          <div className={`grid ${compact ? "grid-cols-1" : "grid-cols-2"} gap-4`}>
-            {/* Earnings card */}
-            <div className="rounded-xl border border-[#F1F2F5] p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="font-bold text-ink text-[14px]">Earning Reports</div>
-                  <div className="text-[11px] text-[#9CA3AF] mt-0.5">Weekly Earnings Overview</div>
-                </div>
-                <div className="text-[#9CA3AF]">⋯</div>
-              </div>
-              <div className="mt-4 flex items-end gap-4">
-                <div>
-                  <div className="text-[22px] font-black text-ink">$468.780</div>
-                  <div className="text-[11px] text-[#10B981] font-semibold mt-1">↑ 4.2%</div>
-                </div>
-                <div className="flex-1 flex items-end justify-end gap-1 h-16">
-                  {[30,50,40,60,45,90,55].map((h,i)=>(
-                    <div key={i} className="w-3 rounded-t-sm" style={{ height: `${h}%`, background: i===5?"#2563EB":"#E9E5FF" }} />
-                  ))}
-                </div>
-              </div>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-[11px]">
-                {[
-                  { l: "Earnings", v: "$545.69", c: "#F59E0B" },
-                  { l: "Profit", v: "$256.34", c: "#10B981" },
-                  { l: "Expense", v: "$74.19", c: "#EF4444" },
-                ].map((s) => (
-                  <div key={s.l} className="rounded-lg border border-[#F1F2F5] p-2">
-                    <div className="text-[#9CA3AF]">{s.l}</div>
-                    <div className="font-bold text-ink text-[13px] mt-0.5">{s.v}</div>
-                    <div className="h-0.5 mt-2 rounded-full" style={{ background: s.c }} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Tracker card */}
-            {!compact && (
-              <div className="rounded-xl border border-[#F1F2F5] p-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="font-bold text-ink text-[14px]">Tracker list</div>
-                    <div className="text-[11px] text-[#9CA3AF] mt-0.5">Last 7 Days</div>
-                  </div>
-                  <div className="text-[#9CA3AF]">⋯</div>
-                </div>
-                <div className="mt-3 flex items-center gap-4">
-                  <div className="flex-1 space-y-2 text-[11px]">
-                    <div className="font-black text-[22px] text-ink leading-none">164</div>
-                    <div className="text-[#9CA3AF]">Total Tickets</div>
-                    <Row label="New Tickets" v="142" />
-                    <Row label="Open Tickets" v="28" />
-                    <Row label="Response Time" v="1 Day" />
-                  </div>
-                  <CircleStat small />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {!compact && (
-            <div className="mt-4 rounded-xl border border-[#F1F2F5] p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="font-bold text-ink text-[14px]">Projects</div>
-                <div className="flex-1 max-w-[200px] ml-4 flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#F1F2F5]">
-                  <Search size={12} className="text-[#9CA3AF]" />
-                  <input placeholder="Search" className="bg-transparent outline-none text-[12px] flex-1" />
-                </div>
-              </div>
-              <div className="grid grid-cols-[24px_1fr_120px_120px_120px] gap-3 text-[11px] text-[#9CA3AF] pb-2 border-b border-[#F1F2F5]">
-                <div /><div>Name ⇅</div><div>Leader ⇅</div><div>Team</div><div>Status ⇅</div>
-              </div>
-            </div>
-          )}
+function StylePanel() {
+  return (
+    <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
+      <div className="text-[13px] font-bold text-ink">Try-On Page</div>
+      <div className="text-[11px] text-[#8A83AB] mb-4">Customize your try-on page appearance</div>
+      <div className="text-[11px] font-semibold text-ink mb-2">Background Color</div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#E4DEF7]">
+          <span className="text-[12px] font-mono text-ink">#1E185B</span>
+          <span className="w-5 h-5 rounded-full bg-[#1E185B]" />
+        </div>
+        <div className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#E4DEF7]">
+          <span className="text-[12px] font-mono text-ink">#D9D9D9</span>
+          <span className="w-5 h-5 rounded-full bg-[#D9D9D9] border border-[#E4DEF7]" />
         </div>
       </div>
     </div>
   );
 }
 
-function Row({ label, v }: { label: string; v: string }) {
+/* ─────────── WHY EASIBIE ─────────── */
+
+function WhyCard({ title, desc, children }: { title: string; desc: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between border-t border-[#F1F2F5] pt-1.5">
-      <span className="text-[#6B7280]">{label}</span>
-      <span className="font-semibold text-ink">{v}</span>
+    <div className="card-tile p-6">
+      <div className="h-44 rounded-xl bg-[#F3F0FE] border border-[#E4DEF7] overflow-hidden">{children}</div>
+      <h4 className="mt-5 text-ink">{title}</h4>
+      <p className="mt-2 text-[13px] text-[#6B6689]">{desc}</p>
     </div>
   );
 }
 
-function CircleStat({ small = false }: { small?: boolean }) {
-  const size = small ? 96 : 160;
-  const stroke = small ? 8 : 12;
-  const r = (size - stroke) / 2;
-  const c = 2 * Math.PI * r;
+function ConnectionsGraphic() {
   return (
-    <div className="grid place-items-center">
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="-rotate-90">
-          <circle cx={size/2} cy={size/2} r={r} stroke="#EEF0F3" strokeWidth={stroke} fill="none" />
-          <circle cx={size/2} cy={size/2} r={r} stroke="#A78BFA" strokeWidth={stroke} fill="none"
-            strokeDashoffset={c*0.15} strokeLinecap="round" style={{ strokeDasharray: "6 8" }} />
-
-        </svg>
-        <div className="absolute inset-0 grid place-items-center">
-          <div className="text-center">
-            <div className={`font-black text-ink ${small ? "text-lg" : "text-3xl"}`}>85%</div>
-            {!small && <div className="text-[11px] text-[#9CA3AF] mt-1">Completed Task</div>}
-          </div>
-        </div>
+    <div className="h-full grid place-items-center relative">
+      <div className="grid grid-cols-3 grid-rows-3 gap-3 w-40 h-40">
+        <div />
+        <div className="w-10 h-10 rounded-full bg-[#38BDF8] grid place-items-center text-white text-[10px] font-bold">S</div>
+        <div />
+        <div className="w-10 h-10 rounded-full bg-[#F59E0B] grid place-items-center text-white text-[10px] font-bold">Z</div>
+        <div className="w-12 h-12 rounded-full bg-white border border-[#E4DEF7] grid place-items-center text-ink text-[10px] font-bold shadow float">✚</div>
+        <div className="w-10 h-10 rounded-full bg-[#22C55E] grid place-items-center text-white text-[10px] font-bold">G</div>
+        <div />
+        <div className="w-10 h-10 rounded-full bg-[#6C5CE7] grid place-items-center text-white text-[10px] font-bold">E</div>
+        <div />
       </div>
     </div>
   );
 }
 
-function FeatureCard({ title, desc, children }: { title: string; desc: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl bg-white border border-[#EEF0F3] p-6">
-      <div className="h-40 mb-6">{children}</div>
-      <div className="flex items-center gap-2 mb-2">
-        <LinkIcon size={14} className="text-[#2563EB]" />
-        <h3 className="text-[16px] font-bold text-ink">{title}</h3>
-      </div>
-      <p className="text-[13px] text-[#6B7280]">{desc}</p>
-    </div>
-  );
-}
-
-function TeamGraph() {
+function WorldGraphic() {
   return (
     <div className="h-full grid place-items-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-[#E5E7EB] grid place-items-center text-[10px] text-[#6B7280]">Shakib</div>
-        <div className="flex gap-8">
-          <div className="w-10 h-10 rounded-full bg-[#E5E7EB] grid place-items-center text-[9px] text-[#6B7280]">Hazard</div>
-          <div className="w-10 h-10 rounded-full bg-[#E5E7EB] grid place-items-center text-[9px] text-[#6B7280]">David L</div>
+      <div className="relative w-52 h-32">
+        <svg viewBox="0 0 200 100" className="w-full h-full opacity-70">
+          {Array.from({length: 15}).map((_, y) => (
+            Array.from({length: 30}).map((_, x) => (
+              <circle key={`${x}-${y}`} cx={x*7} cy={y*7} r="1" fill="#A99BF0" />
+            ))
+          ))}
+        </svg>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-[#1F1747] grid place-items-center text-white float">
+          <Globe size={16} />
         </div>
       </div>
     </div>
   );
 }
 
-function MiniEarnings() {
+function TeamGraphic() {
   return (
-    <div className="h-full rounded-xl border border-[#F1F2F5] p-3">
-      <div className="text-[12px] font-bold text-ink">Earning Reports</div>
-      <div className="text-[10px] text-[#9CA3AF]">Weekly Earnings Overview</div>
-      <div className="mt-2 flex items-end gap-3">
-        <div>
-          <div className="text-[16px] font-black text-ink">$468.780</div>
-          <div className="text-[9px] text-[#10B981] font-semibold">↑ 4.2%</div>
+    <div className="h-full p-4 flex flex-col justify-center">
+      <div className="text-[11px] font-semibold text-ink mb-2 flex items-center gap-1"><Users size={12} /> Add Team Members</div>
+      <div className="text-[10px] text-[#8A83AB] mb-3">Members (2/30)</div>
+      {[
+        { n: "Shane Watson", t: "Sun–Fri, 09am–06pm", r: "Admin", c: "#F59E0B" },
+        { n: "Kane Williamson", t: "Sun–Fri, 09am–06pm", r: "Staff", c: "#6C5CE7" },
+      ].map((m) => (
+        <div key={m.n} className="flex items-center gap-2 py-1.5">
+          <div className="w-7 h-7 rounded-full" style={{ background: m.c }} />
+          <div className="flex-1">
+            <div className="text-[11px] font-bold text-ink leading-none">{m.n}</div>
+            <div className="text-[9px] text-[#8A83AB] mt-0.5">{m.t}</div>
+          </div>
+          <span className="text-[9px] font-bold text-[#6B6689]">{m.r}</span>
         </div>
-        <div className="flex-1 flex items-end justify-end gap-1 h-10">
-          {[30,50,40,60,45,90,55].map((h,i)=>(
-            <div key={i} className="w-2 rounded-t-sm" style={{ height: `${h}%`, background: i===5?"#2563EB":"#E9E5FF" }} />
-          ))}
+      ))}
+    </div>
+  );
+}
+
+/* ─────────── LODGING / USE CASE MOCK ─────────── */
+
+function PropertyMock() {
+  return (
+    <div className="relative">
+      <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-[#C7BEEB] to-[#A99BF0] relative">
+        <div className="absolute inset-0 grid place-items-center text-[80px] opacity-40">👗</div>
+        <div className="absolute top-4 left-4 pill text-[10px]">One product · Try-On</div>
+        <div className="absolute bottom-4 right-4 pill text-[10px]">Live preview</div>
+      </div>
+      <div className="absolute -top-4 -right-4 bg-white rounded-2xl border border-[#E4DEF7] px-4 py-3 shadow float">
+        <div className="text-[10px] text-[#8A83AB]">28 April · 30 April, 2026</div>
+        <div className="text-[12px] font-bold text-ink flex items-center gap-1 mt-1">
+          <Check size={12} className="text-[#22C55E]" /> Sessions booked
         </div>
       </div>
+      <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl border border-[#E4DEF7] px-4 py-3 shadow flex items-center gap-2 float-y">
+        <span className="w-8 h-8 rounded-lg bg-[#1F1747] text-white grid place-items-center"><Camera size={14} /></span>
+        <div>
+          <div className="text-[10px] text-[#8A83AB]">Deluxe view</div>
+          <div className="text-[12px] font-bold text-ink">Full-body pose</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────── FEATURE TILES ─────────── */
+
+const FEATS = [
+  { icon: Shield, title: "Eliminate double previews", desc: "Prevent scheduling conflicts and ensure smooth, hassle-free try-on sessions effortlessly." },
+  { icon: Users, title: "Cap attendees per slot", desc: "Limit participants per slot for better scheduling control across concurrent sessions." },
+  { icon: Wand2, title: "Quickly add personalised questions", desc: "Customize your try-on flow by adding tailored questions effortlessly for every shopper." },
+  { icon: Layers, title: "Group products into one booking", desc: "Simplify scheduling by combining multiple SKUs into a single try-on experience." },
+  { icon: Globe, title: "Multilingual support made easy", desc: "Effortlessly reach a global audience with seamless multilingual support out of the box." },
+  { icon: Shield, title: "Block unwanted try-ons", desc: "Prevent unauthorized or unwanted try-on requests with seamless restriction controls." },
+];
+
+function FeatureTile({ icon: Icon, title, desc }: { icon: any; title: string; desc: string }) {
+  return (
+    <div className="card-tile p-6">
+      <div className="w-11 h-11 rounded-xl bg-[#F3F0FE] grid place-items-center text-[#1F1747]">
+        <Icon size={18} />
+      </div>
+      <h4 className="mt-5 text-ink text-[16px]">{title}</h4>
+      <p className="mt-2 text-[13px] text-[#6B6689]">{desc}</p>
+    </div>
+  );
+}
+
+/* ─────────── PRICING ─────────── */
+
+const TIERS: Tier[] = [
+  {
+    name: "Free", price: "Free", note: "For individuals starting out with basic try-ons.",
+    highlight: false,
+    features: ["Unlimited previews", "Unlimited products", "Unlimited stops", "Email notifications", "Time zone compliant", "Mobile & desktop"],
+  },
+  {
+    name: "Pro", price: "$18.99", note: "For individuals with advanced try-on needs.",
+    highlight: false,
+    features: ["Unlimited bookings", "Unlimited services", "Unlimited reminders", "Add questions", "Multiday", "Cancel & reschedule", "Custom duration"],
+  },
+  {
+    name: "Elite", price: "$28.99", note: "For companies (several team members).",
+    highlight: true, popular: true,
+    features: ["Everything before +", "No Easibie branding", "Google calendar", "Google meet automatic", "Zoom links", "POS", "Upsell services"],
+  },
+  {
+    name: "Pro+", price: "$39.99", note: "For teams needing extra features, security, admin control, and support.",
+    highlight: false,
+    features: ["Elite +", "No Easibie branding", "SMS notification", "Abandoned booking", "Custom vendor", "Booking deposit", "Custom deposit", "Team portal"],
+  },
+];
+
+type Tier = { name: string; price: string; note: string; highlight: boolean; popular?: boolean; features: string[] };
+
+function PricingTile({ name, price, note, highlight, popular, features }: Tier) {
+  return (
+    <div className={`p-6 rounded-2xl relative flex flex-col ${highlight ? "bg-[#1F1747] text-white" : "bg-white border border-[#E4DEF7]"}`}>
+      {popular && (
+        <span className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-wider bg-white text-[#1F1747] px-2.5 py-1 rounded-full">Popular</span>
+      )}
+      <div className={`text-[13px] font-bold uppercase tracking-wide ${highlight ? "text-[#C7BEEB]" : "text-[#6B6689]"}`}>{name}</div>
+      <div className="mt-4 flex items-baseline gap-1">
+        <span className={`text-[36px] font-extrabold tracking-tight ${highlight ? "text-white" : "text-ink"}`}>{price}</span>
+        {price !== "Free" && <span className={`text-[13px] ${highlight ? "text-[#C7BEEB]" : "text-[#8A83AB]"}`}>/month</span>}
+      </div>
+      <p className={`mt-3 text-[12.5px] ${highlight ? "text-[#D8D2F5]" : "text-[#6B6689]"}`}>{note}</p>
+      <button className={`mt-5 w-full py-3 rounded-full text-[13px] font-bold ${highlight ? "bg-white text-[#1F1747]" : "bg-[#1F1747] text-white"}`}>
+        Get started for free
+      </button>
+      <ul className="mt-6 space-y-2.5 flex-1">
+        {features.map((f) => (
+          <li key={f} className={`flex items-center gap-2 text-[13px] ${highlight ? "text-[#E8E4F9]" : "text-[#4B4368]"}`}>
+            <Check size={13} className={highlight ? "text-[#C7BEEB]" : "text-[#1F1747]"} />
+            {f}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/* ─────────── TESTIMONIALS ─────────── */
+
+const TESTIMONIALS = [
+  { name: "Shane Watson", role: "Operations Manager at Cleanwill", body: "Easibie transformed our workflow! Easy to use, seamless integrations, and outstanding support. Highly recommended for any business scaling up!" },
+  { name: "Mitchel Straick", role: "Founder at Peko Studios", body: "Easibie has been a game-changer for our business! The platform is incredibly intuitive, making onboarding seamless. Integration with our existing tools was fluid, and the automation features saved us huge time." },
+  { name: "Steve Smith", role: "CEO at Wayside Tours", body: "Easibie streamlined our workflow with an intuitive interface and seamless integrations. The automation features saved us valuable time, and the support team is fantastic." },
+];
+
+function TestimonialCard({ name, role, body }: { name: string; role: string; body: string }) {
+  return (
+    <div className="card-tile p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full bg-[#C7BEEB]" />
+        <div>
+          <div className="text-[13px] font-bold text-ink">{name}</div>
+          <div className="text-[11px] text-[#8A83AB]">{role}</div>
+        </div>
+      </div>
+      <p className="text-[13px] text-[#4B4368] leading-relaxed">{body}</p>
+      <div className="rating-stars mt-4 text-[13px]">★★★★★</div>
     </div>
   );
 }
