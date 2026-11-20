@@ -116,7 +116,7 @@
     border-radius: 20px;
   }
 
-  .btn-primary {
+  .btn-primary, .btn-cyan {
     background: var(--primary); color: #ffffff;
     padding: 13px 26px; border-radius: 999px;
     font-weight: 600; font-size: 14px;
@@ -124,8 +124,8 @@
     transition: transform .15s, background .15s, box-shadow .2s;
     box-shadow: 0 10px 24px -12px rgba(31,23,71,0.55);
   }
-  .btn-primary:hover { background: #14102B; transform: translateY(-1px); }
-  .btn-ghost {
+  .btn-primary:hover, .btn-cyan:hover { background: #14102B; transform: translateY(-1px); }
+  .btn-ghost, .btn-outline-cyan {
     background: #FFFFFF; color: var(--ink);
     padding: 13px 26px; border-radius: 999px;
     font-weight: 600; font-size: 14px;
@@ -133,9 +133,7 @@
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     transition: all .15s;
   }
-  .btn-ghost:hover { border-color: var(--primary-light); color: var(--primary-light); }
-  .btn-cyan { @apply btn-primary; }
-  .btn-outline-cyan { @apply btn-ghost; }
+  .btn-ghost:hover, .btn-outline-cyan:hover { border-color: var(--primary-light); color: var(--primary-light); }
 
   .input-base {
     width: 100%; background: #ffffff; border: 1px solid var(--border);
