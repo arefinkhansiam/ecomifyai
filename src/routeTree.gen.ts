@@ -9,66 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as CheckoutRouteImport } from './routes/checkout'
-import { Route as HowItWorksRouteImport } from './routes/how-it-works'
-import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as TryArRouteImport } from './routes/try-ar'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as ArTokenRouteImport } from './routes/ar.$token'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
-import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
-import { Route as AuthenticatedDashboardBehaviourRouteImport } from './routes/_authenticated/dashboard.behaviour'
-import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
-import { Route as AuthenticatedDashboardEmbedRouteImport } from './routes/_authenticated/dashboard.embed'
-import { Route as AuthenticatedDashboardProductsRouteImport } from './routes/_authenticated/dashboard.products'
-import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
-import { Route as AuthenticatedDashboardShopifyRouteImport } from './routes/_authenticated/dashboard.shopify'
-import { Route as AuthenticatedDashboardUploadRouteImport } from './routes/_authenticated/dashboard.upload'
-import { Route as ApiPublicArComposeRouteImport } from './routes/api/public/ar-compose'
-import { Route as ApiPublicTrackArSessionRouteImport } from './routes/api/public/track-ar-session'
-import { Route as ApiPublicTryonDemoRouteImport } from './routes/api/public/tryon-demo'
-import { Route as ApiPublicTryonEventRouteImport } from './routes/api/public/tryon-event'
-import { Route as ApiPublicTryonFeedbackRouteImport } from './routes/api/public/tryon-feedback'
-import { Route as ApiPublicTryonRelatedRouteImport } from './routes/api/public/tryon-related'
-import { Route as ArStoreProductRouteImport } from './routes/ar.$store.$product'
 import { Route as ArViewProductIdRouteImport } from './routes/ar.view.$productId'
+import { Route as ArStoreProductRouteImport } from './routes/ar.$store.$product'
+import { Route as ApiPublicTryonRelatedRouteImport } from './routes/api/public/tryon-related'
+import { Route as ApiPublicTryonFeedbackRouteImport } from './routes/api/public/tryon-feedback'
+import { Route as ApiPublicTryonEventRouteImport } from './routes/api/public/tryon-event'
+import { Route as ApiPublicTryonDemoRouteImport } from './routes/api/public/tryon-demo'
+import { Route as ApiPublicTrackArSessionRouteImport } from './routes/api/public/track-ar-session'
+import { Route as ApiPublicArComposeRouteImport } from './routes/api/public/ar-compose'
+import { Route as AuthenticatedDashboardUploadRouteImport } from './routes/_authenticated/dashboard.upload'
+import { Route as AuthenticatedDashboardShopifyRouteImport } from './routes/_authenticated/dashboard.shopify'
+import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
+import { Route as AuthenticatedDashboardProductsRouteImport } from './routes/_authenticated/dashboard.products'
+import { Route as AuthenticatedDashboardEmbedRouteImport } from './routes/_authenticated/dashboard.embed'
+import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
+import { Route as AuthenticatedDashboardBehaviourRouteImport } from './routes/_authenticated/dashboard.behaviour'
+import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardProductsIndexRouteImport } from './routes/_authenticated/dashboard.products.index'
-import { Route as ApiPublicShopifyCallbackRouteImport } from './routes/api/public/shopify.callback'
-import { Route as ApiPublicShopifyInstallRouteImport } from './routes/api/public/shopify.install'
 import { Route as ApiPublicShopifyWebhookRouteImport } from './routes/api/public/shopify.webhook'
+import { Route as ApiPublicShopifyInstallRouteImport } from './routes/api/public/shopify.install'
+import { Route as ApiPublicShopifyCallbackRouteImport } from './routes/api/public/shopify.callback'
 import { Route as AuthenticatedDashboardProductsIdCustomizeRouteImport } from './routes/_authenticated/dashboard.products.$id.customize'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HowItWorksRoute = HowItWorksRouteImport.update({
-  id: '/how-it-works',
-  path: '/how-it-works',
+const TryArRoute = TryArRouteImport.update({
+  id: '/try-ar',
+  path: '/try-ar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -76,19 +52,43 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TryArRoute = TryArRouteImport.update({
-  id: '/try-ar',
-  path: '/try-ar',
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArTokenRoute = ArTokenRouteImport.update({
   id: '/ar/$token',
   path: '/ar/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardIndexRoute =
@@ -97,40 +97,50 @@ const AuthenticatedDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardAnalyticsRoute =
-  AuthenticatedDashboardAnalyticsRouteImport.update({
-    id: '/dashboard/analytics',
-    path: '/dashboard/analytics',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardBehaviourRoute =
-  AuthenticatedDashboardBehaviourRouteImport.update({
-    id: '/dashboard/behaviour',
-    path: '/dashboard/behaviour',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardBillingRoute =
-  AuthenticatedDashboardBillingRouteImport.update({
-    id: '/dashboard/billing',
-    path: '/dashboard/billing',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardEmbedRoute =
-  AuthenticatedDashboardEmbedRouteImport.update({
-    id: '/dashboard/embed',
-    path: '/dashboard/embed',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardProductsRoute =
-  AuthenticatedDashboardProductsRouteImport.update({
-    id: '/dashboard/products',
-    path: '/dashboard/products',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardSettingsRoute =
-  AuthenticatedDashboardSettingsRouteImport.update({
-    id: '/dashboard/settings',
-    path: '/dashboard/settings',
+const ArViewProductIdRoute = ArViewProductIdRouteImport.update({
+  id: '/ar/view/$productId',
+  path: '/ar/view/$productId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArStoreProductRoute = ArStoreProductRouteImport.update({
+  id: '/ar/$store/$product',
+  path: '/ar/$store/$product',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTryonRelatedRoute = ApiPublicTryonRelatedRouteImport.update({
+  id: '/api/public/tryon-related',
+  path: '/api/public/tryon-related',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTryonFeedbackRoute = ApiPublicTryonFeedbackRouteImport.update({
+  id: '/api/public/tryon-feedback',
+  path: '/api/public/tryon-feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTryonEventRoute = ApiPublicTryonEventRouteImport.update({
+  id: '/api/public/tryon-event',
+  path: '/api/public/tryon-event',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTryonDemoRoute = ApiPublicTryonDemoRouteImport.update({
+  id: '/api/public/tryon-demo',
+  path: '/api/public/tryon-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTrackArSessionRoute = ApiPublicTrackArSessionRouteImport.update({
+  id: '/api/public/track-ar-session',
+  path: '/api/public/track-ar-session',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicArComposeRoute = ApiPublicArComposeRouteImport.update({
+  id: '/api/public/ar-compose',
+  path: '/api/public/ar-compose',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardUploadRoute =
+  AuthenticatedDashboardUploadRouteImport.update({
+    id: '/dashboard/upload',
+    path: '/dashboard/upload',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardShopifyRoute =
@@ -139,74 +149,64 @@ const AuthenticatedDashboardShopifyRoute =
     path: '/dashboard/shopify',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardUploadRoute =
-  AuthenticatedDashboardUploadRouteImport.update({
-    id: '/dashboard/upload',
-    path: '/dashboard/upload',
+const AuthenticatedDashboardSettingsRoute =
+  AuthenticatedDashboardSettingsRouteImport.update({
+    id: '/dashboard/settings',
+    path: '/dashboard/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiPublicArComposeRoute = ApiPublicArComposeRouteImport.update({
-  id: '/api/public/ar-compose',
-  path: '/api/public/ar-compose',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicTrackArSessionRoute = ApiPublicTrackArSessionRouteImport.update({
-  id: '/api/public/track-ar-session',
-  path: '/api/public/track-ar-session',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicTryonDemoRoute = ApiPublicTryonDemoRouteImport.update({
-  id: '/api/public/tryon-demo',
-  path: '/api/public/tryon-demo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicTryonEventRoute = ApiPublicTryonEventRouteImport.update({
-  id: '/api/public/tryon-event',
-  path: '/api/public/tryon-event',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicTryonFeedbackRoute = ApiPublicTryonFeedbackRouteImport.update({
-  id: '/api/public/tryon-feedback',
-  path: '/api/public/tryon-feedback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicTryonRelatedRoute = ApiPublicTryonRelatedRouteImport.update({
-  id: '/api/public/tryon-related',
-  path: '/api/public/tryon-related',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ArStoreProductRoute = ArStoreProductRouteImport.update({
-  id: '/ar/$store/$product',
-  path: '/ar/$store/$product',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ArViewProductIdRoute = ArViewProductIdRouteImport.update({
-  id: '/ar/view/$productId',
-  path: '/ar/view/$productId',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedDashboardProductsRoute =
+  AuthenticatedDashboardProductsRouteImport.update({
+    id: '/dashboard/products',
+    path: '/dashboard/products',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardEmbedRoute =
+  AuthenticatedDashboardEmbedRouteImport.update({
+    id: '/dashboard/embed',
+    path: '/dashboard/embed',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardBillingRoute =
+  AuthenticatedDashboardBillingRouteImport.update({
+    id: '/dashboard/billing',
+    path: '/dashboard/billing',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardBehaviourRoute =
+  AuthenticatedDashboardBehaviourRouteImport.update({
+    id: '/dashboard/behaviour',
+    path: '/dashboard/behaviour',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardAnalyticsRoute =
+  AuthenticatedDashboardAnalyticsRouteImport.update({
+    id: '/dashboard/analytics',
+    path: '/dashboard/analytics',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardProductsIndexRoute =
   AuthenticatedDashboardProductsIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedDashboardProductsRoute,
   } as any)
+const ApiPublicShopifyWebhookRoute = ApiPublicShopifyWebhookRouteImport.update({
+  id: '/api/public/shopify/webhook',
+  path: '/api/public/shopify/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicShopifyInstallRoute = ApiPublicShopifyInstallRouteImport.update({
+  id: '/api/public/shopify/install',
+  path: '/api/public/shopify/install',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicShopifyCallbackRoute =
   ApiPublicShopifyCallbackRouteImport.update({
     id: '/api/public/shopify/callback',
     path: '/api/public/shopify/callback',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicShopifyInstallRoute = ApiPublicShopifyInstallRouteImport.update({
-  id: '/api/public/shopify/install',
-  path: '/api/public/shopify/install',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicShopifyWebhookRoute = ApiPublicShopifyWebhookRouteImport.update({
-  id: '/api/public/shopify/webhook',
-  path: '/api/public/shopify/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedDashboardProductsIdCustomizeRoute =
   AuthenticatedDashboardProductsIdCustomizeRouteImport.update({
     id: '/$id/customize',
@@ -442,46 +442,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/how-it-works': {
-      id: '/how-it-works'
-      path: '/how-it-works'
-      fullPath: '/how-it-works'
-      preLoaderRoute: typeof HowItWorksRouteImport
+    '/try-ar': {
+      id: '/try-ar'
+      path: '/try-ar'
+      fullPath: '/try-ar'
+      preLoaderRoute: typeof TryArRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -491,18 +456,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/try-ar': {
-      id: '/try-ar'
-      path: '/try-ar'
-      fullPath: '/try-ar'
-      preLoaderRoute: typeof TryArRouteImport
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ar/$token': {
@@ -512,6 +505,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
       path: '/dashboard'
@@ -519,102 +519,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard/analytics': {
-      id: '/_authenticated/dashboard/analytics'
-      path: '/dashboard/analytics'
-      fullPath: '/dashboard/analytics'
-      preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/behaviour': {
-      id: '/_authenticated/dashboard/behaviour'
-      path: '/dashboard/behaviour'
-      fullPath: '/dashboard/behaviour'
-      preLoaderRoute: typeof AuthenticatedDashboardBehaviourRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/billing': {
-      id: '/_authenticated/dashboard/billing'
-      path: '/dashboard/billing'
-      fullPath: '/dashboard/billing'
-      preLoaderRoute: typeof AuthenticatedDashboardBillingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/embed': {
-      id: '/_authenticated/dashboard/embed'
-      path: '/dashboard/embed'
-      fullPath: '/dashboard/embed'
-      preLoaderRoute: typeof AuthenticatedDashboardEmbedRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/products': {
-      id: '/_authenticated/dashboard/products'
-      path: '/dashboard/products'
-      fullPath: '/dashboard/products'
-      preLoaderRoute: typeof AuthenticatedDashboardProductsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/settings': {
-      id: '/_authenticated/dashboard/settings'
-      path: '/dashboard/settings'
-      fullPath: '/dashboard/settings'
-      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/shopify': {
-      id: '/_authenticated/dashboard/shopify'
-      path: '/dashboard/shopify'
-      fullPath: '/dashboard/shopify'
-      preLoaderRoute: typeof AuthenticatedDashboardShopifyRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard/upload': {
-      id: '/_authenticated/dashboard/upload'
-      path: '/dashboard/upload'
-      fullPath: '/dashboard/upload'
-      preLoaderRoute: typeof AuthenticatedDashboardUploadRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/api/public/ar-compose': {
-      id: '/api/public/ar-compose'
-      path: '/api/public/ar-compose'
-      fullPath: '/api/public/ar-compose'
-      preLoaderRoute: typeof ApiPublicArComposeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/track-ar-session': {
-      id: '/api/public/track-ar-session'
-      path: '/api/public/track-ar-session'
-      fullPath: '/api/public/track-ar-session'
-      preLoaderRoute: typeof ApiPublicTrackArSessionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/tryon-demo': {
-      id: '/api/public/tryon-demo'
-      path: '/api/public/tryon-demo'
-      fullPath: '/api/public/tryon-demo'
-      preLoaderRoute: typeof ApiPublicTryonDemoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/tryon-event': {
-      id: '/api/public/tryon-event'
-      path: '/api/public/tryon-event'
-      fullPath: '/api/public/tryon-event'
-      preLoaderRoute: typeof ApiPublicTryonEventRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/tryon-feedback': {
-      id: '/api/public/tryon-feedback'
-      path: '/api/public/tryon-feedback'
-      fullPath: '/api/public/tryon-feedback'
-      preLoaderRoute: typeof ApiPublicTryonFeedbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/tryon-related': {
-      id: '/api/public/tryon-related'
-      path: '/api/public/tryon-related'
-      fullPath: '/api/public/tryon-related'
-      preLoaderRoute: typeof ApiPublicTryonRelatedRouteImport
+    '/ar/view/$productId': {
+      id: '/ar/view/$productId'
+      path: '/ar/view/$productId'
+      fullPath: '/ar/view/$productId'
+      preLoaderRoute: typeof ArViewProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ar/$store/$product': {
@@ -624,12 +533,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArStoreProductRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ar/view/$productId': {
-      id: '/ar/view/$productId'
-      path: '/ar/view/$productId'
-      fullPath: '/ar/view/$productId'
-      preLoaderRoute: typeof ArViewProductIdRouteImport
+    '/api/public/tryon-related': {
+      id: '/api/public/tryon-related'
+      path: '/api/public/tryon-related'
+      fullPath: '/api/public/tryon-related'
+      preLoaderRoute: typeof ApiPublicTryonRelatedRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tryon-feedback': {
+      id: '/api/public/tryon-feedback'
+      path: '/api/public/tryon-feedback'
+      fullPath: '/api/public/tryon-feedback'
+      preLoaderRoute: typeof ApiPublicTryonFeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tryon-event': {
+      id: '/api/public/tryon-event'
+      path: '/api/public/tryon-event'
+      fullPath: '/api/public/tryon-event'
+      preLoaderRoute: typeof ApiPublicTryonEventRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tryon-demo': {
+      id: '/api/public/tryon-demo'
+      path: '/api/public/tryon-demo'
+      fullPath: '/api/public/tryon-demo'
+      preLoaderRoute: typeof ApiPublicTryonDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/track-ar-session': {
+      id: '/api/public/track-ar-session'
+      path: '/api/public/track-ar-session'
+      fullPath: '/api/public/track-ar-session'
+      preLoaderRoute: typeof ApiPublicTrackArSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ar-compose': {
+      id: '/api/public/ar-compose'
+      path: '/api/public/ar-compose'
+      fullPath: '/api/public/ar-compose'
+      preLoaderRoute: typeof ApiPublicArComposeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard/upload': {
+      id: '/_authenticated/dashboard/upload'
+      path: '/dashboard/upload'
+      fullPath: '/dashboard/upload'
+      preLoaderRoute: typeof AuthenticatedDashboardUploadRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/shopify': {
+      id: '/_authenticated/dashboard/shopify'
+      path: '/dashboard/shopify'
+      fullPath: '/dashboard/shopify'
+      preLoaderRoute: typeof AuthenticatedDashboardShopifyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/settings': {
+      id: '/_authenticated/dashboard/settings'
+      path: '/dashboard/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/products': {
+      id: '/_authenticated/dashboard/products'
+      path: '/dashboard/products'
+      fullPath: '/dashboard/products'
+      preLoaderRoute: typeof AuthenticatedDashboardProductsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/embed': {
+      id: '/_authenticated/dashboard/embed'
+      path: '/dashboard/embed'
+      fullPath: '/dashboard/embed'
+      preLoaderRoute: typeof AuthenticatedDashboardEmbedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/billing': {
+      id: '/_authenticated/dashboard/billing'
+      path: '/dashboard/billing'
+      fullPath: '/dashboard/billing'
+      preLoaderRoute: typeof AuthenticatedDashboardBillingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/behaviour': {
+      id: '/_authenticated/dashboard/behaviour'
+      path: '/dashboard/behaviour'
+      fullPath: '/dashboard/behaviour'
+      preLoaderRoute: typeof AuthenticatedDashboardBehaviourRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/analytics': {
+      id: '/_authenticated/dashboard/analytics'
+      path: '/dashboard/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/products/': {
       id: '/_authenticated/dashboard/products/'
@@ -638,11 +638,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardProductsIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardProductsRoute
     }
-    '/api/public/shopify/callback': {
-      id: '/api/public/shopify/callback'
-      path: '/api/public/shopify/callback'
-      fullPath: '/api/public/shopify/callback'
-      preLoaderRoute: typeof ApiPublicShopifyCallbackRouteImport
+    '/api/public/shopify/webhook': {
+      id: '/api/public/shopify/webhook'
+      path: '/api/public/shopify/webhook'
+      fullPath: '/api/public/shopify/webhook'
+      preLoaderRoute: typeof ApiPublicShopifyWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/shopify/install': {
@@ -652,11 +652,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicShopifyInstallRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/shopify/webhook': {
-      id: '/api/public/shopify/webhook'
-      path: '/api/public/shopify/webhook'
-      fullPath: '/api/public/shopify/webhook'
-      preLoaderRoute: typeof ApiPublicShopifyWebhookRouteImport
+    '/api/public/shopify/callback': {
+      id: '/api/public/shopify/callback'
+      path: '/api/public/shopify/callback'
+      fullPath: '/api/public/shopify/callback'
+      preLoaderRoute: typeof ApiPublicShopifyCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/products/$id/customize': {

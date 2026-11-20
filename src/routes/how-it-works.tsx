@@ -83,6 +83,58 @@ function HowItWorks() {
         </div>
       </section>
 
+      {/* COMPARISON */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-4xl text-center mb-12">
+          <span className="pill"><Sparkles size={12} /> The Modern Advantage</span>
+          <h2 className="mt-5 text-ink">Traditional Photography vs. <span className="italic">Easibie</span></h2>
+          <p className="mt-3 text-[15px] text-[#6B6689] max-w-lg mx-auto">
+            Why forward-thinking apparel retailers are switching to real-time neural try-on.
+          </p>
+        </div>
+        <div className="mx-auto max-w-4xl card-soft p-6 md:p-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 rounded-2xl bg-[#F8FAFC] border border-[#E4DEF7]">
+              <div className="text-[12px] font-bold text-[#8A83AB] uppercase tracking-wider mb-2">Traditional Lookbooks</div>
+              <h4 className="text-ink text-[17px] mb-3">Static Studio Mannequins</h4>
+              <ul className="space-y-3 text-[13px] text-[#6B6689]">
+                <li className="flex items-start gap-2">
+                  <span className="text-red-500 font-bold shrink-0">✕</span>
+                  <span>Shoppers can't visualize fit on their unique body shape.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-500 font-bold shrink-0">✕</span>
+                  <span>38% average size return rate due to sizing uncertainty.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-500 font-bold shrink-0">✕</span>
+                  <span>Requires multi-day photo shoots for every single SKU.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-[#1F1747] text-white shadow-lg">
+              <div className="text-[12px] font-bold text-[#C7BEEB] uppercase tracking-wider mb-2">With Easibie AI</div>
+              <h4 className="text-white text-[17px] mb-3">Personalized On-Body Fitting</h4>
+              <ul className="space-y-3 text-[13px] text-[#D8D2F5]">
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                  <span>Instant drape on shopper's own photo in under 2 seconds.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                  <span>-38% fewer size returns and higher cart checkout conversion.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                  <span>1-click embed snippet for Shopify, WooCommerce, and custom web apps.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="px-4 pb-24">
         <div className="mx-auto max-w-4xl card-soft p-14 text-center relative overflow-hidden">

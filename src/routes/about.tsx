@@ -68,6 +68,33 @@ function About() {
         </div>
       </section>
 
+      {/* SUSTAINABILITY & RESPONSIBLE AI */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-4xl card-soft p-10 md:p-14">
+          <div className="flex items-center gap-2 text-ink font-bold text-[13px] mb-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Sustainability & Responsible AI
+          </div>
+          <h2 className="text-ink">Cutting return waste, <span className="italic">protecting the planet.</span></h2>
+          <p className="mt-4 text-[15px] text-[#4B4368] leading-relaxed">
+            In fashion e-commerce, sizing mismatch accounts for over 70% of clothing returns. Millions of returned garments end up incinerated or in landfills each year due to reverse logistics costs.
+          </p>
+          <div className="mt-8 grid sm:grid-cols-3 gap-5 pt-6 border-t border-[#E4DEF7]">
+            <div>
+              <div className="text-[28px] font-extrabold text-ink">-38%</div>
+              <div className="text-[12px] text-[#6B6689] mt-1">Fewer return parcels and packaging waste</div>
+            </div>
+            <div>
+              <div className="text-[28px] font-extrabold text-ink">0.00%</div>
+              <div className="text-[12px] text-[#6B6689] mt-1">Biometric retention — 100% purged after drape</div>
+            </div>
+            <div>
+              <div className="text-[28px] font-extrabold text-ink">100%</div>
+              <div className="text-[12px] text-[#6B6689] mt-1">Inclusive sizing representation for every shopper</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* STORY */}
       <section className="px-4 pb-24">
         <div className="mx-auto max-w-4xl card-soft p-10 md:p-14">

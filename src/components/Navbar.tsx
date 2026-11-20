@@ -6,10 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 const links = [
   { to: "/", label: "Home" },
-  { to: "/how-it-works", label: "Features" },
-  { to: "/how-it-works", label: "Use Cases" },
+  { to: "/how-it-works", label: "How It Works" },
+  { to: "/try-ar", label: "Try-On Studio" },
   { to: "/pricing", label: "Pricing" },
-  { to: "/about", label: "Testimonials" },
+  { to: "/about", label: "About Us" },
 ];
 
 export function Navbar() {

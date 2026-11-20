@@ -18,33 +18,36 @@ export const Route = createFileRoute("/try-ar")({
 function TryItOnPage() {
   return (
     <MarketingShell>
-      <section className="relative">
-        <div className="absolute inset-0 -z-10 opacity-70"
-          style={{ background: "radial-gradient(ellipse 900px 500px at 50% 0%, rgba(14,165,233,0.22), transparent 70%)" }} />
-        <div className="mx-auto max-w-5xl px-6 pt-16 pb-6 text-center">
-          <h1 className="mt-4 text-gradient-ocean">See it on you in seconds.</h1>
-          <p className="mt-5 max-w-2xl mx-auto text-lg">
-            Pick a sample product, upload one photo of yourself or your room, and watch our AI render a photoreal try-on right here. This is exactly what your shoppers see.
-          </p>
+      <section className="relative px-4 pt-6">
+        <div className="mx-auto max-w-6xl card-soft px-6 md:px-14 pt-16 pb-10 text-center relative overflow-hidden">
+          <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #C7BEEB, transparent 70%)" }} />
+          <div className="absolute -bottom-32 -right-24 w-96 h-96 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #A99BF0, transparent 70%)" }} />
+          <div className="relative">
+            <span className="pill"><Sparkles size={12} /> Interactive Fitting Studio</span>
+            <h1 className="mt-5 text-ink">See it on you in <span className="italic">seconds.</span></h1>
+            <p className="mt-5 max-w-2xl mx-auto text-[16px] text-[#6B6689] leading-relaxed">
+              Pick a garment, upload one photo of yourself, and watch our AI drape the piece onto your body with natural fold dynamics. This is the exact interactive experience your shoppers see on product pages.
+            </p>
+          </div>
         </div>
 
-        <div className="mx-auto max-w-5xl px-6 pb-12">
+        <div className="mx-auto max-w-5xl px-4 py-12">
           <InlineTryOnDemo />
         </div>
 
-        <div className="mx-auto max-w-5xl px-6 pb-24">
-          <div className="grid sm:grid-cols-3 gap-4">
+        <div className="mx-auto max-w-5xl px-4 pb-24">
+          <div className="grid sm:grid-cols-3 gap-5">
             {[
-              { icon: UploadCloud, t: "1. Pick a product", d: "T-shirt for fashion, armchair for furniture, lipstick for makeup. One tap to switch." },
-              { icon: Wand2, t: "2. Upload your photo", d: "A selfie, full-body shot, or room photo. Our AI handles the rest using Google Gemini." },
-              { icon: Share2, t: "3. Download or share", d: "Save the result, share it directly from your phone, or come back and try a different product." },
+              { icon: UploadCloud, t: "1. Select Garment SKU", d: "Choose any catalog apparel piece with flat-lay or model photography." },
+              { icon: Wand2, t: "2. Shopper Uploads Photo", d: "Standard selfie or full-body shot. No mobile app download required." },
+              { icon: Share2, t: "3. Photoreal On-Body Drape", d: "Accurate cloth tension and shadow alignment in under 2 seconds." },
             ].map((f) => (
-              <div key={f.t} className="rounded-2xl p-5 border bg-white" style={{ borderColor: "rgba(2,132,199,0.18)", boxShadow: "0 14px 30px -18px rgba(2,132,199,0.25)" }}>
-                <div className="w-11 h-11 rounded-xl grid place-items-center text-white" style={{ background: "linear-gradient(135deg,#0369A1,#38BDF8)" }}>
+              <div key={f.t} className="card-tile p-6">
+                <div className="w-11 h-11 rounded-xl bg-[#F3F0FE] grid place-items-center text-[#1F1747]">
                   <f.icon size={18} />
                 </div>
-                <div className="mt-3 font-display font-bold text-ink">{f.t}</div>
-                <p className="mt-1 text-sm text-muted">{f.d}</p>
+                <div className="mt-4 font-display font-bold text-ink text-[16px]">{f.t}</div>
+                <p className="mt-2 text-[13px] text-[#6B6689] leading-relaxed">{f.d}</p>
               </div>
             ))}
           </div>

@@ -3,8 +3,10 @@ import { useAuth } from "@/lib/use-auth";
 import { MarketingShell } from "@/components/MarketingShell";
 import {
   Sparkles, Camera, Wand2, Share2, ArrowRight, Check, Star, Shield,
-  Palette, Layers, BarChart3, Globe, Users, Zap, MessageCircle,
+  Palette, Layers, BarChart3, Globe, Users, Zap, MessageCircle, Sliders, CheckCircle2,
 } from "lucide-react";
+import demoBefore from "@/assets/demo-before.jpg";
+import demoAfter from "@/assets/demo-after.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -176,21 +178,35 @@ function Landing() {
 /* ─────────── HERO MOCKS ─────────── */
 
 function CalendarCard() {
-  const days = Array.from({ length: 28 }, (_, i) => i + 1);
   return (
-    <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
+    <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5 flex flex-col justify-between">
       <div className="flex items-center justify-between mb-3">
-        <button className="w-7 h-7 rounded-full border border-[#E4DEF7] grid place-items-center text-[#6B6689]">‹</button>
-        <div className="text-[13px] font-bold text-ink">Daily Try-On Sessions</div>
-        <button className="w-7 h-7 rounded-full border border-[#E4DEF7] grid place-items-center text-[#6B6689]">›</button>
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="text-[13px] font-bold text-ink">AI Drape Simulator</div>
+        </div>
+        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#F3F0FE] text-[#1F1747]">1.4s Drape</span>
       </div>
-      <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-[#8A83AB] font-semibold mb-2">
-        {["S","M","T","W","T","F","S"].map((d,i)=><div key={i}>{d}</div>)}
+      
+      <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-slate-900 border border-[#E4DEF7] mb-3">
+        <img
+          src={demoAfter}
+          alt="AI Drape Result"
+          className="w-full h-full object-cover object-top"
+        />
+        <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded">
+          ✦ Tailored Blazer
+        </div>
+        <div className="absolute bottom-2 right-2 bg-white/95 text-ink text-[10.5px] font-bold px-2 py-0.5 rounded shadow-xs">
+          Match: 99.4%
+        </div>
       </div>
-      <div className="grid grid-cols-7 gap-1 text-[11px] text-[#4B4368]">
-        {days.map((d) => (
-          <div key={d} className={`h-7 grid place-items-center rounded-full ${d===6 ? "bg-[#1F1747] text-white font-bold" : ""}`}>{d}</div>
-        ))}
+
+      <div className="flex items-center justify-between text-[11px] text-[#6B6689] pt-1">
+        <span>True to body shape</span>
+        <span className="font-semibold text-emerald-700 flex items-center gap-1">
+          <Check size={12} /> Seams Aligned
+        </span>
       </div>
     </div>
   );
@@ -199,46 +215,71 @@ function CalendarCard() {
 function TryOnTypeCard() {
   return (
     <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5 flex flex-col">
-      <div className="text-[13px] font-bold text-ink mb-4">Fitting Studio Mode</div>
-      <label className="flex items-start gap-3 p-3 rounded-xl border border-[#E4DEF7] mb-2 cursor-pointer">
-        <span className="w-4 h-4 rounded-full border-[3px] border-[#1F1747] mt-0.5" />
+      <div className="text-[13px] font-bold text-ink mb-4">Shopper Fitting Mode</div>
+      <label className="flex items-start gap-3 p-3 rounded-xl border border-[#1F1747] bg-[#F3F0FE]/40 mb-2 cursor-pointer">
+        <span className="w-4 h-4 rounded-full border-[3px] border-[#1F1747] mt-0.5 shrink-0" />
         <div>
-          <div className="text-[12.5px] font-semibold text-ink">Instant photo try-on</div>
-          <div className="text-[11px] text-[#8A83AB]">Shoppers upload a snapshot to see realistic garment draping in 1.4s.</div>
+          <div className="text-[12.5px] font-bold text-ink flex items-center gap-1.5">
+            Instant photo try-on
+            <span className="text-[9.5px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">Active</span>
+          </div>
+          <div className="text-[11px] text-[#6B6689] mt-0.5">Shoppers upload a snapshot to see realistic garment draping in 1.4s.</div>
         </div>
       </label>
-      <label className="flex items-start gap-3 p-3 rounded-xl cursor-pointer">
-        <span className="w-4 h-4 rounded-full border-2 border-[#C7BEEB] mt-0.5" />
+      <label className="flex items-start gap-3 p-3 rounded-xl border border-[#E4DEF7] cursor-pointer hover:bg-slate-50 transition">
+        <span className="w-4 h-4 rounded-full border-2 border-[#C7BEEB] mt-0.5 shrink-0" />
         <div>
           <div className="text-[12.5px] font-semibold text-ink">In-store hangtag QR</div>
-          <div className="text-[11px] text-[#8A83AB]">Shoppers scan physical tags to preview fits on mobile.</div>
+          <div className="text-[11px] text-[#8A83AB] mt-0.5">Shoppers scan physical tags to preview fits on mobile.</div>
         </div>
       </label>
       <div className="mt-auto pt-4">
-        <button className="w-full bg-[#F3F0FE] border border-[#E4DEF7] rounded-xl px-3 py-2.5 text-[12px] font-semibold text-ink flex items-center justify-between">
+        <Link
+          to="/auth"
+          search={{ mode: "signup" }}
+          className="w-full bg-[#F3F0FE] border border-[#E4DEF7] hover:border-[#1F1747] rounded-xl px-3 py-2.5 text-[12px] font-semibold text-ink flex items-center justify-between transition"
+        >
           Start your journey with AI
           <span className="w-6 h-6 rounded-full bg-[#1F1747] text-white grid place-items-center"><ArrowRight size={12} /></span>
-        </button>
+        </Link>
       </div>
     </div>
   );
 }
 
 function TimeSlotCard() {
-  const times = ["99.4% Fit Match", "98.8% Shoulder Alignment", "97.9% Chest Drape", "96.5% Sleeve Length", "1.4s Latency"];
+  const metrics = [
+    { label: "Shoulder & Collar Fit", val: "99.4%" },
+    { label: "Chest & Bust Tension", val: "98.8%" },
+    { label: "Fabric Fold Realism", val: "97.9%" },
+    { label: "Sleeve Inseam Drop", val: "96.5%" },
+    { label: "Return Cost Saved", val: "-38%" },
+  ];
   return (
-    <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-[13px] font-bold text-ink">Garment Fit Confidence</div>
-      </div>
-      <div className="flex items-center justify-between text-[11px] text-[#8A83AB] mb-2">
-        Shopper accuracy metrics
-        <span className="w-8 h-4 rounded-full bg-[#1F1747] relative"><span className="absolute right-0.5 top-0.5 w-3 h-3 rounded-full bg-white" /></span>
+    <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5 flex flex-col justify-between">
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <div className="text-[13px] font-bold text-ink">Garment Fit Confidence</div>
+          <span className="text-[11px] font-extrabold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">98.6% Avg</span>
+        </div>
+        <div className="text-[11px] text-[#8A83AB] mb-3">
+          Neural alignment calibration breakdown
+        </div>
       </div>
       <div className="space-y-2">
-        {times.map((t, i) => (
-          <div key={t} className={`px-3 py-2 rounded-xl text-[12px] font-semibold text-center ${i===0 ? "bg-[#1F1747] text-white" : "bg-white border border-[#E4DEF7] text-[#4B4368]"}`}>
-            {t}
+        {metrics.map((m, i) => (
+          <div
+            key={m.label}
+            className={`px-3 py-2 rounded-xl text-[11.5px] flex items-center justify-between transition ${
+              i === 0
+                ? "bg-[#1F1747] text-white font-bold"
+                : "bg-white border border-[#E4DEF7] text-[#4B4368] font-medium"
+            }`}
+          >
+            <span>{m.label}</span>
+            <span className={i === 0 ? "text-emerald-300 font-extrabold" : "text-blue-700 font-bold"}>
+              {m.val}
+            </span>
           </div>
         ))}
       </div>
@@ -249,23 +290,41 @@ function TimeSlotCard() {
 function SessionCard() {
   return (
     <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
-      <div className="flex items-center gap-2 text-[12px] font-semibold text-ink mb-3">
-        <Camera size={13} /> 420+ Stores Live
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 text-[12px] font-bold text-ink">
+          <Camera size={14} className="text-[#6C5CE7]" /> Live Fitting Activity
+        </div>
+        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+          ● 420+ Stores Live
+        </span>
       </div>
-      <div className="flex gap-2">
-        {["Blazers","Dresses","Outerwear"].map((t,i)=>(
-          <div key={t} className={`px-4 py-2 rounded-full text-[12px] font-semibold ${i===0 ? "bg-white border border-[#1F1747] text-ink" : "text-[#8A83AB]"}`}>
+      <div className="flex gap-2 mb-3">
+        {["Tailored Blazers", "Silk Dresses", "Raw Denim"].map((t, i) => (
+          <div
+            key={t}
+            className={`px-3 py-1.5 rounded-full text-[11px] font-semibold ${
+              i === 0
+                ? "bg-[#1F1747] text-white"
+                : "bg-[#F3F0FE] text-[#4B4368] border border-[#E4DEF7]"
+            }`}
+          >
             {t}
           </div>
         ))}
       </div>
-      <div className="mt-4 flex items-center gap-3 pt-4 border-t border-[#E4DEF7]">
-        <div className="w-9 h-9 rounded-full bg-[#C7BEEB]" />
-        <div>
-          <div className="text-[13px] font-bold text-ink">Sarah Jenkins</div>
-          <div className="text-[11px] text-[#8A83AB]">Head of E-Commerce • Atelier V</div>
+      <div className="flex items-center gap-3 pt-3 border-t border-[#E4DEF7]">
+        <img
+          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
+          alt="Sarah Jenkins"
+          className="w-10 h-10 rounded-full object-cover border border-[#E4DEF7]"
+        />
+        <div className="min-w-0 flex-1">
+          <div className="text-[12.5px] font-bold text-ink truncate">Elena Rowe</div>
+          <div className="text-[10.5px] text-[#8A83AB] truncate">Head of E-Commerce • Atelier V</div>
         </div>
-        <span className="ml-auto text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-[#F3F0FE] text-[#1F1747]">Brand</span>
+        <span className="text-[9.5px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+          Verified Brand
+        </span>
       </div>
     </div>
   );
@@ -274,18 +333,28 @@ function SessionCard() {
 function StylePanel() {
   return (
     <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
-      <div className="text-[13px] font-bold text-ink">Store Widget Style</div>
-      <div className="text-[11px] text-[#8A83AB] mb-4">Customize your button and try-on modal colors</div>
-      <div className="text-[11px] font-semibold text-ink mb-2">Primary Color Preset</div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#E4DEF7]">
-          <span className="text-[12px] font-mono text-ink">#1E185B</span>
-          <span className="w-5 h-5 rounded-full bg-[#1E185B]" />
+      <div className="flex items-center justify-between mb-1">
+        <div className="text-[13px] font-bold text-ink">Storefront Widget Style</div>
+        <span className="text-[10.5px] font-semibold text-[#8A83AB]">Live Customizer</span>
+      </div>
+      <div className="text-[11px] text-[#8A83AB] mb-3">Customize button & modal styling to match your brand</div>
+      
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="flex items-center justify-between px-3 py-2 rounded-xl border border-[#1F1747] bg-[#F3F0FE]/30">
+          <span className="text-[11.5px] font-mono font-bold text-ink">#1F1747</span>
+          <span className="w-5 h-5 rounded-full bg-[#1F1747] border border-white shadow-xs" />
         </div>
-        <div className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#E4DEF7]">
-          <span className="text-[12px] font-mono text-ink">#D9D9D9</span>
-          <span className="w-5 h-5 rounded-full bg-[#D9D9D9] border border-[#E4DEF7]" />
+        <div className="flex items-center justify-between px-3 py-2 rounded-xl border border-[#E4DEF7]">
+          <span className="text-[11.5px] font-mono font-bold text-ink">#6C5CE7</span>
+          <span className="w-5 h-5 rounded-full bg-[#6C5CE7] border border-white shadow-xs" />
         </div>
+      </div>
+
+      <div className="pt-2 border-t border-[#E4DEF7]/70 flex items-center justify-between">
+        <span className="text-[11px] text-[#8A83AB]">Button Preview:</span>
+        <button className="px-3.5 py-1.5 rounded-full text-[11.5px] font-bold bg-[#1F1747] text-white shadow-xs flex items-center gap-1.5">
+          <Sparkles size={11} /> Try It On With Easibie
+        </button>
       </div>
     </div>
   );
@@ -367,22 +436,32 @@ function TeamGraphic() {
 function PropertyMock() {
   return (
     <div className="relative">
-      <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-[#C7BEEB] to-[#A99BF0] relative">
-        <div className="absolute inset-0 grid place-items-center text-[80px] opacity-40">👗</div>
-        <div className="absolute top-4 left-4 pill text-[10px]">Photo Try-On · Live</div>
-        <div className="absolute bottom-4 right-4 pill text-[10px]">1.4s Drape</div>
-      </div>
-      <div className="absolute -top-4 -right-4 bg-white rounded-2xl border border-[#E4DEF7] px-4 py-3 shadow float">
-        <div className="text-[10px] text-[#8A83AB]">Real-Time Store Stats</div>
-        <div className="text-[12px] font-bold text-ink flex items-center gap-1 mt-1">
-          <Check size={12} className="text-[#22C55E]" /> -38% Returns Prevented
+      <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-slate-900 border border-[#E4DEF7] relative shadow-md">
+        <img
+          src={demoAfter}
+          alt="Easibie On-Body Drape Simulation"
+          className="w-full h-full object-cover object-top"
+        />
+        <div className="absolute top-4 left-4 pill text-[10.5px] font-bold bg-white/95 text-ink shadow-xs">
+          ✦ Photo Try-On · Live
+        </div>
+        <div className="absolute bottom-4 right-4 pill text-[10.5px] font-bold bg-slate-900/90 text-white border-white/20">
+          1.4s Fast Drape
         </div>
       </div>
-      <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl border border-[#E4DEF7] px-4 py-3 shadow flex items-center gap-2 float-y">
-        <span className="w-8 h-8 rounded-lg bg-[#1F1747] text-white grid place-items-center"><Camera size={14} /></span>
+      <div className="absolute -top-4 -right-4 bg-white rounded-2xl border border-[#E4DEF7] px-4 py-3 shadow-md float">
+        <div className="text-[10px] font-semibold text-[#8A83AB] uppercase tracking-wider">Storefront Results</div>
+        <div className="text-[12.5px] font-extrabold text-ink flex items-center gap-1.5 mt-1">
+          <Check size={14} className="text-[#22C55E]" /> -38% Returns Prevented
+        </div>
+      </div>
+      <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl border border-[#E4DEF7] px-4 py-3 shadow-md flex items-center gap-2.5 float-y">
+        <span className="w-8 h-8 rounded-lg bg-[#1F1747] text-white grid place-items-center">
+          <Camera size={15} />
+        </span>
         <div>
-          <div className="text-[10px] text-[#8A83AB]">Drape preview</div>
-          <div className="text-[12px] font-bold text-ink">On-body simulation</div>
+          <div className="text-[10px] font-semibold text-[#8A83AB]">Drape preview</div>
+          <div className="text-[12.5px] font-bold text-ink">Photoreal on-body fit</div>
         </div>
       </div>
     </div>
@@ -441,9 +520,9 @@ type Tier = { name: string; price: string; note: string; highlight: boolean; pop
 
 function PricingTile({ name, price, note, highlight, popular, features }: Tier) {
   return (
-    <div className={`p-6 rounded-2xl relative flex flex-col ${highlight ? "bg-[#1F1747] text-white" : "bg-white border border-[#E4DEF7]"}`}>
+    <div className={`p-6 rounded-2xl relative flex flex-col ${highlight ? "bg-[#1F1747] text-white shadow-xl" : "bg-white border border-[#E4DEF7]"}`}>
       {popular && (
-        <span className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-wider bg-white text-[#1F1747] px-2.5 py-1 rounded-full">Popular</span>
+        <span className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-wider bg-white text-[#1F1747] px-2.5 py-1 rounded-full shadow-xs">Popular</span>
       )}
       <div className={`text-[13px] font-bold uppercase tracking-wide ${highlight ? "text-[#C7BEEB]" : "text-[#6B6689]"}`}>{name}</div>
       <div className="mt-4 flex items-baseline gap-1">
@@ -451,9 +530,13 @@ function PricingTile({ name, price, note, highlight, popular, features }: Tier) 
         {price !== "Free" && <span className={`text-[13px] ${highlight ? "text-[#C7BEEB]" : "text-[#8A83AB]"}`}>/month</span>}
       </div>
       <p className={`mt-3 text-[12.5px] ${highlight ? "text-[#D8D2F5]" : "text-[#6B6689]"}`}>{note}</p>
-      <button className={`mt-5 w-full py-3 rounded-full text-[13px] font-bold ${highlight ? "bg-white text-[#1F1747]" : "bg-[#1F1747] text-white"}`}>
+      <Link
+        to="/auth"
+        search={{ mode: "signup" }}
+        className={`mt-5 w-full py-3 rounded-full text-[13px] font-bold text-center block transition ${highlight ? "bg-white text-[#1F1747] hover:bg-slate-100" : "bg-[#1F1747] text-white hover:bg-black"}`}
+      >
         Get started for free
-      </button>
+      </Link>
       <ul className="mt-6 space-y-2.5 flex-1">
         {features.map((f) => (
           <li key={f} className={`flex items-center gap-2 text-[13px] ${highlight ? "text-[#E8E4F9]" : "text-[#4B4368]"}`}>
@@ -469,23 +552,55 @@ function PricingTile({ name, price, note, highlight, popular, features }: Tier) 
 /* ─────────── TESTIMONIALS ─────────── */
 
 const TESTIMONIALS = [
-  { name: "Marcus Vela", role: "Founder at Atelier V", body: "Easibie transformed our product pages! Sizing returns dropped by 39% in our first month. Shoppers love uploading a photo and seeing the drape before completing checkout." },
-  { name: "Elena Rowe", role: "Head of E-Commerce at Northbeam Silk", body: "Easibie has been a game-changer for our eveningwear line. Shoppers were always hesitant about slip dress sizing. Letting them preview it on their own body skyrocketed our checkout conversion rate." },
-  { name: "Raj Patel", role: "Co-Founder at Loop Denim", body: "Installing the Shopify script took less than two minutes. The return cost savings directly boosted our net margins, and customer satisfaction has never been higher." },
+  {
+    name: "Marcus Vela",
+    role: "Founder • Atelier V Menswear",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+    brand: "Shopify Plus Brand",
+    body: "Easibie transformed our product pages! Sizing returns dropped by 39% in our first month. Shoppers love uploading a photo and seeing the drape before completing checkout.",
+  },
+  {
+    name: "Elena Rowe",
+    role: "Head of E-Commerce • Northbeam Silk",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    brand: "Luxury Apparel",
+    body: "Easibie has been a game-changer for our eveningwear line. Shoppers were always hesitant about slip dress sizing. Letting them preview it on their own body skyrocketed our checkout conversion rate.",
+  },
+  {
+    name: "Raj Patel",
+    role: "Co-Founder • Loop Denim Co.",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+    brand: "Contemporary Denim",
+    body: "Installing the Shopify script took less than two minutes. The return cost savings directly boosted our net margins, and customer satisfaction has never been higher.",
+  },
 ];
 
-function TestimonialCard({ name, role, body }: { name: string; role: string; body: string }) {
+function TestimonialCard({ name, role, body, avatar, brand }: any) {
   return (
-    <div className="card-tile p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-full bg-[#C7BEEB]" />
-        <div>
-          <div className="text-[13px] font-bold text-ink">{name}</div>
-          <div className="text-[11px] text-[#8A83AB]">{role}</div>
+    <div className="card-tile p-6 flex flex-col justify-between">
+      <div>
+        <div className="flex items-center gap-3 mb-4">
+          <img
+            src={avatar}
+            alt={name}
+            className="w-11 h-11 rounded-full object-cover border border-[#E4DEF7] shadow-xs"
+          />
+          <div className="min-w-0 flex-1">
+            <div className="text-[13.5px] font-bold text-ink truncate">{name}</div>
+            <div className="text-[11px] text-[#8A83AB] truncate">{role}</div>
+          </div>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F3F0FE] text-[#1F1747] shrink-0">
+            {brand}
+          </span>
         </div>
+        <p className="text-[13px] text-[#4B4368] leading-relaxed italic">"{body}"</p>
       </div>
-      <p className="text-[13px] text-[#4B4368] leading-relaxed">{body}</p>
-      <div className="rating-stars mt-4 text-[13px]">★★★★★</div>
+      <div className="mt-5 pt-3 border-t border-[#E4DEF7]/60 flex items-center justify-between text-[11px] text-[#8A83AB]">
+        <div className="rating-stars text-[13px]">★★★★★</div>
+        <span className="font-semibold text-emerald-700 flex items-center gap-1">
+          <Check size={12} /> Verified Merchant
+        </span>
+      </div>
     </div>
   );
 }
