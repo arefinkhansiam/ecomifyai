@@ -32,13 +32,13 @@ function Landing() {
           <div className="text-center relative">
             <div className="inline-flex items-center gap-2 text-[13px] font-semibold text-ink">
               <span className="rating-stars text-[13px]">★★★★★</span>
-              <span className="text-[#6B6689]">1200+ Reviews</span>
+              <span className="text-[#6B6689]">1,200+ Fashion Stores Live</span>
             </div>
             <h1 className="mt-5 text-ink font-extrabold leading-[1.02] tracking-[-0.04em]">
               AI-powered try-on<br />simplified with <span className="italic">Easibie</span>
             </h1>
             <p className="mt-6 text-[16px] text-[#6B6689] max-w-xl mx-auto">
-              Enhance your storefront by leveraging AI to let shoppers see themselves in the product — driving conversion, cutting returns, and delighting every customer.
+              Enhance your storefront by leveraging AI to let shoppers preview clothing on their own photo — driving conversion, cutting returns by up to 38%, and delighting every customer.
             </p>
             <div className="mt-8">
               <Link to="/auth" search={{ mode: "signup" }} className="btn-primary">Get started for free</Link>
@@ -64,18 +64,18 @@ function Landing() {
           <span className="pill"><Sparkles size={12} /> One Stop Solution</span>
           <h2 className="mt-5 text-ink">Why Easibie?</h2>
           <p className="mt-5 text-[15px] text-[#6B6689] max-w-xl mx-auto">
-            Whether you're a solo boutique or a 10,000-SKU brand, Easibie streamlines every try-on with an easy-to-use, maintainable system.
+            Whether you're a boutique label or a 10,000-SKU fashion brand, Easibie streamlines virtual try-on with zero 3D modeling required.
           </p>
         </div>
 
         <div className="mt-14 mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6">
-          <WhyCard title="Effortless, direct connections" desc="Make seamless connections that enhance collaboration, streamline communication, and boost efficiency in every interaction.">
+          <WhyCard title="1-Click storefront connections" desc="Connect Shopify, WooCommerce, or custom storefronts with a single lightweight script tag that loads in milliseconds.">
             <ConnectionsGraphic />
           </WhyCard>
-          <WhyCard title="Automatically detects context" desc="Do you sell in the US and ship to Europe? Easibie auto-detects locale, currency, sizing and skin-tone diversity — you have it covered.">
+          <WhyCard title="Automatically detects garment context" desc="Sell across global markets? Easibie auto-detects international sizing, fabric drape physics, and skin-tone diversity effortlessly.">
             <WorldGraphic />
           </WhyCard>
-          <WhyCard title="Add team members" desc="Carefully crafted and fine-tuned for a seamless, intuitive, and exceptional multi-user experience.">
+          <WhyCard title="Add styling team members" desc="Carefully crafted for merchandising and styling teams with multi-user permissions, brand presets, and analytics.">
             <TeamGraphic />
           </WhyCard>
         </div>
@@ -87,10 +87,10 @@ function Landing() {
           <div>
             <div className="flex items-center gap-3 mb-6">
               {[
-                { icon: Palette, label: "Fashion", active: true },
-                { icon: Layers, label: "Furniture" },
-                { icon: Sparkles, label: "Beauty" },
-                { icon: Users, label: "Retail" },
+                { icon: Palette, label: "Tailoring", active: true },
+                { icon: Layers, label: "Streetwear" },
+                { icon: Sparkles, label: "Eveningwear" },
+                { icon: Users, label: "Athleisure" },
               ].map((t, i) => (
                 <div key={i} className={`flex flex-col items-center gap-1 ${t.active ? "text-ink" : "text-[#8A83AB]"}`}>
                   <div className={`w-11 h-11 rounded-xl grid place-items-center ${t.active ? "bg-[#1F1747] text-white" : "bg-white border border-[#E4DEF7]"}`}>
@@ -100,9 +100,9 @@ function Landing() {
                 </div>
               ))}
             </div>
-            <h2 className="text-ink">Fashion and lifestyle try-on made effortless.</h2>
+            <h2 className="text-ink">Fashion and apparel try-on made effortless.</h2>
             <p className="mt-4 text-[15px] text-[#6B6689] max-w-md">
-              Streamline your storefront with Easibie — automate try-on links, embed on any product page, and boost revenue with high-converting AI previews.
+              Streamline your storefront with Easibie — embed virtual fitting rooms on product pages, eliminate sizing doubts, and protect margins by cutting reverse logistics.
             </p>
             <Link to="/auth" search={{ mode: "signup" }} className="btn-primary mt-7">Get started for free</Link>
           </div>
@@ -129,7 +129,7 @@ function Landing() {
           <span className="pill"><Zap size={12} /> Pay as you grow</span>
           <h2 className="mt-5 text-ink">Pricing</h2>
           <p className="mt-4 text-[15px] text-[#6B6689] max-w-lg mx-auto">
-            Choose a plan that fits your needs, offering flexibility and value to support your growth and success with Easibie.
+            Choose a plan that fits your catalog size, offering predictable value to reduce returns and scale checkout conversions.
           </p>
         </div>
         <div className="mx-auto max-w-6xl mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -143,9 +143,9 @@ function Landing() {
       <section className="px-4 pb-24">
         <div className="mx-auto max-w-4xl text-center">
           <span className="pill"><MessageCircle size={12} /> Reviews</span>
-          <h2 className="mt-5 text-ink">What people say about Easibie</h2>
+          <h2 className="mt-5 text-ink">What fashion brands say about Easibie</h2>
           <p className="mt-4 text-[15px] text-[#6B6689] max-w-lg mx-auto">
-            Hear from our satisfied customers who have transformed their storefront experience and boosted efficiency with Easibie's powerful engine.
+            Hear from retail founders and e-commerce leaders who have transformed customer checkout confidence with Easibie.
           </p>
         </div>
         <div className="mx-auto max-w-6xl mt-12 grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -161,9 +161,9 @@ function Landing() {
           <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #C7BEEB, transparent 70%)" }} />
           <div className="absolute -bottom-24 -right-16 w-80 h-80 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #A99BF0, transparent 70%)" }} />
           <div className="relative">
-            <h2 className="text-ink">Scale your <span className="italic">business</span></h2>
+            <h2 className="text-ink">Scale your <span className="italic">fashion brand</span></h2>
             <p className="mt-4 text-[15px] text-[#6B6689] max-w-md mx-auto">
-              The ultimate AI try-on platform designed to revolutionize the way you sell online.
+              The ultimate AI virtual fitting room designed to eliminate sizing doubt and boost online apparel sales.
             </p>
             <Link to="/auth" search={{ mode: "signup" }} className="btn-primary mt-8">Get started for free</Link>
           </div>
@@ -181,7 +181,7 @@ function CalendarCard() {
     <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
       <div className="flex items-center justify-between mb-3">
         <button className="w-7 h-7 rounded-full border border-[#E4DEF7] grid place-items-center text-[#6B6689]">‹</button>
-        <div className="text-[13px] font-bold text-ink">January 2026</div>
+        <div className="text-[13px] font-bold text-ink">Daily Try-On Sessions</div>
         <button className="w-7 h-7 rounded-full border border-[#E4DEF7] grid place-items-center text-[#6B6689]">›</button>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-[#8A83AB] font-semibold mb-2">
@@ -199,19 +199,19 @@ function CalendarCard() {
 function TryOnTypeCard() {
   return (
     <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5 flex flex-col">
-      <div className="text-[13px] font-bold text-ink mb-4">Type of Try-On</div>
+      <div className="text-[13px] font-bold text-ink mb-4">Fitting Studio Mode</div>
       <label className="flex items-start gap-3 p-3 rounded-xl border border-[#E4DEF7] mb-2 cursor-pointer">
         <span className="w-4 h-4 rounded-full border-[3px] border-[#1F1747] mt-0.5" />
         <div>
-          <div className="text-[12.5px] font-semibold text-ink">Instant try-on</div>
-          <div className="text-[11px] text-[#8A83AB]">Use this type of try-on when you need customers to visualize instantly.</div>
+          <div className="text-[12.5px] font-semibold text-ink">Instant photo try-on</div>
+          <div className="text-[11px] text-[#8A83AB]">Shoppers upload a snapshot to see realistic garment draping in 1.4s.</div>
         </div>
       </label>
       <label className="flex items-start gap-3 p-3 rounded-xl cursor-pointer">
         <span className="w-4 h-4 rounded-full border-2 border-[#C7BEEB] mt-0.5" />
         <div>
-          <div className="text-[12.5px] font-semibold text-ink">Scheduled preview</div>
-          <div className="text-[11px] text-[#8A83AB]">Batched preview no checkout.</div>
+          <div className="text-[12.5px] font-semibold text-ink">In-store hangtag QR</div>
+          <div className="text-[11px] text-[#8A83AB]">Shoppers scan physical tags to preview fits on mobile.</div>
         </div>
       </label>
       <div className="mt-auto pt-4">
@@ -225,14 +225,14 @@ function TryOnTypeCard() {
 }
 
 function TimeSlotCard() {
-  const times = ["09:30", "10:30", "11:30", "12:30", "01:30"];
+  const times = ["99.4% Fit Match", "98.8% Shoulder Alignment", "97.9% Chest Drape", "96.5% Sleeve Length", "1.4s Latency"];
   return (
     <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
       <div className="flex items-center justify-between mb-3">
-        <div className="text-[13px] font-bold text-ink">Book a 30m Preview</div>
+        <div className="text-[13px] font-bold text-ink">Garment Fit Confidence</div>
       </div>
       <div className="flex items-center justify-between text-[11px] text-[#8A83AB] mb-2">
-        What time works best
+        Shopper accuracy metrics
         <span className="w-8 h-4 rounded-full bg-[#1F1747] relative"><span className="absolute right-0.5 top-0.5 w-3 h-3 rounded-full bg-white" /></span>
       </div>
       <div className="space-y-2">
@@ -250,10 +250,10 @@ function SessionCard() {
   return (
     <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
       <div className="flex items-center gap-2 text-[12px] font-semibold text-ink mb-3">
-        <Camera size={13} /> 28 April, 2026
+        <Camera size={13} /> 420+ Stores Live
       </div>
       <div className="flex gap-2">
-        {["12:30","02:30","03:30"].map((t,i)=>(
+        {["Blazers","Dresses","Outerwear"].map((t,i)=>(
           <div key={t} className={`px-4 py-2 rounded-full text-[12px] font-semibold ${i===0 ? "bg-white border border-[#1F1747] text-ink" : "text-[#8A83AB]"}`}>
             {t}
           </div>
@@ -262,10 +262,10 @@ function SessionCard() {
       <div className="mt-4 flex items-center gap-3 pt-4 border-t border-[#E4DEF7]">
         <div className="w-9 h-9 rounded-full bg-[#C7BEEB]" />
         <div>
-          <div className="text-[13px] font-bold text-ink">Shane Watson</div>
-          <div className="text-[11px] text-[#8A83AB]">Sun–Fri, 09am – 06pm</div>
+          <div className="text-[13px] font-bold text-ink">Sarah Jenkins</div>
+          <div className="text-[11px] text-[#8A83AB]">Head of E-Commerce • Atelier V</div>
         </div>
-        <span className="ml-auto text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-[#F3F0FE] text-[#1F1747]">Admin</span>
+        <span className="ml-auto text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-[#F3F0FE] text-[#1F1747]">Brand</span>
       </div>
     </div>
   );
@@ -274,9 +274,9 @@ function SessionCard() {
 function StylePanel() {
   return (
     <div className="rounded-2xl bg-white border border-[#E4DEF7] p-5">
-      <div className="text-[13px] font-bold text-ink">Try-On Page</div>
-      <div className="text-[11px] text-[#8A83AB] mb-4">Customize your try-on page appearance</div>
-      <div className="text-[11px] font-semibold text-ink mb-2">Background Color</div>
+      <div className="text-[13px] font-bold text-ink">Store Widget Style</div>
+      <div className="text-[11px] text-[#8A83AB] mb-4">Customize your button and try-on modal colors</div>
+      <div className="text-[11px] font-semibold text-ink mb-2">Primary Color Preset</div>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#E4DEF7]">
           <span className="text-[12px] font-mono text-ink">#1E185B</span>
@@ -310,9 +310,9 @@ function ConnectionsGraphic() {
         <div />
         <div className="w-10 h-10 rounded-full bg-[#38BDF8] grid place-items-center text-white text-[10px] font-bold">S</div>
         <div />
-        <div className="w-10 h-10 rounded-full bg-[#F59E0B] grid place-items-center text-white text-[10px] font-bold">Z</div>
+        <div className="w-10 h-10 rounded-full bg-[#F59E0B] grid place-items-center text-white text-[10px] font-bold">W</div>
         <div className="w-12 h-12 rounded-full bg-white border border-[#E4DEF7] grid place-items-center text-ink text-[10px] font-bold shadow float">✚</div>
-        <div className="w-10 h-10 rounded-full bg-[#22C55E] grid place-items-center text-white text-[10px] font-bold">G</div>
+        <div className="w-10 h-10 rounded-full bg-[#22C55E] grid place-items-center text-white text-[10px] font-bold">R</div>
         <div />
         <div className="w-10 h-10 rounded-full bg-[#6C5CE7] grid place-items-center text-white text-[10px] font-bold">E</div>
         <div />
@@ -343,11 +343,11 @@ function WorldGraphic() {
 function TeamGraphic() {
   return (
     <div className="h-full p-4 flex flex-col justify-center">
-      <div className="text-[11px] font-semibold text-ink mb-2 flex items-center gap-1"><Users size={12} /> Add Team Members</div>
+      <div className="text-[11px] font-semibold text-ink mb-2 flex items-center gap-1"><Users size={12} /> Styling & Merch Team</div>
       <div className="text-[10px] text-[#8A83AB] mb-3">Members (2/30)</div>
       {[
-        { n: "Shane Watson", t: "Sun–Fri, 09am–06pm", r: "Admin", c: "#F59E0B" },
-        { n: "Kane Williamson", t: "Sun–Fri, 09am–06pm", r: "Staff", c: "#6C5CE7" },
+        { n: "Sarah Jenkins", t: "Catalog Lead • Active", r: "Admin", c: "#F59E0B" },
+        { n: "David Chen", t: "Merchandise Stylist", r: "Staff", c: "#6C5CE7" },
       ].map((m) => (
         <div key={m.n} className="flex items-center gap-2 py-1.5">
           <div className="w-7 h-7 rounded-full" style={{ background: m.c }} />
@@ -369,20 +369,20 @@ function PropertyMock() {
     <div className="relative">
       <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-[#C7BEEB] to-[#A99BF0] relative">
         <div className="absolute inset-0 grid place-items-center text-[80px] opacity-40">👗</div>
-        <div className="absolute top-4 left-4 pill text-[10px]">One product · Try-On</div>
-        <div className="absolute bottom-4 right-4 pill text-[10px]">Live preview</div>
+        <div className="absolute top-4 left-4 pill text-[10px]">Photo Try-On · Live</div>
+        <div className="absolute bottom-4 right-4 pill text-[10px]">1.4s Drape</div>
       </div>
       <div className="absolute -top-4 -right-4 bg-white rounded-2xl border border-[#E4DEF7] px-4 py-3 shadow float">
-        <div className="text-[10px] text-[#8A83AB]">28 April · 30 April, 2026</div>
+        <div className="text-[10px] text-[#8A83AB]">Real-Time Store Stats</div>
         <div className="text-[12px] font-bold text-ink flex items-center gap-1 mt-1">
-          <Check size={12} className="text-[#22C55E]" /> Sessions booked
+          <Check size={12} className="text-[#22C55E]" /> -38% Returns Prevented
         </div>
       </div>
       <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl border border-[#E4DEF7] px-4 py-3 shadow flex items-center gap-2 float-y">
         <span className="w-8 h-8 rounded-lg bg-[#1F1747] text-white grid place-items-center"><Camera size={14} /></span>
         <div>
-          <div className="text-[10px] text-[#8A83AB]">Deluxe view</div>
-          <div className="text-[12px] font-bold text-ink">Full-body pose</div>
+          <div className="text-[10px] text-[#8A83AB]">Drape preview</div>
+          <div className="text-[12px] font-bold text-ink">On-body simulation</div>
         </div>
       </div>
     </div>
@@ -392,12 +392,12 @@ function PropertyMock() {
 /* ─────────── FEATURE TILES ─────────── */
 
 const FEATS = [
-  { icon: Shield, title: "Eliminate double previews", desc: "Prevent scheduling conflicts and ensure smooth, hassle-free try-on sessions effortlessly." },
-  { icon: Users, title: "Cap attendees per slot", desc: "Limit participants per slot for better scheduling control across concurrent sessions." },
-  { icon: Wand2, title: "Quickly add personalised questions", desc: "Customize your try-on flow by adding tailored questions effortlessly for every shopper." },
-  { icon: Layers, title: "Group products into one booking", desc: "Simplify scheduling by combining multiple SKUs into a single try-on experience." },
-  { icon: Globe, title: "Multilingual support made easy", desc: "Effortlessly reach a global audience with seamless multilingual support out of the box." },
-  { icon: Shield, title: "Block unwanted try-ons", desc: "Prevent unauthorized or unwanted try-on requests with seamless restriction controls." },
+  { icon: Shield, title: "Zero biometric storage", desc: "Customer photos are processed in temporary encrypted RAM and purged immediately after draping." },
+  { icon: Users, title: "Instant multi-size drape", desc: "Shoppers preview how tailoring, sleeve lengths, and waistlines fit on their personal posture." },
+  { icon: Wand2, title: "Photoreal fabric physics", desc: "Neural networks simulate weave tension, wool fold lines, and natural ambient lighting realistically." },
+  { icon: Layers, title: "1-Click Shopify & store embed", desc: "Drop a single script tag into your product page template with zero developer friction." },
+  { icon: Globe, title: "Global sizing intelligence", desc: "Supports international sizing charts, multi-currency stores, and diverse shopper body shapes seamlessly." },
+  { icon: Shield, title: "In-store hangtag QR generator", desc: "Print QR codes on showroom tags so shoppers can scan and try on garments with their phone." },
 ];
 
 function FeatureTile({ icon: Icon, title, desc }: { icon: any; title: string; desc: string }) {
@@ -416,24 +416,24 @@ function FeatureTile({ icon: Icon, title, desc }: { icon: any; title: string; de
 
 const TIERS: Tier[] = [
   {
-    name: "Free", price: "Free", note: "For individuals starting out with basic try-ons.",
+    name: "Starter Pilot", price: "Free", note: "For fashion boutiques validating photo try-on with real shoppers.",
     highlight: false,
-    features: ["Unlimited previews", "Unlimited products", "Unlimited stops", "Email notifications", "Time zone compliant", "Mobile & desktop"],
+    features: ["250 photo try-on sessions", "10 active store garments", "Universal embed snippet", "Standard sizing report", "Community support", "Mobile & desktop optimized"],
   },
   {
-    name: "Pro", price: "$18.99", note: "For individuals with advanced try-on needs.",
+    name: "Growth", price: "$18.99", note: "For emerging apparel brands scaling sales and reducing returns.",
     highlight: false,
-    features: ["Unlimited bookings", "Unlimited services", "Unlimited reminders", "Add questions", "Multiday", "Cancel & reschedule", "Custom duration"],
+    features: ["2,500 try-on sessions / mo", "Unlimited active garments", "Custom brand button colors", "Shopify 1-click sync", "Return reduction metrics", "Priority GPU queue"],
   },
   {
-    name: "Elite", price: "$28.99", note: "For companies (several team members).",
+    name: "Elite", price: "$28.99", note: "For established clothing brands wanting full white-label experience.",
     highlight: true, popular: true,
-    features: ["Everything before +", "No Easibie branding", "Google calendar", "Google meet automatic", "Zoom links", "POS", "Upsell services"],
+    features: ["10,000 try-on sessions", "No Easibie branding", "In-store QR code generator", "Advanced fabric drape tuning", "Custom CSS styling", "Multi-seat team portal", "Priority support"],
   },
   {
-    name: "Pro+", price: "$39.99", note: "For teams needing extra features, security, admin control, and support.",
+    name: "Enterprise", price: "$39.99", note: "For high-volume retail teams needing custom APIs, SLAs, and dedicated compute.",
     highlight: false,
-    features: ["Elite +", "No Easibie branding", "SMS notification", "Abandoned booking", "Custom vendor", "Booking deposit", "Custom deposit", "Team portal"],
+    features: ["Unlimited try-on sessions", "Headless React SDK", "Dedicated GPU cluster", "Custom AI drape training", "Dedicated account manager", "99.9% uptime SLA", "Custom invoicing"],
   },
 ];
 
@@ -469,9 +469,9 @@ function PricingTile({ name, price, note, highlight, popular, features }: Tier) 
 /* ─────────── TESTIMONIALS ─────────── */
 
 const TESTIMONIALS = [
-  { name: "Shane Watson", role: "Operations Manager at Cleanwill", body: "Easibie transformed our workflow! Easy to use, seamless integrations, and outstanding support. Highly recommended for any business scaling up!" },
-  { name: "Mitchel Straick", role: "Founder at Peko Studios", body: "Easibie has been a game-changer for our business! The platform is incredibly intuitive, making onboarding seamless. Integration with our existing tools was fluid, and the automation features saved us huge time." },
-  { name: "Steve Smith", role: "CEO at Wayside Tours", body: "Easibie streamlined our workflow with an intuitive interface and seamless integrations. The automation features saved us valuable time, and the support team is fantastic." },
+  { name: "Marcus Vela", role: "Founder at Atelier V", body: "Easibie transformed our product pages! Sizing returns dropped by 39% in our first month. Shoppers love uploading a photo and seeing the drape before completing checkout." },
+  { name: "Elena Rowe", role: "Head of E-Commerce at Northbeam Silk", body: "Easibie has been a game-changer for our eveningwear line. Shoppers were always hesitant about slip dress sizing. Letting them preview it on their own body skyrocketed our checkout conversion rate." },
+  { name: "Raj Patel", role: "Co-Founder at Loop Denim", body: "Installing the Shopify script took less than two minutes. The return cost savings directly boosted our net margins, and customer satisfaction has never been higher." },
 ];
 
 function TestimonialCard({ name, role, body }: { name: string; role: string; body: string }) {
