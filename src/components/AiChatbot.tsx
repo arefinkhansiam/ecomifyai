@@ -115,9 +115,11 @@ export function AiChatbot() {
         >
           {/* Header */}
           <div className="px-4 py-3 flex items-center gap-2.5" style={{ background: "linear-gradient(135deg,#0B1220 0%,#0369A1 60%,#0EA5E9 100%)", color: "#fff" }}>
-            <span className="w-8 h-8 rounded-full grid place-items-center" style={{ background: "rgba(255,255,255,0.18)" }}>
-              <Sparkles size={15} />
-            </span>
+            <img
+              src="/easibie-logo.jpg"
+              alt="Easibie"
+              className="w-8 h-8 rounded-lg object-cover border border-white/20 shrink-0"
+            />
             <div className="min-w-0 flex-1">
               <div className="text-[13px] font-semibold leading-tight">Easibie Assistant</div>
               <div className="text-[10.5px]" style={{ color: "rgba(255,255,255,0.75)" }}>AI · usually replies instantly</div>

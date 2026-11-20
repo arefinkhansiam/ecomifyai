@@ -52,7 +52,10 @@ export function ArLivePreview(p: Props) {
           {p.buttonLabel}
         </button>
         {p.showBranding && (
-          <div className="mt-3 text-[10px] uppercase tracking-wider text-muted">Powered by Easibie</div>
+          <div className="mt-3 text-[10px] uppercase tracking-wider text-muted inline-flex items-center gap-1.5">
+            <img src="/easibie-logo.jpg" alt="" className="w-3.5 h-3.5 rounded-[3px] object-cover" />
+            <span>Powered by Easibie</span>
+          </div>
         )}
       </div>
 
@@ -150,9 +153,10 @@ export function ArLivePreview(p: Props) {
           </div>
 
           {p.showBranding && (
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[7px] uppercase tracking-wider"
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[7px] uppercase tracking-wider inline-flex items-center gap-1"
                  style={{ background: p.overlay, color: p.fontColor, opacity: 0.8 }}>
-              Powered by <span style={{ color: p.accent, fontWeight: 700 }}>Easibie</span>
+              <img src="/easibie-logo.jpg" alt="" className="w-2.5 h-2.5 rounded-[2px] object-cover" />
+              <span>Powered by <span style={{ color: p.accent, fontWeight: 700 }}>Easibie</span></span>
             </div>
           )}
         </div>

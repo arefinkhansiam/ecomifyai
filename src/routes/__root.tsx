@@ -62,6 +62,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a77039ba-709a-4283-8ed5-dcf2b6ae8c52/id-preview-541cac40--cf67ac36-8498-48f8-aa46-849ecb68157b.lovable.app-1780828070252.png" },
     ],
     links: [
+      { rel: "icon", type: "image/jpeg", href: "/easibie-logo.jpg" },
+      { rel: "apple-touch-icon", href: "/easibie-logo.jpg" },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },

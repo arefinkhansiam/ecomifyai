@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Twitter, Linkedin, Facebook } from "lucide-react";
+import { EasibieLogo } from "./EasibieLogo";
 
 const cols = [
   { title: "Product", links: [
@@ -25,10 +26,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl rounded-[28px] bg-white border border-[#E4DEF7] px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div>
-            <Link to="/" className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-[10px] grid place-items-center bg-[#1F1747] text-white text-[13px] font-black">E</span>
-              <span className="text-[18px] font-extrabold tracking-tight text-ink">Easibie</span>
-            </Link>
+            <EasibieLogo size="md" />
             <p className="mt-4 text-[13px] text-[#6B6689] max-w-[220px]">AI try-on for modern commerce. Turn every product photo into a personalised experience.</p>
             <div className="flex gap-2 mt-5">
               {[Instagram, Twitter, Linkedin, Facebook].map((Icon, i) => (

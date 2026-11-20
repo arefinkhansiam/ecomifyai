@@ -741,8 +741,9 @@ function CameraComposeView({ mode }: { mode: "fashion" | "furniture" | "makeup" 
       )}
 
       {product.show_branding !== false && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-70" style={{ background: cust.overlay, color: cust.fontColor }}>
-          Powered by <span className="font-bold" style={{ color: cust.accent }}>Easibie</span>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider opacity-80 inline-flex items-center gap-1.5" style={{ background: cust.overlay, color: cust.fontColor }}>
+          <img src="/easibie-logo.jpg" alt="" className="w-3.5 h-3.5 rounded-[3px] object-cover" />
+          <span>Powered by <span className="font-bold" style={{ color: cust.accent }}>Easibie</span></span>
         </div>
       )}
     </div>

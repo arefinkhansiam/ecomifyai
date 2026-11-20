@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { EasibieLogo } from "./EasibieLogo";
 
 const links = [
   { to: "/", label: "Home" },
@@ -25,10 +26,7 @@ export function Navbar() {
   return (
     <header className="fixed top-5 left-0 right-0 z-50 px-4">
       <div className="mx-auto max-w-6xl bg-white rounded-[22px] border border-[#E4DEF7] shadow-[0_10px_40px_-24px_rgba(31,23,71,0.18)] h-[68px] px-5 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="w-8 h-8 rounded-[10px] grid place-items-center bg-[#1F1747] text-white text-[13px] font-black">E</span>
-          <span className="text-[18px] font-extrabold tracking-tight text-ink">Easibie</span>
-        </Link>
+        <EasibieLogo size="md" />
 
         <nav className="hidden md:flex items-center gap-9 absolute left-1/2 -translate-x-1/2">
           {links.map((l, i) => (
@@ -62,6 +60,9 @@ export function Navbar() {
 
       {menuOpen && (
         <div className="fixed inset-0 z-[60] bg-[#EDEAFB] flex flex-col items-center justify-center gap-8">
+          <div className="absolute top-6 left-6">
+            <EasibieLogo size="md" />
+          </div>
           <button onClick={() => setMenuOpen(false)} className="absolute top-6 right-6 text-ink"><X size={24} /></button>
           {links.map((l, i) => (
             <Link key={i} to={l.to} onClick={() => setMenuOpen(false)} className="text-2xl font-bold text-ink">

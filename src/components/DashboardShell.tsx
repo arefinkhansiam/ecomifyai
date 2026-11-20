@@ -103,9 +103,11 @@ export function DashboardShell({ title, children }: { title: string; children: R
             className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white/5 transition"
             style={{ color: "#E3E3E3" }}
           >
-            <div className="w-7 h-7 rounded-md grid place-items-center text-[11px] font-bold flex-shrink-0" style={{ background: "#FFFFFF", color: "#000000", boxShadow: "0 4px 12px -6px rgba(255,255,255,0.55)" }}>
-              {initial}
-            </div>
+            <img
+              src="/easibie-logo.jpg"
+              alt="Easibie"
+              className="w-7 h-7 rounded-md object-cover shadow-xs border border-white/20 shrink-0"
+            />
             <div className="min-w-0 flex-1 text-left">
               <div className="text-[13px] font-semibold truncate">{displayName}</div>
               <div className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.5)" }}>Easibie Studio</div>
@@ -186,7 +188,12 @@ export function DashboardShell({ title, children }: { title: string; children: R
         {/* Top bar */}
         <header className="px-4 sm:px-6 md:px-8 h-14 flex items-center justify-between sticky top-0 z-20"
           style={{ background: "#FFFFFF", borderBottom: "1px solid #E1E3E5" }}>
-          <h2 className="text-[15px] font-semibold" style={{ color: "#1A1A1A", letterSpacing: "-0.01em" }}>{title}</h2>
+          <div className="flex items-center gap-2">
+            <Link to="/" className="md:hidden flex items-center gap-1.5" title="Back to home">
+              <img src="/easibie-logo.jpg" alt="Easibie" className="w-6 h-6 rounded-md object-cover border border-slate-200" />
+            </Link>
+            <h2 className="text-[15px] font-semibold" style={{ color: "#1A1A1A", letterSpacing: "-0.01em" }}>{title}</h2>
+          </div>
           <div className="flex items-center gap-1.5 relative" ref={popRef}>
             {/* Notifications */}
             <button onClick={() => setOpenMenu(openMenu === "bell" ? null : "bell")} className="w-9 h-9 rounded-md grid place-items-center hover:bg-[#F1F2F4] transition relative" title="Notifications">

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Mail, KeyRound, User, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { EasibieLogo } from "@/components/EasibieLogo";
 
 const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional(), redirect: z.string().optional() });
 
@@ -130,12 +131,13 @@ function AuthPage() {
         linear-gradient(180deg, #02060c 0%, #060d18 55%, #0B1220 100%)
       `,
     }}>
-      {/* top label + progress bars */}
-      <div className="w-full max-w-md mx-auto">
+      {/* top label + logo + progress bars */}
+      <div className="w-full max-w-md mx-auto flex flex-col items-center">
+        <EasibieLogo size="lg" textColor="text-white" showSubtitle className="mb-4" />
         <p className="text-center text-sm" style={{ color: "rgba(148,163,184,0.9)" }}>
           {mode === "signup" ? "Create your account" : "Welcome back"}
         </p>
-        <div className="mt-3 grid grid-cols-4 gap-2">
+        <div className="mt-3 grid grid-cols-4 gap-2 w-full">
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className="h-1 rounded-full" style={{ background: GRAD, boxShadow: "0 0 12px rgba(56,189,248,0.6)" }} />
           ))}
