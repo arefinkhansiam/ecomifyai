@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Mail, KeyRound, User, Eye, EyeOff, Store, ArrowRight, ShieldCheck, Sparkles, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { EasibieLogo } from "@/components/EasibieLogo";
 
 const searchSchema = z.object({
   mode: z.enum(["signin", "signup"]).optional(),
@@ -170,16 +171,9 @@ function AuthPage() {
 
       {/* Top Header */}
       <div className="relative z-10 w-full max-w-md mx-auto flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0F2744] via-[#1E40AF] to-[#2563EB] grid place-items-center text-white shadow-sm">
-            <Sparkles size={16} />
-          </div>
-          <span className="text-[19px] font-extrabold text-[#0B192C]">
-            Easibie<span className="text-[#2563EB]">.ai</span>
-          </span>
-        </Link>
+        <EasibieLogo size="md" showSubtitle />
         <Link to="/" className="text-[12.5px] font-semibold text-[#64748B] hover:text-[#0B192C] transition">
-          ← Back to store
+          ← Back to home
         </Link>
       </div>
 

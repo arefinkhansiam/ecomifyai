@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TryArRouteImport } from './routes/try-ar'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as ForStoresRouteImport } from './routes/for-stores'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
@@ -47,6 +49,11 @@ const TryArRoute = TryArRouteImport.update({
   path: '/try-ar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoadmapRoute = RoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -55,6 +62,11 @@ const PricingRoute = PricingRouteImport.update({
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForStoresRoute = ForStoresRouteImport.update({
+  id: '/for-stores',
+  path: '/for-stores',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -219,8 +231,10 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/checkout': typeof CheckoutRoute
+  '/for-stores': typeof ForStoresRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
+  '/roadmap': typeof RoadmapRoute
   '/try-ar': typeof TryArRoute
   '/api/chat': typeof ApiChatRoute
   '/ar/$token': typeof ArTokenRoute
@@ -252,8 +266,10 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/checkout': typeof CheckoutRoute
+  '/for-stores': typeof ForStoresRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
+  '/roadmap': typeof RoadmapRoute
   '/try-ar': typeof TryArRoute
   '/api/chat': typeof ApiChatRoute
   '/ar/$token': typeof ArTokenRoute
@@ -286,8 +302,10 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/checkout': typeof CheckoutRoute
+  '/for-stores': typeof ForStoresRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
+  '/roadmap': typeof RoadmapRoute
   '/try-ar': typeof TryArRoute
   '/api/chat': typeof ApiChatRoute
   '/ar/$token': typeof ArTokenRoute
@@ -321,8 +339,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/checkout'
+    | '/for-stores'
     | '/how-it-works'
     | '/pricing'
+    | '/roadmap'
     | '/try-ar'
     | '/api/chat'
     | '/ar/$token'
@@ -354,8 +374,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/checkout'
+    | '/for-stores'
     | '/how-it-works'
     | '/pricing'
+    | '/roadmap'
     | '/try-ar'
     | '/api/chat'
     | '/ar/$token'
@@ -387,8 +409,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/checkout'
+    | '/for-stores'
     | '/how-it-works'
     | '/pricing'
+    | '/roadmap'
     | '/try-ar'
     | '/api/chat'
     | '/ar/$token'
@@ -422,8 +446,10 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   CheckoutRoute: typeof CheckoutRoute
+  ForStoresRoute: typeof ForStoresRoute
   HowItWorksRoute: typeof HowItWorksRoute
   PricingRoute: typeof PricingRoute
+  RoadmapRoute: typeof RoadmapRoute
   TryArRoute: typeof TryArRoute
   ApiChatRoute: typeof ApiChatRoute
   ArTokenRoute: typeof ArTokenRoute
@@ -449,6 +475,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TryArRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing': {
       id: '/pricing'
       path: '/pricing'
@@ -461,6 +494,13 @@ declare module '@tanstack/react-router' {
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-stores': {
+      id: '/for-stores'
+      path: '/for-stores'
+      fullPath: '/for-stores'
+      preLoaderRoute: typeof ForStoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -721,8 +761,10 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   CheckoutRoute: CheckoutRoute,
+  ForStoresRoute: ForStoresRoute,
   HowItWorksRoute: HowItWorksRoute,
   PricingRoute: PricingRoute,
+  RoadmapRoute: RoadmapRoute,
   TryArRoute: TryArRoute,
   ApiChatRoute: ApiChatRoute,
   ArTokenRoute: ArTokenRoute,

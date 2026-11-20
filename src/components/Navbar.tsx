@@ -1,17 +1,18 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, ArrowRight, Sparkles, LayoutDashboard } from "lucide-react";
+import { Menu, X, ArrowRight, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { EasibieLogo } from "./EasibieLogo";
 
-const links = [
-  { to: "/#how-it-works", label: "How It Works" },
-  { to: "/#photo-studio", label: "Photo Try-On" },
-  { to: "/#embed-widget", label: "Store Embed" },
-  { to: "/#roadmap", label: "Roadmap (AR)" },
-  { to: "/#pricing", label: "Pricing" },
-  { to: "/try-ar", label: "Live Studio" },
-];
+const NAV_LINKS = [
+  { to: "/how-it-works", label: "How It Works" },
+  { to: "/try-ar", label: "Photo Studio" },
+  { to: "/for-stores", label: "For Stores" },
+  { to: "/roadmap", label: "Roadmap" },
+  { to: "/pricing", label: "Pricing" },
+  { to: "/about", label: "About" },
+] as const;
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,42 +24,35 @@ export function Navbar() {
     window.location.href = "/";
   };
 
-  return (
-    <header className="fixed top-4 left-0 right-0 z-50 px-4">
-      <div className="mx-auto max-w-6xl bg-white/95 backdrop-blur-md rounded-full border border-[#E2E8F0] shadow-[0_4px_24px_-4px_rgba(11,25,44,0.08)] h-[60px] px-6 flex items-center justify-between">
-        {/* Brand Logo - Easibie in Deep Blue */}
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0F2744] via-[#1E40AF] to-[#2563EB] grid place-items-center text-white shadow-sm shadow-blue-500/20 group-hover:scale-105 transition-transform">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M4 7C4 5.89543 4.89543 5 6 5H18C19.1046 5 20 5.89543 20 7V19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V7Z" stroke="white" strokeWidth="2"/>
-              <path d="M9 5V3C9 2.44772 9.44772 2 10 2H14C14.5523 2 15 2.44772 15 3V5" stroke="white" strokeWidth="2"/>
-              <circle cx="12" cy="13" r="3" fill="#60A5FA"/>
-            </svg>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[19px] font-extrabold tracking-tight text-[#0B192C] leading-none">
-              Easibie<span className="text-[#2563EB]">.ai</span>
-            </span>
-            <span className="text-[9.5px] font-semibold text-[#64748B] tracking-wider uppercase">
-              Virtual Try-On
-            </span>
-          </div>
-        </Link>
+  const isActive = (to: string) => pathname === to;
 
-        {/* Center Desktop Navigation */}
+  return (
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#E2E8F0]">
+      <div className="mx-auto max-w-6xl h-16 px-4 sm:px-6 flex items-center justify-between">
+        {/* Brand Logo with Professional Easibie Logo Component */}
+        <EasibieLogo size="md" showSubtitle />
+
+        {/* Center Desktop Dedicated Links */}
         <nav className="hidden md:flex items-center gap-7">
-          {links.map((l, i) => (
-            <a
-              key={i}
-              href={l.to}
-              className="text-[13.5px] font-semibold text-[#475569] hover:text-[#1E40AF] transition-colors"
-            >
-              {l.label}
-            </a>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const active = isActive(link.to);
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`text-[13.5px] font-semibold transition-colors ${
+                  active
+                    ? "text-[#1E40AF] font-bold"
+                    : "text-[#475569] hover:text-[#0F172A]"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Right CTA Buttons */}
+        {/* Right CTA Action Buttons */}
         <div className="hidden md:flex items-center gap-3">
           {user ? (
             <div className="flex items-center gap-2">
@@ -70,9 +64,9 @@ export function Navbar() {
               </Link>
               <button
                 onClick={signOut}
-                className="text-[12.5px] font-semibold text-[#64748B] hover:text-[#0B192C] px-2 py-1"
+                className="text-[12.5px] font-semibold text-[#64748B] hover:text-[#0F172A] px-2 py-1"
               >
-                Sign out
+                Sign Out
               </button>
             </div>
           ) : (
@@ -80,16 +74,16 @@ export function Navbar() {
               <Link
                 to="/auth"
                 search={{ mode: "signin" }}
-                className="text-[13px] font-bold text-[#0B192C] hover:text-[#1E40AF] px-3 py-1.5 transition"
+                className="text-[13px] font-semibold text-[#0F172A] hover:text-[#1E40AF] px-3 py-1.5 transition"
               >
                 Sign In
               </Link>
               <Link
                 to="/auth"
                 search={{ mode: "signup" }}
-                className="btn-blue-primary text-[13px] !py-2 !px-5"
+                className="btn-blue-primary text-[13px] !py-2 !px-4"
               >
-                Get Started <ArrowRight size={14} className="inline ml-1" />
+                Get Started Free →
               </Link>
             </div>
           )}
@@ -97,9 +91,9 @@ export function Navbar() {
 
         {/* Mobile Hamburger */}
         <button
-          className="md:hidden text-[#0B192C] p-1.5"
+          className="md:hidden text-[#0F172A] p-1.5 rounded-lg hover:bg-slate-100"
           onClick={() => setMenuOpen(true)}
-          aria-label="Open menu"
+          aria-label="Open navigation menu"
         >
           <Menu size={22} />
         </button>
@@ -107,31 +101,34 @@ export function Navbar() {
 
       {/* Mobile Drawer */}
       {menuOpen && (
-        <div className="fixed inset-0 z-[60] bg-white flex flex-col items-center justify-center gap-6 p-6">
-          <button
-            onClick={() => setMenuOpen(false)}
-            className="absolute top-6 right-6 text-[#0B192C] p-2"
-            aria-label="Close menu"
-          >
-            <X size={24} />
-          </button>
-          <div className="flex items-center gap-2.5 mb-2">
-            <div className="w-9 h-9 rounded-xl bg-[#1E40AF] grid place-items-center text-white">
-              <Sparkles size={18} />
-            </div>
-            <span className="text-[22px] font-extrabold text-[#0B192C]">Easibie.ai</span>
-          </div>
-          {links.map((l, i) => (
-            <a
-              key={i}
-              href={l.to}
+        <div className="fixed inset-0 z-[60] bg-white flex flex-col p-6 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between pb-6 border-b border-slate-100">
+            <EasibieLogo size="md" showSubtitle />
+            <button
               onClick={() => setMenuOpen(false)}
-              className="text-[17px] font-bold text-[#0B192C] hover:text-[#2563EB]"
+              className="text-[#0F172A] p-2 rounded-lg hover:bg-slate-100"
+              aria-label="Close menu"
             >
-              {l.label}
-            </a>
-          ))}
-          <div className="flex flex-col gap-3 w-full max-w-xs mt-4">
+              <X size={22} />
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-4 py-8">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setMenuOpen(false)}
+                className={`text-[16px] font-semibold transition ${
+                  isActive(link.to) ? "text-blue-700 font-bold" : "text-[#0F172A]"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-auto pt-6 border-t border-slate-100 flex flex-col gap-3">
             <Link
               to="/auth"
               search={{ mode: "signin" }}
