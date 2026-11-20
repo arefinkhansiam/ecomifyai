@@ -1,164 +1,150 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Check, Sparkles, ShieldCheck } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Check, Sparkles, ShieldCheck, ArrowRight } from "lucide-react";
 import { MarketingShell } from "@/components/MarketingShell";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Easibie Pricing — Free, Pro, Elite" },
-      { name: "description", content: "Simple plans for stores of every size. Start free and upgrade when you scale." },
+      { title: "Pricing & Plans — Easibie AI Fashion Try-On" },
+      { name: "description", content: "Predictable pricing for fashion e-commerce. 14-day free pilot, no credit card required." },
     ],
   }),
   component: PricingPage,
 });
 
-type Tier = { name: string; price: string; note: string; highlight: boolean; popular?: boolean; features: string[] };
-
-const TIERS: Tier[] = [
+const PLANS = [
   {
-    name: "Free", price: "Free", note: "For individuals starting out with basic try-ons.",
-    highlight: false,
-    features: ["Unlimited previews", "1 product", "Shareable link & QR", "Email notifications", "Time zone compliant", "Mobile & desktop"],
+    name: "Starter Pilot",
+    price: "$0",
+    period: "for 14 days",
+    desc: "For fashion boutiques validating photo try-on with real shoppers.",
+    popular: false,
+    features: [
+      "250 photo try-on sessions",
+      "10 active store garments",
+      "Universal embed snippet",
+      "Standard fitting report",
+      "Community & email support",
+    ],
+    cta: "Start Free Pilot",
   },
   {
-    name: "Pro", price: "$18.99", note: "For individuals with advanced try-on needs.",
-    highlight: false,
-    features: ["10 products", "Unlimited services", "Unlimited reminders", "Add questions", "Multi-locale", "Cancel & reschedule", "Custom duration"],
+    name: "Growth Brand",
+    price: "$49",
+    period: "/ month",
+    desc: "For growing clothing brands scaling sales and cutting return costs.",
+    popular: true,
+    features: [
+      "2,500 photo try-on sessions / mo",
+      "Unlimited active garments",
+      "Custom branding & button colors",
+      "Shopify & WooCommerce 1-click sync",
+      "Advanced sizing analytics & return ROI",
+      "Priority GPU processing queue",
+    ],
+    cta: "Start 14-Day Free Trial",
   },
   {
-    name: "Elite", price: "$28.99", note: "For companies (several team members).",
-    highlight: true, popular: true,
-    features: ["Everything before +", "No Easibie branding", "Custom brand colours", "Team seats up to 5", "Advanced analytics", "Zoom / calendar links", "Upsell services"],
-  },
-  {
-    name: "Pro+", price: "$39.99", note: "For teams needing extra features, security, admin control, and support.",
-    highlight: false,
-    features: ["Elite +", "No Easibie branding", "SMS notification", "Abandoned booking", "Custom vendor", "Booking deposit", "Team portal"],
+    name: "Enterprise",
+    price: "$99",
+    period: "/ month",
+    desc: "For high-volume apparel brands needing dedicated scale and custom APIs.",
+    popular: false,
+    features: [
+      "10,000+ photo try-ons included",
+      "Headless React SDK & webhook access",
+      "Sub-second GPU inference latency",
+      "Custom drape fine-tuning on your lookbook",
+      "Dedicated account manager",
+      "99.9% uptime SLA",
+    ],
+    cta: "Contact Enterprise Sales",
   },
 ];
-
-const COMPARE = [
-  { label: "Try-On products", free: "1", pro: "Unlimited" },
-  { label: "Access to all features", free: false, pro: true },
-  { label: "Remove Easibie branding", free: false, pro: true },
-  { label: "Custom viewer skin", free: false, pro: true },
-  { label: "Brand colours & gradient", free: false, pro: true },
-  { label: "Analytics dashboard", free: false, pro: true },
-  { label: "Priority support", free: false, pro: true },
-  { label: "Team seats", free: "1", pro: "Unlimited" },
-] as const;
 
 function PricingPage() {
   return (
     <MarketingShell>
       {/* HERO */}
-      <section className="px-4 pt-6">
-        <div className="mx-auto max-w-6xl card-soft px-6 md:px-14 pt-20 pb-14 text-center relative overflow-hidden">
-          <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #C7BEEB, transparent 70%)" }} />
-          <div className="absolute -bottom-32 -right-24 w-96 h-96 rounded-full opacity-40 blob" style={{ background: "radial-gradient(circle, #A99BF0, transparent 70%)" }} />
-          <div className="relative">
-            <span className="pill"><Sparkles size={12} /> Pay as you grow</span>
-            <h1 className="mt-5 text-ink">Pick your <span className="italic">plan</span></h1>
-            <p className="mt-6 text-[16px] text-[#6B6689] max-w-xl mx-auto">
-              Choose a plan that fits your needs, offering flexibility and value to support your growth and success with Easibie.
-            </p>
-          </div>
+      <section className="px-4 pt-12 pb-16 blue-cloud-bg">
+        <div className="mx-auto max-w-5xl text-center">
+          <span className="pill-blue-badge"><Sparkles size={13} /> Transparent Pricing</span>
+          <h1 className="mt-4 text-[38px] sm:text-[52px] font-extrabold text-[#0B192C]">
+            Predictable Plans for Fashion Brands
+          </h1>
+          <p className="mt-4 text-[16px] text-[#475569] max-w-xl mx-auto">
+            Boost customer checkout confidence and reduce return shipping costs.
+            Start with our 14-day free pilot — cancel anytime.
+          </p>
         </div>
       </section>
 
       {/* PRICING GRID */}
-      <section className="px-4 py-16">
-        <div className="mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {TIERS.map((t) => (
-            <PricingTile key={t.name} {...t} />
-          ))}
-        </div>
-      </section>
-
-      {/* COMPARE */}
-      <section className="px-4 pb-24">
-        <div className="mx-auto max-w-4xl text-center mb-12">
-          <span className="pill">Compare</span>
-          <h2 className="mt-5 text-ink">Unlock full <span className="italic">try-on capabilities</span></h2>
-        </div>
-        <div className="mx-auto max-w-4xl card-soft p-8">
-          <div className="grid grid-cols-[1.6fr_1fr_1fr] text-sm">
-            <div className="text-[11px] text-[#8A83AB] font-bold uppercase tracking-wider py-4">What you'll get</div>
-            <div className="text-center text-[12px] font-bold text-[#6B6689] py-4">Free</div>
-            <div className="text-center text-[12px] font-bold text-white py-3 bg-[#1F1747] rounded-t-2xl">Pro</div>
-            {COMPARE.map((row, i) => (
-              <div key={row.label} className="contents">
-                <div className="py-4 text-[13px] text-[#4B4368] border-t border-[#E4DEF7]">{row.label}</div>
-                <div className="py-4 text-center border-t border-[#E4DEF7] text-[#8A83AB]">
-                  {typeof row.free === "boolean" ? (row.free ? <Check size={15} className="inline text-[#1F1747]" /> : "–") : row.free}
+      <section className="px-4 py-16 bg-white">
+        <div className="mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+          {PLANS.map((p, i) => (
+            <div
+              key={i}
+              className={`card-white p-8 flex flex-col justify-between relative ${
+                p.popular ? "border-2 border-[#1E40AF] shadow-xl" : ""
+              }`}
+            >
+              {p.popular && (
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#1E40AF] text-white text-[11px] font-extrabold px-3.5 py-0.5 rounded-full uppercase tracking-wider">
+                  Most Popular
                 </div>
-                <div
-                  className={`py-4 text-center bg-[#F3F0FE] border-l border-r border-[#1F1747] ${i === COMPARE.length - 1 ? "rounded-b-2xl border-b" : ""}`}
-                  style={{ color: "#1F1747", fontWeight: 600 }}
-                >
-                  {typeof row.pro === "boolean" ? (row.pro ? <Check size={15} className="inline" /> : "–") : row.pro}
+              )}
+              <div>
+                <span className="text-[12px] font-bold uppercase text-[#64748B]">{p.name}</span>
+                <div className="mt-3 flex items-baseline gap-1">
+                  <span className="text-[40px] font-extrabold text-[#0B192C]">{p.price}</span>
+                  <span className="text-[13px] text-[#64748B]">{p.period}</span>
+                </div>
+                <p className="text-[13px] text-[#64748B] mt-2">{p.desc}</p>
+
+                <div className="mt-6 pt-6 border-t border-slate-100 space-y-3 text-[13px] text-[#0B192C]">
+                  {p.features.map((f, j) => (
+                    <div key={j} className="flex items-center gap-2.5">
+                      <Check size={16} className="text-blue-600 shrink-0" />
+                      <span>{f}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-          <div className="mt-8 flex items-center justify-center gap-2 text-[12px] text-[#8A83AB]">
-            <ShieldCheck size={14} /> 7-day free trial · cancel anytime
-          </div>
+
+              <div className="mt-8">
+                <Link
+                  to="/auth"
+                  search={{ mode: "signup" }}
+                  className={`w-full !py-3 !rounded-xl !text-[13.5px] font-bold text-center block ${
+                    p.popular ? "btn-blue-primary" : "btn-white-secondary"
+                  }`}
+                >
+                  {p.cta} →
+                </Link>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="px-4 pb-24">
-        <div className="mx-auto max-w-4xl text-center mb-10">
-          <span className="pill">FAQ</span>
-          <h2 className="mt-5 text-ink">Frequently asked <span className="italic">questions</span></h2>
-        </div>
-        <div className="mx-auto max-w-3xl space-y-3">
-          {[
-            { q: "How does the free trial work?", a: "Every paid plan starts with a 7-day free trial. No card required up front — you only pay when the trial ends." },
-            { q: "Can I change my plan later?", a: "Yes. Upgrade or downgrade anytime from your dashboard. Changes apply at the next billing cycle." },
-            { q: "How many try-ons can I generate?", a: "Free plan covers 1 product. Pro covers 10, Elite covers 50, Pro+ is unlimited." },
-            { q: "Will the try-ons work on my store?", a: "Yes. We provide a one-line embed snippet that works on Shopify, WooCommerce, Wix, Squarespace and any custom site." },
-            { q: "Is my shopper data safe?", a: "Yes. Shopper photos are processed for the try-on only and never used for training." },
-            { q: "Do you offer refunds?", a: "If something is broken, contact support and we'll make it right. Otherwise, cancel anytime to stop future charges." },
-          ].map((f) => (
-            <details key={f.q} className="card-tile group px-6 py-4">
-              <summary className="flex items-center justify-between cursor-pointer list-none text-ink font-semibold text-[14px]">
-                {f.q}
-                <span className="text-[#8A83AB] group-open:rotate-180 transition-transform">⌄</span>
-              </summary>
-              <p className="mt-3 text-[13px] text-[#6B6689] leading-relaxed">{f.a}</p>
-            </details>
-          ))}
+      {/* GUARANTEE */}
+      <section className="px-4 pb-20 bg-white">
+        <div className="mx-auto max-w-3xl card-white p-6 text-center flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-left">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 grid place-items-center shrink-0">
+              <ShieldCheck size={22} />
+            </div>
+            <div>
+              <div className="text-[14px] font-bold text-[#0B192C]">14-Day Risk-Free Guarantee</div>
+              <div className="text-[12px] text-[#64748B]">Test on your live store. If returns don't drop, you pay nothing.</div>
+            </div>
+          </div>
+          <Link to="/auth" search={{ mode: "signup" }} className="btn-blue-primary text-[12.5px] !py-2 !px-5 whitespace-nowrap">
+            Start Free Pilot
+          </Link>
         </div>
       </section>
     </MarketingShell>
-  );
-}
-
-function PricingTile({ name, price, note, highlight, popular, features }: Tier) {
-  return (
-    <div className={`p-6 rounded-2xl relative flex flex-col ${highlight ? "bg-[#1F1747] text-white" : "bg-white border border-[#E4DEF7]"}`}>
-      {popular && (
-        <span className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-wider bg-white text-[#1F1747] px-2.5 py-1 rounded-full">Popular</span>
-      )}
-      <div className={`text-[13px] font-bold uppercase tracking-wide ${highlight ? "text-[#C7BEEB]" : "text-[#6B6689]"}`}>{name}</div>
-      <div className="mt-4 flex items-baseline gap-1">
-        <span className={`text-[36px] font-extrabold tracking-tight ${highlight ? "text-white" : "text-ink"}`}>{price}</span>
-        {price !== "Free" && <span className={`text-[13px] ${highlight ? "text-[#C7BEEB]" : "text-[#8A83AB]"}`}>/month</span>}
-      </div>
-      <p className={`mt-3 text-[12.5px] ${highlight ? "text-[#D8D2F5]" : "text-[#6B6689]"}`}>{note}</p>
-      <button className={`mt-5 w-full py-3 rounded-full text-[13px] font-bold ${highlight ? "bg-white text-[#1F1747]" : "bg-[#1F1747] text-white"}`}>
-        Get started for free
-      </button>
-      <ul className="mt-6 space-y-2.5 flex-1">
-        {features.map((f) => (
-          <li key={f} className={`flex items-center gap-2 text-[13px] ${highlight ? "text-[#E8E4F9]" : "text-[#4B4368]"}`}>
-            <Check size={13} className={highlight ? "text-[#C7BEEB]" : "text-[#1F1747]"} />
-            {f}
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
