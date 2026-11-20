@@ -23,8 +23,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { AiChatbot } from "./AiChatbot";
 
-import { EasibieLogo } from "./EasibieLogo";
-
 const dashboardTheme = {
   background: "#F8FAFC",
   "--bg": "#F8FAFC",
@@ -113,9 +111,19 @@ export function DashboardShell({ title, children }: { title: string; children: R
       <aside className="hidden md:flex w-64 flex-col fixed left-0 top-0 bottom-0 z-30 bg-white border-r border-[#E2E8F0] shadow-sm">
         {/* Brand Logo & Store Header */}
         <div className="px-5 pt-5 pb-4 border-b border-[#F1F5F9]">
-          <div className="mb-4">
-            <EasibieLogo size="md" showSubtitle />
-          </div>
+          <Link to="/" className="flex items-center gap-2.5 group mb-4">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0F2744] via-[#1E40AF] to-[#2563EB] grid place-items-center text-white shadow-sm">
+              <Sparkles size={16} />
+            </div>
+            <div>
+              <span className="text-[17px] font-extrabold text-[#0B192C] tracking-tight block leading-none">
+                Easibie<span className="text-[#2563EB]">.ai</span>
+              </span>
+              <span className="text-[9.5px] uppercase font-bold text-[#64748B] tracking-wider">
+                Merchant Console
+              </span>
+            </div>
+          </Link>
 
           {/* Store Switcher Pill */}
           <div className="relative">
