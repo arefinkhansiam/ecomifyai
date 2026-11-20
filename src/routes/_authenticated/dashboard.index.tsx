@@ -3,357 +3,171 @@ import { useEffect, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Box,
-  Eye,
-  Upload,
-  ArrowRight,
-  TrendingUp,
-  Sparkles,
-  ShoppingBag,
-  Code2,
-  CheckCircle2,
-  ShieldCheck,
-  Zap,
-  ExternalLink,
-  ChevronRight,
-  BarChart2,
-} from "lucide-react";
-import demoAfter from "@/assets/demo-after.jpg";
+import { Box, Eye, Upload, ArrowRight, TrendingUp, Crown, ArrowUpRight, MoreHorizontal, Check } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: Dashboard,
 });
 
-const RECENT_SESSIONS = [
-  { id: "sess-1", shopper: "Shopper in New York, US", garment: "Obsidian Tailored Blazer", size: "M", time: "2 min ago", status: "Added to Cart ($185)" },
-  { id: "sess-2", shopper: "Shopper in London, UK", garment: "Sage Belgian Linen Shirt", size: "L", time: "7 min ago", status: "Fit Verified (98.6%)" },
-  { id: "sess-3", shopper: "Shopper in Toronto, CA", garment: "Mulberry Silk Slip Dress", size: "S", time: "14 min ago", status: "Added to Cart ($175)" },
-  { id: "sess-4", shopper: "Shopper in Sydney, AU", garment: "Raw Selvedge 14oz Jacket", size: "XL", time: "22 min ago", status: "Shared Preview" },
-];
-
-const TOP_GARMENTS = [
-  { id: "g-1", name: "Obsidian Tailored Blazer", sku: "EB-BLZ-01", category: "Outerwear", tries: 4820, cartRate: "24.6%", returnDrop: "-42%", img: demoAfter },
-  { id: "g-2", name: "Sage Belgian Linen Shirt", sku: "EB-LIN-04", category: "Tops", tries: 3610, cartRate: "21.2%", returnDrop: "-38%", img: demoAfter },
-  { id: "g-3", name: "Mulberry Silk Slip Dress", sku: "EB-DRS-08", category: "Dresses", tries: 2940, cartRate: "28.1%", returnDrop: "-45%", img: demoAfter },
-  { id: "g-4", name: "Raw Selvedge Denim Trucker", sku: "EB-DNM-02", category: "Outerwear", tries: 2150, cartRate: "19.8%", returnDrop: "-34%", img: demoAfter },
-];
-
 function Dashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState<{
-    total_products: number;
-    ready_products: number;
-    total_views: number;
-    total_embeds: number;
-    plan: string;
-    plan_limit: number;
-    ar_slots_used: number;
-    sessions_this_month: number;
-  } | null>(null);
+  const [stats, setStats] = useState<{ total_products: number; ready_products: number; total_views: number; total_embeds: number; plan: string; plan_limit: number; ar_slots_used: number; sessions_this_month: number } | null>(null);
+  const [customizedCount, setCustomizedCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .rpc("get_user_dashboard_stats", { uid: user.id })
-      .then(({ data }) => {
-        if (data) setStats(data as any);
-      });
+    supabase.rpc("get_user_dashboard_stats", { uid: user.id }).then(({ data }) => {
+      if (data) setStats(data as any);
+    });
+    supabase.from("tryon_branding").select("user_id", { count: "exact", head: true }).eq("user_id", user.id).then(({ count, error }) => {
+      if (error) console.warn("[dashboard] failed to count customized try-ons", error);
+      setCustomizedCount(count ?? 0);
+    });
   }, [user]);
 
-  const firstName = user?.user_metadata?.full_name?.split(" ")[0] || "Retailer";
+  const plan = stats?.plan ?? "free";
+  const isPaid = plan !== "free";
+  const slotsUsed = stats?.ar_slots_used ?? 0;
+  const slotLimit = stats?.plan_limit ?? 1;
+  const pct = Math.min(100, (slotsUsed / Math.max(1, slotLimit)) * 100);
+
+  const metrics = [
+    { label: "Total try-ons", value: stats?.total_products ?? 0, delta: "+0%", icon: Box },
+    { label: "Ready", value: stats?.ready_products ?? 0, delta: "Live", icon: TrendingUp },
+    { label: "Try-on views", value: stats?.total_views ?? 0, delta: "+0%", icon: Eye },
+    { label: "Sessions this month", value: stats?.sessions_this_month ?? 0, delta: "+0%", icon: TrendingUp },
+  ];
+
+  const firstName = user?.user_metadata?.full_name?.split(" ")[0];
 
   return (
-    <DashboardShell title="Overview">
-      {/* Top Banner Greeting */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <DashboardShell title="Home">
+      {/* Greeting + primary CTA */}
+      <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-[24px] font-extrabold text-[#0B192C] tracking-tight">
-              Good to see you, {firstName}
-            </h1>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live Store Connected
-            </span>
-          </div>
-          <p className="text-[13px] text-[#64748B] mt-1">
-            Real-time fitting volume, return prevention, and shopper conversion across your store.
-          </p>
+          <h1 className="text-[22px] font-semibold tracking-tight" style={{ color: "#1A1A1A" }}>
+            Good to see you{firstName ? `, ${firstName}` : ""}
+          </h1>
+          <p className="text-[13px] mt-1" style={{ color: "#6B7280" }}>Here's what's happening with your store today.</p>
         </div>
-
-        <div className="flex items-center gap-2.5">
-          <Link
-            to="/try-ar"
-            target="_blank"
-            className="btn-white-secondary text-[12.5px] !py-2 !px-4"
-          >
-            <Eye size={14} className="text-blue-600" /> Preview Shopper Studio
-          </Link>
-          <Link
-            to="/dashboard/upload"
-            className="btn-blue-primary text-[12.5px] !py-2 !px-4"
-          >
-            <Upload size={14} /> Add New SKU
-          </Link>
-        </div>
+        <Link to="/dashboard/upload" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-semibold transition hover:opacity-90"
+          style={{ background: "#1A1A1A", color: "#fff", boxShadow: "0 1px 0 rgba(0,0,0,0.05), inset 0 -1px 0 rgba(255,255,255,0.10)" }}>
+          <Upload size={14} /> New try-on
+        </Link>
       </div>
 
-      {/* 4 Core Advanced Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {/* Metric 1 */}
-        <div className="card-white p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-[#64748B] uppercase">Total Photo Try-Ons</span>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 grid place-items-center">
-              <Sparkles size={16} />
+      {/* Metric tiles */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {metrics.map((m) => (
+          <div key={m.label} className="p-4 rounded-xl"
+            style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] font-medium" style={{ color: "#6B7280" }}>{m.label}</span>
+              <m.icon size={14} style={{ color: "#9CA3AF" }} />
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-[24px] font-semibold tracking-tight" style={{ color: "#1A1A1A" }}>{m.value.toLocaleString()}</span>
+              <span className="text-[11px] font-medium" style={{ color: "#008060" }}>{m.delta}</span>
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-[28px] font-extrabold text-[#0B192C] tracking-tight">
-              {stats?.total_views ? stats.total_views.toLocaleString() : "14,820"}
-            </span>
-            <span className="text-[11.5px] font-bold text-emerald-600">+28.4% MoM</span>
-          </div>
-          <div className="text-[11.5px] text-[#64748B] mt-1">
-            Shopper fitting previews generated
-          </div>
-        </div>
-
-        {/* Metric 2 */}
-        <div className="card-white p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-[#64748B] uppercase">Try-On-to-Cart</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 grid place-items-center">
-              <ShoppingBag size={16} />
-            </div>
-          </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-[28px] font-extrabold text-[#0B192C] tracking-tight">
-              21.8%
-            </span>
-            <span className="text-[11.5px] font-bold text-emerald-600">+5.2x baseline</span>
-          </div>
-          <div className="text-[11.5px] text-[#64748B] mt-1">
-            Shoppers adding item after photo preview
-          </div>
-        </div>
-
-        {/* Metric 3 */}
-        <div className="card-white p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-[#64748B] uppercase">Returns Prevented</span>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 grid place-items-center">
-              <TrendingUp size={16} />
-            </div>
-          </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-[28px] font-extrabold text-[#0B192C] tracking-tight">
-              -38.2%
-            </span>
-            <span className="text-[11.5px] font-bold text-blue-700">$48,200 saved</span>
-          </div>
-          <div className="text-[11.5px] text-[#64748B] mt-1">
-            Reverse shipping & restocking avoided
-          </div>
-        </div>
-
-        {/* Metric 4 */}
-        <div className="card-white p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-[#64748B] uppercase">Active Store SKUs</span>
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 grid place-items-center">
-              <Box size={16} />
-            </div>
-          </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-[28px] font-extrabold text-[#0B192C] tracking-tight">
-              {stats?.total_products || 24} SKUs
-            </span>
-            <span className="text-[11.5px] font-bold text-emerald-600">100% Ready</span>
-          </div>
-          <div className="text-[11.5px] text-[#64748B] mt-1">
-            Enabled for instant photo draping
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Main 2-Column Grid: Left Analytics & Top Products, Right Activity & Embed */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column (lg:col-span-8) */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Fitting Performance Chart Card */}
-          <div className="card-white p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-[16px] font-bold text-[#0B192C]">Daily Fitting Activity</h3>
-                <p className="text-[12px] text-[#64748B]">Photo try-on volume over the last 14 days</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">
-                  Last 14 Days
-                </span>
-              </div>
+      {/* Two column: tasks + plan */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-4">
+        <div className="lg:col-span-2 rounded-xl" style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+          <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #E1E3E5" }}>
+            <div>
+              <h3 className="text-[14px] font-semibold m-0" style={{ color: "#1A1A1A" }}>Setup guide</h3>
+              <p className="text-[12px] m-0 mt-0.5" style={{ color: "#6B7280" }}>Use this personalised guide to get your store up and running.</p>
             </div>
-
-            {/* Visual Simulated Bar Chart */}
-            <div className="h-44 flex items-end gap-2.5 pt-4 pb-2 border-b border-slate-100">
-              {[
-                { day: "Mon", val: 65 },
-                { day: "Tue", val: 82 },
-                { day: "Wed", val: 78 },
-                { day: "Thu", val: 95 },
-                { day: "Fri", val: 110 },
-                { day: "Sat", val: 145 },
-                { day: "Sun", val: 160 },
-                { day: "Mon", val: 130 },
-                { day: "Tue", val: 140 },
-                { day: "Wed", val: 155 },
-                { day: "Thu", val: 175 },
-                { day: "Fri", val: 190 },
-                { day: "Sat", val: 215 },
-                { day: "Sun", val: 230 },
-              ].map((b, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1.5 group cursor-pointer">
-                  <div className="w-full bg-slate-100 rounded-t-md h-36 flex items-end overflow-hidden">
-                    <div
-                      className={`w-full transition-all group-hover:opacity-90 ${
-                        i >= 11
-                          ? "bg-gradient-to-t from-[#1E40AF] to-[#2563EB]"
-                          : "bg-gradient-to-t from-slate-700 to-slate-900"
-                      }`}
-                      style={{ height: `${(b.val / 240) * 100}%` }}
-                    />
+            <button className="w-7 h-7 rounded-md grid place-items-center hover:bg-[#F1F2F4]"><MoreHorizontal size={15} style={{ color: "#6B7280" }} /></button>
+          </div>
+          {(() => {
+            const steps = [
+              { to: "/dashboard/upload", title: "Upload your first product", body: "Add product photos from every angle.", done: (stats?.total_products ?? 0) > 0 },
+              { to: "/dashboard/products", title: "Customize your try-on", body: "Edit name, colors, and branding.", done: customizedCount > 0 },
+              { to: "/dashboard/embed", title: "Add the widget to your store", body: "Copy the Shopify or universal embed code.", done: (stats?.total_views ?? 0) > 0 },
+              { to: "/dashboard/analytics", title: "Track shopper behaviour", body: "See views, sessions, and recommendations.", done: (stats?.sessions_this_month ?? 0) > 0 },
+            ];
+            const doneCount = steps.filter((s) => s.done).length;
+            return (
+              <>
+                <div className="px-5 py-2.5 flex items-center gap-3" style={{ borderBottom: "1px solid #F1F2F4", background: "#FAFBFB" }}>
+                  <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "#E1E3E5" }}>
+                    <div className="h-full rounded-full transition-all" style={{ width: `${(doneCount / steps.length) * 100}%`, background: "#008060" }} />
                   </div>
-                  <span className="text-[9.5px] font-bold text-[#64748B]">{b.day}</span>
+                  <span className="text-[11px] font-semibold" style={{ color: "#6B7280" }}>{doneCount} / {steps.length} done</span>
                 </div>
-              ))}
-            </div>
-
-            <div className="flex items-center justify-between pt-3 text-[12px] text-[#64748B]">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-sm bg-blue-600" /> Current Weekend Surge
-                <span className="w-2.5 h-2.5 rounded-sm bg-slate-800 ml-3" /> Standard Weekday
-              </div>
-              <div className="font-bold text-[#0B192C]">Average 185 try-ons / day</div>
-            </div>
-          </div>
-
-          {/* Top Tried-On Garments Table */}
-          <div className="card-white p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-[16px] font-bold text-[#0B192C]">Top Tried-On Apparel</h3>
-                <p className="text-[12px] text-[#64748B]">Garments driving the highest engagement & cart conversion</p>
-              </div>
-              <Link to="/dashboard/products" className="text-[12px] font-bold text-blue-700 hover:text-blue-800 flex items-center gap-1">
-                View All SKUs <ArrowRight size={13} />
-              </Link>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-[13px]">
-                <thead>
-                  <tr className="border-b border-slate-100 text-[#64748B] text-[11px] uppercase tracking-wider">
-                    <th className="pb-3 font-semibold">Garment</th>
-                    <th className="pb-3 font-semibold">Try-On Volume</th>
-                    <th className="pb-3 font-semibold">Cart Conversion</th>
-                    <th className="pb-3 font-semibold">Return Reduction</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {TOP_GARMENTS.map((g) => (
-                    <tr key={g.id} className="hover:bg-slate-50/60 transition">
-                      <td className="py-3 flex items-center gap-3">
-                        <img src={g.img} alt="" className="w-10 h-10 rounded-lg object-cover object-top border border-slate-200" />
-                        <div>
-                          <div className="font-bold text-[#0B192C]">{g.name}</div>
-                          <div className="text-[11px] text-[#64748B]">{g.sku} • {g.category}</div>
+                <ul>
+                  {steps.map((s, i) => (
+                    <li key={s.to}>
+                      <Link to={s.to} className="flex items-start gap-3 px-5 py-3 hover:bg-[#FAFBFB] transition"
+                        style={{ borderBottom: i < steps.length - 1 ? "1px solid #F1F2F4" : "none" }}>
+                        <span className="mt-0.5 w-5 h-5 rounded-full grid place-items-center text-[10px] font-semibold flex-shrink-0"
+                          style={s.done
+                            ? { background: "#008060", border: "1.5px solid #008060", color: "#fff" }
+                            : { background: "#FFFFFF", border: "1.5px dashed #C9CCD1", color: "#6B7280" }}>
+                          {s.done ? <Check size={11} strokeWidth={3} /> : i + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[13px] font-semibold" style={{ color: "#1A1A1A", textDecoration: s.done ? "line-through" : "none", opacity: s.done ? 0.65 : 1 }}>{s.title}</div>
+                          <div className="text-[12px]" style={{ color: "#6B7280" }}>{s.done ? "Completed" : s.body}</div>
                         </div>
-                      </td>
-                      <td className="py-3 font-bold text-[#0B192C]">{g.tries.toLocaleString()}</td>
-                      <td className="py-3">
-                        <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-[11.5px]">
-                          {g.cartRate}
-                        </span>
-                      </td>
-                      <td className="py-3">
-                        <span className="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-[11.5px]">
-                          {g.returnDrop}
-                        </span>
-                      </td>
-                    </tr>
+                        <ArrowRight size={14} style={{ color: "#9CA3AF" }} className="mt-1" />
+                      </Link>
+                    </li>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                </ul>
+              </>
+            );
+          })()}
         </div>
 
-        {/* Right Column (lg:col-span-4): Live Activity & Embed Widget Quick Card */}
-        <div className="lg:col-span-4 space-y-6">
-          {/* Quick Embed Snippet Card */}
-          <div className="card-deep-blue p-6 relative overflow-hidden">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-sky-300 uppercase tracking-wider">
-                Universal Store Widget
+        {/* Plan card */}
+        <div className="rounded-xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+          <div className="px-5 py-4" style={{ borderBottom: "1px solid #E1E3E5" }}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[14px] font-semibold m-0" style={{ color: "#1A1A1A" }}>Your plan</h3>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider"
+                style={{ background: isPaid ? "#E3F1DF" : "#F1F2F4", color: isPaid ? "#0C5132" : "#4A4A4A" }}>
+                {isPaid && <Crown size={9} />} {plan}
               </span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            </div>
-            <h4 className="text-[18px] font-extrabold text-white">Embed in 60 Seconds</h4>
-            <p className="text-[12.5px] text-slate-300 mt-1">
-              Add the photo try-on button directly to your product pages with one script tag.
-            </p>
-
-            <div className="mt-4 p-3 rounded-xl bg-black/40 border border-white/10 font-mono text-[11px] text-sky-200 truncate">
-              &lt;script src="https://cdn.easibie.com/widget.js" ...&gt;
-            </div>
-
-            <div className="mt-4 flex gap-2">
-              <Link
-                to="/dashboard/embed"
-                className="flex-1 py-2 px-3 rounded-lg bg-white text-[#0B192C] font-bold text-[12px] text-center hover:bg-slate-100 transition"
-              >
-                Configure Widget →
-              </Link>
             </div>
           </div>
-
-          {/* Real-Time Shopper Try-On Stream */}
-          <div className="card-white p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[15px] font-bold text-[#0B192C] flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Live Fitting Stream
-              </h3>
-              <span className="text-[11px] text-[#64748B]">Real-time</span>
+          <div className="px-5 py-4">
+            <div className="text-[12px]" style={{ color: "#6B7280" }}>Try-on slots used</div>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-[22px] font-semibold" style={{ color: "#1A1A1A" }}>{slotsUsed}</span>
+              <span className="text-[12px]" style={{ color: "#6B7280" }}>of {slotLimit}</span>
             </div>
-
-            <div className="space-y-3.5">
-              {RECENT_SESSIONS.map((s) => (
-                <div key={s.id} className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-[12px] space-y-1">
-                  <div className="flex items-center justify-between text-[#64748B]">
-                    <span className="font-semibold text-[#0B192C]">{s.shopper}</span>
-                    <span className="text-[10.5px]">{s.time}</span>
-                  </div>
-                  <div className="text-[11.5px] text-[#475569]">
-                    Tried on <strong>{s.garment}</strong> (Size {s.size})
-                  </div>
-                  <div className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                    <CheckCircle2 size={12} /> {s.status}
-                  </div>
-                </div>
-              ))}
+            <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: "#F1F2F4" }}>
+              <div className="h-full rounded-full" style={{ width: `${pct}%`, background: "#1A1A1A" }} />
             </div>
-
-            <Link
-              to="/dashboard/behaviour"
-              className="mt-4 block text-center text-[12px] font-bold text-blue-700 hover:text-blue-800"
-            >
-              View Full Shopper Analytics →
+            <p className="text-[11px] mt-3" style={{ color: "#9CA3AF" }}>Slots are permanent — deleting a product does not give a slot back.</p>
+            <Link to="/dashboard/billing" className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold" style={{ color: "#005BD3" }}>
+              {isPaid ? "Manage plan" : "Upgrade plan"} <ArrowUpRight size={12} />
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Bottom row: quick links */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+        {[
+          { to: "/dashboard/products", title: "Try-on products", body: "Manage and edit your try-on catalog." },
+          { to: "/dashboard/analytics", title: "Analytics", body: "Sessions, views, conversions, recommendations." },
+          { to: "/dashboard/embed", title: "Embed & share", body: "Shopify Liquid, universal script, iframe." },
+        ].map((q) => (
+          <Link key={q.to} to={q.to} className="p-4 rounded-xl transition hover:border-[#1A1A1A]"
+            style={{ background: "#FFFFFF", border: "1px solid #E1E3E5" }}>
+            <h4 className="text-[13px] font-semibold m-0" style={{ color: "#1A1A1A" }}>{q.title}</h4>
+            <p className="text-[12px] m-0 mt-1" style={{ color: "#6B7280" }}>{q.body}</p>
+            <div className="mt-3 text-[12px] font-semibold inline-flex items-center gap-1" style={{ color: "#005BD3" }}>
+              Open <ArrowRight size={12} />
+            </div>
+          </Link>
+        ))}
       </div>
     </DashboardShell>
   );
